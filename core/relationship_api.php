@@ -61,7 +61,7 @@
  * @subpackage RelationshipAPI
  * @author Marcello Scata' <marcelloscata at users.sourceforge.net> ITALY
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -625,8 +625,8 @@ function relationship_get_details( $p_bug_id, $p_relationship, $p_html = false, 
 
 	# get the information from the related bug and prepare the link
 	$t_bug = bug_get( $t_related_bug_id, false );
-	$t_status_string = get_enum_element( 'status', $t_bug->status );
-	$t_resolution_string = get_enum_element( 'resolution', $t_bug->resolution );
+	$t_status_string = get_enum_element( 'status', $t_bug->status, auth_get_current_user_id(), $t_bug->project_id );
+	$t_resolution_string = get_enum_element( 'resolution', $t_bug->resolution, auth_get_current_user_id(), $t_bug->project_id );
 
 	$t_relationship_info_html = $t_td . string_no_break( $t_relationship_descr ) . '&#160;</td>';
 	if( $p_html_preview == false ) {
@@ -677,7 +677,9 @@ function relationship_get_details( $p_bug_id, $p_relationship, $p_html = false, 
 	$t_relationship_info_text .= "\n";
 
 	if( $p_html_preview == false ) {
-		$t_relationship_info_html = '<tr bgcolor="' . get_status_color( $t_bug->status ) . '">' . $t_relationship_info_html . '</tr>' . "\n";
+		$t_relationship_info_html = '<tr bgcolor="'
+			. get_status_color( $t_bug->status, auth_get_current_user_id(), $t_bug->project_id )
+			. '">' . $t_relationship_info_html . '</tr>' . "\n";
 	} else {
 		$t_relationship_info_html = '<tr>' . $t_relationship_info_html . '</tr>';
 	}
@@ -772,17 +774,17 @@ function relationship_get_summary_text( $p_bug_id ) {
  * @param int $p_bug_id Bug id
  * @return null
  */
-function relationship_list_box( $p_default_rel_type = -1, $p_select_name = "rel_type", $p_include_any = false, $p_include_none = false ) {
+function relationship_list_box( $p_default_rel_type = BUG_REL_ANY, $p_select_name = "rel_type", $p_include_any = false, $p_include_none = false ) {
 	global $g_relationships;
 	?>
 <select name="<?php echo $p_select_name?>">
 <?php if( $p_include_any ) {?>
-<option value="-1" <?php echo( $p_default_rel_type == -1 ? ' selected="selected"' : '' )?>>[<?php echo lang_get( 'any' )?>]</option>
+<option value="<?php echo BUG_REL_ANY ?>" <?php echo( $p_default_rel_type == BUG_REL_ANY ? ' selected="selected"' : '' )?>>[<?php echo lang_get( 'any' )?>]</option>
 <?php
 	}
 
 	if( $p_include_none ) {?>
-<option value="-2" <?php echo( $p_default_rel_type == -2 ? ' selected="selected"' : '' )?>>[<?php echo lang_get( 'none' )?>]</option>
+<option value="<?php echo BUG_REL_NONE ?>" <?php echo( $p_default_rel_type == BUG_REL_NONE ? ' selected="selected"' : '' )?>>[<?php echo lang_get( 'none' )?>]</option>
 <?php
 	}
 
@@ -833,7 +835,7 @@ function relationship_view_box( $p_bug_id ) {
 		<form method="post" action="bug_relationship_add.php">
 		<?php echo form_security_field( 'bug_relationship_add' ) ?>
 		<input type="hidden" name="src_bug_id" value="<?php echo $p_bug_id?>" size="4" />
-		<?php relationship_list_box( -1 )?>
+		<?php relationship_list_box( config_get( 'default_bug_relationship' ) )?>
 		<input type="text" name="dest_bug_id" value="" />
 		<input type="submit" name="add_relationship" class="button" value="<?php echo lang_get( 'add_new_relationship_button' )?>" />
 		</form>

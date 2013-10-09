@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -193,7 +193,7 @@
 		$t_actions[] = 'sponsor';
 	}
 
-	$t_actions[] = 'relationship';
+	$t_actions[] = 'relation';
 
 	$t_statuses = MantisEnum::getAssocArrayIndexedByValues( config_get( 'status_enum_string' ) );
 	foreach( $t_statuses as $t_status ) {
@@ -263,7 +263,7 @@
 			get_capability_row_for_email( lang_get( 'email_on_sponsorship_changed' ), 'sponsor' );
 		}
 
-		get_capability_row_for_email( lang_get( 'email_on_relationship_changed' ), 'relationship' );
+		get_capability_row_for_email( lang_get( 'email_on_relationship_changed' ), 'relation' );
 
 		$t_statuses = MantisEnum::getAssocArrayIndexedByValues( config_get( 'status_enum_string' ) );
 		foreach ( $t_statuses as $t_status => $t_label ) {

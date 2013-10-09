@@ -17,7 +17,7 @@
 /**
  * @package Tests
  * @subpackage UnitTests
- * @copyright Copyright (C) 2002 - 2011  Mantis Team   - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -40,11 +40,12 @@ require_once 'ProjectTest.php';
 require_once 'VersionTest.php';
 require_once 'RelationshipTest.php';
 require_once 'UserTest.php';
+require_once 'TagTest.php';
 
 /**
  * @package    Tests
  * @subpackage UnitTests
- * @copyright Copyright (C) 2002 - 2011  Mantis Team   - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 class Soap_AllTests extends PHPUnit_Framework_TestSuite
@@ -77,6 +78,7 @@ class Soap_AllTests extends PHPUnit_Framework_TestSuite
 	    $suite->addTestSuite('VersionTest');
 	    $suite->addTestSuite('RelationshipTest');
 	    $suite->addTestSuite('UserTest');
+	    $suite->addTestSuite('TagTest');
 
         return $suite;
     }

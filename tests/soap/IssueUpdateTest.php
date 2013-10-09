@@ -17,7 +17,7 @@
 /**
  * @package Tests
  * @subpackage UnitTests
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -112,6 +112,7 @@ class IssueUpdateTest extends SoapBase {
 		$this->deleteAfterRun( $issueId );
 
 		$issueToUpdate = $this->getIssueToAdd( 'IssueUpdateTest.testUpdateSummaryBasedOnMandatoryFields' );
+		$issueToUpdate['sticky'] = true;
 
 		$this->client->mc_issue_update(
 			$this->userName,
@@ -131,6 +132,7 @@ class IssueUpdateTest extends SoapBase {
 		$this->assertEquals( $issueToUpdate['summary'], $issue->summary );
 		$this->assertEquals( $issueToUpdate['description'], $issue->description );
 		$this->assertEquals( $issueToUpdate['project']['id'], $issue->project->id );
+		$this->assertEquals( $issueToUpdate['sticky'], $issue->sticky );
 
 		// defaulted fields
 		$this->assertEquals( $issueId, $issue->id );
@@ -290,7 +292,7 @@ class IssueUpdateTest extends SoapBase {
 	public function testUpdateIssueDueDate() {
 		$this->skipIfDueDateIsNotEnabled();
 		
-		$date = '2015-10-29T12:59:14Z';
+		$date = '2015-10-29T12:59:14+00:00';
 
 		$issueToAdd = $this->getIssueToAdd( 'IssueUpdateTest.testUpdateIssueDueDate' );
 
@@ -457,5 +459,86 @@ class IssueUpdateTest extends SoapBase {
 		$this->assertEquals( 'platform', $retrievedIssue->platform );
 		$this->assertEquals( 'os', $retrievedIssue->os );
 		$this->assertEquals( 'os_build', $retrievedIssue->os_build);
-	}	
+	}
+
+	public function testUpdateWithTagOperations() {
+		
+		// initialise tags
+		$tagId1 = $this->client->mc_tag_add( $this->userName, $this->password, array (
+			'name' => 'IssueUpdateTest.testUpdateWithTagAdditions'
+		));
+		$this->deleteTagAfterRun( $tagId1 );
+		
+		$tagId2 = $this->client->mc_tag_add( $this->userName, $this->password, array (
+			'name' => 'IssueUpdateTest.testUpdateWithTagAdditions2'
+		));
+		$this->deleteTagAfterRun( $tagId2 );
+		
+		$tag1 = new stdClass();
+		$tag1->id = $tagId1;
+		
+		$tag2 = new stdClass();
+		$tag2->id = $tagId2;
+		
+		// create issue
+		$issueToAdd = $this->getIssueToAdd( 'IssueUpdateTest.testUpdateWithRareFields' );
+		$issueId = $this->client->mc_issue_add( $this->userName, $this->password, $issueToAdd);
+		$this->deleteAfterRun( $issueId );
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		
+		// update from 0 to 2 tags -> test attaching tags
+		$issue->tags = array ( $tag1, $tag2 );
+		$this->client->mc_issue_update( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		self::assertEquals(2, count ( $issue->tags ) );
+		
+		// update from 2 to 1 tags -> test partially detaching tags
+		$issue->tags = array ( $tag1 );
+		$this->client->mc_issue_update( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		self::assertEquals(1, count ( $issue->tags ) );
+
+		// update from 1 to 2 tags -> test partially attaching tags 
+		$issue->tags = array ( $tag1, $tag2 );
+		$this->client->mc_issue_update( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		self::assertEquals(2, count ( $issue->tags ) );
+		
+		// update from 2 to 0 tags -> test detaching tags
+		$issue->tags = array();
+		$this->client->mc_issue_update( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		self::assertEquals(0, count ( $issue->tags ) );
+	}
+	
+	public function testUpdateWithMonitors() {
+		
+		// create issue
+		$issueToAdd = $this->getIssueToAdd( 'IssueUpdateTest.testUpdateWithMonitors' );
+		$issueId = $this->client->mc_issue_add( $this->userName, $this->password, $issueToAdd);
+		$this->deleteAfterRun( $issueId );
+		
+		// fresh issue -> no monitors exist
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId );
+		self::assertEquals(0, count ( $issue->monitors ));
+		
+		// update with this user as monitor -> should be added
+		$issue->monitors = array ( array ( 'id' => $this->userId));
+		$this->client->mc_issue_update ( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId);
+		self::assertEquals( 1, count($issue->monitors) );
+		self::assertEquals($this->userId, $issue->monitors[0]->id );
+		
+		// update with same monitor list -> should be preserved
+		$this->client->mc_issue_update ( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId);
+		self::assertEquals( 1, count($issue->monitors) );
+		self::assertEquals($this->userId, $issue->monitors[0]->id );
+		
+		// update with empty monitor list -> should be removed
+		$issue->monitors = array();
+		$this->client->mc_issue_update ( $this->userName, $this->password, $issueId, $issue);
+		$issue = $this->client->mc_issue_get( $this->userName, $this->password, $issueId);
+		self::assertEquals( 0, count($issue->monitors) );
+	}
 }

@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Interlingua (Interlingua)
+/** Interlingua (interlingua)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -123,6 +123,8 @@ $s_select_option = '(seliger)';
 $s_bug_actiongroup_access = 'Tu non habeva le permissiones necessari pro exequer iste action.';
 $s_bug_actiongroup_status = 'Iste problema non pote esser cambiate al stato requestate';
 $s_bug_actiongroup_category = 'Iste problema non pote esser cambiate al categoria requestate';
+$s_bug_actiongroup_handler = 'Le usator requestate non ha le permission de tractar iste problema';
+$s_bug_actiongroup_version = 'Le version requestate non existe in le projecto de iste problema';
 $s_close_bugs_conf_msg = 'Es tu secur de voler clauder iste problemas?';
 $s_delete_bugs_conf_msg = 'Es tu secur de voler deler iste problemas?';
 $s_move_bugs_conf_msg = 'Displaciar problemas verso';
@@ -165,7 +167,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Il habeva un error in tu reporto.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Nulle file specificate.';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Iste typo de file non es permittite.';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Le directorio non existe. Per favor verifica le configuration del projecto.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Isto es un file duplicate. Per favor dele primo le file.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Existe ja un projecto con iste nomine.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Le campo obligatori "%1$s" esseva vacue. Per favor verifica tu entrata.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Iste conto es protegite. Tu non ha le permission de acceder a illo usque le protection del conto es levate.';
@@ -211,6 +212,7 @@ $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE] = 'Isto e un nomine duplicate.
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_IN_USE] = 'Al minus un projecto usa ancora iste campo.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_VALUE] = 'Valor invalide pro campo "%1$s".';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_DEFINITION] = 'Definition de campo personalisate invalide.';
+$MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_PROPERTY] = 'Proprietate de campo personalisate non valide (%1$s).';
 $MANTIS_ERROR[ERROR_LDAP_AUTH_FAILED] = 'Authentication LDAP fallite.';
 $MANTIS_ERROR[ERROR_LDAP_SERVER_CONNECT_FAILED] = 'Connexion al servitor LDAP fallite.';
 $MANTIS_ERROR[ERROR_LDAP_UPDATE_FAILED] = 'Actualisation de registro LDAP fallite.';
@@ -223,6 +225,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = 'Existe ja un categoria con iste nomin
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = 'Nulle action de copia esseva specificate.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = 'Categoria non trovate.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = 'Categoria "%1$s" non trovate pro le projecto "%2$s".';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = 'Iste categoria non pote esser delite perque illo es definite como "categoria predefinite pro displaciamentos".';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'Existe ja un version con iste nomine.';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Version "%1$s" non trovate.';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = 'Le nomine de usator es invalide. Le nomines de usator pote solmente continer litteras latin, numeros, spatios, tractos de union, punctos, signos plus e tractos de sublineamento.';
@@ -261,6 +264,7 @@ $MANTIS_ERROR[ERROR_EVENT_UNDECLARED] = 'Le evento "%1$s" non ha ancora essite d
 $MANTIS_ERROR[ERROR_PLUGIN_NOT_REGISTERED] = 'Le plug-in non es registrate in MantisBT.';
 $MANTIS_ERROR[ERROR_PLUGIN_ALREADY_INSTALLED] = 'Le plug-in es ja installate.';
 $MANTIS_ERROR[ERROR_PLUGIN_PAGE_NOT_FOUND] = 'Pagina de plug-in non trovate.';
+$MANTIS_ERROR[ERROR_PLUGIN_INSTALL_FAILED] = 'Le installation del plug-in ha fallite: %1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_UPGRADE_FAILED] = 'Le actualisation del schema de plug-in falleva in le bloco #%1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_GENERIC] = 'Il habeva un error incognite "%1$s" durante le execution del plug-in "%2$s".';
 $MANTIS_ERROR[ERROR_COLUMNS_DUPLICATE] = 'Le campo "%1$s" contine un columna duplicate "%2$s".';
@@ -268,7 +272,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'Le campo "%1$s" contine un campo invalid
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Gestor de session invalide.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'Variabile de session "%1$s" non trovate.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'Tu session ha devenite invalide.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Indicio de securitate del formulario invalide. Submitteva tu le formulario duo vices per accidente?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Le indicio de securitate del formulario es invalide. Isto pote esser causate per un expiration del session, o per submitter le formulario duo vices per accidente.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Non es possibile acceder a iste pagina usante iste methodo.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Campo de ordinamento invalide.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Formato de data invalide.';
@@ -458,8 +462,11 @@ $s_monitor_bug_button = 'Surveliar';
 $s_unmonitor_bug_button = 'Finir surveliantia';
 $s_file_upload_msg = 'File incargate con successo.';
 $s_upload_file = 'Incargar file';
+$s_upload_files = 'Incargar files';
 $s_select_file = 'Seliger file';
+$s_select_files = 'Seliger files';
 $s_upload_file_button = 'Incargar file';
+$s_upload_files_button = 'Incargar files';
 $s_max_file_size = 'Dimension maxime';
 $s_bug_reopened_msg = 'Le problema ha essite reaperite...';
 $s_reopen_add_bugnote_title = 'Adder nota con motivo pro reaperir problema';
@@ -473,7 +480,9 @@ $s_from = 'De';
 $s_to = 'A';
 $s_sent_you_this_reminder_about = 'te inviava iste rememoration sur';
 $s_bug_reminder = 'Inviar un rememoration';
-$s_reminder_sent_to = 'Rememoration inviate a:';
+$s_reminder_sent_to = 'Rememoration inviate a';
+$s_reminder_sent_none = 'Nulle rememoration ha potite esser inviate';
+$s_reminder_list_truncated = 'lista de destinatarios truncate; vide le historia de problemas pro le lista complete';
 $s_bug_send_button = 'Inviar';
 $s_reminder = 'Rememoration';
 $s_reminder_explain = 'Iste nota essera inviate al destinatarios listate como requestante commentario sur iste problema.';
@@ -586,6 +595,7 @@ $s_protected = 'Protegite';
 $s_create_user_button = 'Crear usator';
 $s_hide_disabled = 'Celar disactivates';
 $s_filter_button = 'Applicar filtro';
+$s_default_filter = 'Filtro predefinite';
 $s_create_filter_link = 'Crear permaligamine';
 $s_create_short_link = 'Crear ligamine curte';
 $s_filter_permalink = 'Ecce un ligamine permanente al filtro actualmente configurate:';
@@ -608,6 +618,7 @@ $s_1_week_title = '1 septimana';
 $s_never_logged_in_title = 'Nunquam aperiva session';
 $s_prune_accounts = 'Purgar contos';
 $s_hide_inactive = 'Celar inactives';
+$s_show_disabled = 'Monstrar disactivates';
 $s_manage_accounts_title = 'Gerer contos';
 $s_date_created = 'Data de creation';
 $s_last_visit = 'Ultime visita';
@@ -759,6 +770,7 @@ $s_accounts_pruned_msg = 'Tote le contos que nunquam ha aperite session e es plu
 $s_prune_accounts_button = 'Purgar';
 $s_confirm_account_pruning = 'Es tu secur de voler deler vetule contos que nunquam ha aperite session?';
 $s_edit_user_title = 'Modificar usator';
+$s_account_unlock_button = 'Disblocar conto';
 $s_reset_password_button = 'Reinitialisar contrasigno';
 $s_delete_user_button = 'Deler usator';
 $s_reset_password_msg = 'Le reinitialisation del contrasigno invia le URL de confirmation via e-mail.';
@@ -769,7 +781,8 @@ $s_users_new = 'Nove';
 $s_account_reset_protected_msg = 'Conto protegite. Non pote reinitialisar le contrasigno.';
 $s_account_reset_msg = 'Un requesta de confirmation ha essite inviate al adresse de e-mail del usator seligite. Usante iste, le usator potera cambiar su contrasigno.';
 $s_account_reset_msg2 = 'Le contrasigno del conto ha essite mittite in blanco...';
-$s_manage_user_protected_msg = 'Conto protegite. Nivello de accesso e activation protegite. Pro le resto, le conto ha essite actualisate...';
+$s_account_unlock_msg = 'Le conto ha essite disblocate.';
+$s_manage_user_protected_msg = 'Conto protegite; le campos \'Nivello de accesso\' e \'Activate\' non pote esser modificate. Le altere campos ha essite actualisate con successo.';
 $s_manage_user_updated_msg = 'Conto actualisate con successo...';
 $s_email_user_updated_subject = 'Conto actualisate';
 $s_email_user_updated_msg = 'Tu conto ha essite actualisate per un administrator. Un lista de iste cambios se trova hic infra. Tu pote actualisar le detalios e preferentias de tu conto a qualcunque momento via le sequente URL:';
@@ -783,7 +796,7 @@ $s_account_link = 'Mi conto';
 $s_users_link = 'Usatores';
 $s_manage_link = 'Gerer';
 $s_edit_news_link = 'Modificar novas';
-$s_docs_link = 'Documentos';
+$s_docs_link = 'Documentation';
 $s_logout_link = 'Clauder session';
 $s_my_view_link = 'Mi vista';
 $s_my_view_title_unassigned = 'Non assignate';
@@ -915,6 +928,9 @@ $s_sort = 'Ordinar per';
 $s_issue_id = 'Problema №';
 $s_recently_visited = 'Recentemente visitate';
 $s_note_user_id = 'Nota per';
+$s_filter_match_type = 'Typo de correspondentia';
+$s_filter_match_all = 'Tote le conditiones';
+$s_filter_match_any = 'Qualcunque condition';
 $s_none = 'nulle';
 $s_current = 'actual';
 $s_search = 'Cercar';
@@ -953,6 +969,7 @@ $s_update_bug_button = 'Modificar';
 $s_bug_assign_to_button = 'Assignar a:';
 $s_bug_status_to_button = 'Cambiar stato in:';
 $s_reopen_bug_button = 'Reaperir';
+$s_close_bug_button = 'Clauder';
 $s_move_bug_button = 'Displaciar';
 $s_attached_files = 'Files annexate';
 $s_publish = 'Publicar';
@@ -1048,6 +1065,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>Attention:</b> Non to
 $s_create_child_bug_button = 'Clonar';
 $s_bug_cloned_to = 'Problema clonate';
 $s_bug_created_from = 'Problema generate ex';
+$s_copy_from_parent = 'Copiar le datos extendite del problema genitor';
+$s_copy_notes_from_parent = 'Copiar le notas del problema';
+$s_copy_attachments_from_parent = 'Copiar le annexos';
 $s_viewing_bug_relationship_graph_title = 'Graphico de relationes';
 $s_viewing_bug_dependency_graph_title = 'Graphico de dependentias';
 $s_relation_graph = 'Graphico de relationes';
@@ -1086,7 +1106,7 @@ $s_delete_attachments = 'Deler annexos';
 $s_delete_attachment_button = 'Deler';
 $s_delete_attachment_sure_msg = 'Es tu secur de voler deler iste annexo?';
 $s_upload_issue_attachments = 'Incargar annexos a problemas';
-$s_filters = 'filtros';
+$s_filters = 'Filtros';
 $s_save_filters = 'Salveguardar filtros';
 $s_save_filters_as_shared = 'Salveguardar filtros pro uso in commun';
 $s_use_saved_filters = 'Usar filtros salveguardate';
@@ -1108,6 +1128,7 @@ $s_handle_sponsored_issue = 'Manear problema sponsorisate';
 $s_others = 'Alteres';
 $s_see_email_addresses_of_other_users = 'Vider adresses de e-mail de altere usatores';
 $s_send_reminders = 'Inviar rememorationes';
+$s_receive_reminders = 'Reciper rememorationes';
 $s_add_profiles = 'Adder profilos';
 $s_notify_of_new_user_created = 'Notificar creation de nove usatores';
 $s_email_notification = 'Notification per e-mail';

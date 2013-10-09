@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Swedish (Svenska)
+/** Swedish (svenska)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -25,6 +25,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Fader
  * @author Lokal Profil
  * @author McDutchie
  * @author Najami
@@ -33,6 +34,9 @@
  * @author Skalman
  * @author Thomas Sjogren <thomas.sjogren@multicomsecurity.se>
  * @author Thosjo
+ * @author Tor.klingberg
+ * @author Warrakkk
+ * @author WikiPhoenix
  */
 
 $s_actiongroup_menu_move = 'Flytta';
@@ -130,6 +134,8 @@ $s_select_option = '(välj)';
 $s_bug_actiongroup_access = 'Du hade inte tillräckliga rättigheter för att utföra åtgärden.';
 $s_bug_actiongroup_status = 'Detta ärende kan inte ändras till den valda statusen.';
 $s_bug_actiongroup_category = 'Detta ärende kan inte ändras till den valda kategorin';
+$s_bug_actiongroup_handler = 'Den begärda användaren tillåts inte hantera denna fråga';
+$s_bug_actiongroup_version = 'Den begärda versionen existerar inte i denna frågas projekt';
 $s_close_bugs_conf_msg = 'Är du säker på att du vill stänga dessa ärenden?';
 $s_delete_bugs_conf_msg = 'Är du säker på att du vill ta bort dessa ärenden?';
 $s_move_bugs_conf_msg = 'Flytta ärenden till';
@@ -172,7 +178,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Det fanns ett fel i din rapport.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Ingen fil angiven';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Filtypen är inte tillåten';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Katalogen finns inte. Var god kontrollera projektinställningarna.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Filen finns redan.  Var god ta bort den andra filen först.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Ett projekt med det namnet finns redan.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Det obligatoriska fältet "%1$s" var tomt. Var god kontrollera din inmatning.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Detta konto är skyddat.  Du har inte tillgång till det innan skyddet är borttaget.';
@@ -218,6 +223,7 @@ $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE] = 'Detta namnet är inte unikt
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_IN_USE] = 'Fältet används av åtminstone ett annat projekt.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_VALUE] = 'Ogiltigt fältvärde för "1$s".';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_DEFINITION] = 'Felaktig definition av egendefinierat fält';
+$MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_PROPERTY] = 'Ogiltig anpassad fältegenskap (%1$s).';
 $MANTIS_ERROR[ERROR_LDAP_AUTH_FAILED] = 'LDAP-autentisering misslyckades,';
 $MANTIS_ERROR[ERROR_LDAP_SERVER_CONNECT_FAILED] = 'Anslutningen till LDAP-servern misslyckades';
 $MANTIS_ERROR[ERROR_LDAP_UPDATE_FAILED] = 'Uppdatering av LDAP-posten misslyckades.';
@@ -230,6 +236,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = 'Kategorin finns redan.';
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = 'Ingen kopieringsändring angiven.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = 'Kategorin finns inte.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = 'Kategori "%1$s" hittades inte i projekt "%2$s".';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = 'Denna kategori kan inte raderas, eftersom den definieras som "Standardkategori för flyttningar".';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'Versionen finns redan.';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Versionen "%1$s" hittas inte.';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = 'Användarnamnet är ogiltigt. Användarnamn får enbart innehålla latinska bokstäver, siffror, mellanslag, bindestreck, punkter, plustecken och understreck.';
@@ -268,6 +275,7 @@ $MANTIS_ERROR[ERROR_EVENT_UNDECLARED] = 'Händelse "%1$s" har ännu inte blivit 
 $MANTIS_ERROR[ERROR_PLUGIN_NOT_REGISTERED] = 'Insticksprogrammet är inte registrerat hos MantisBT.';
 $MANTIS_ERROR[ERROR_PLUGIN_ALREADY_INSTALLED] = 'Insticksprogrammet är redan installerat.';
 $MANTIS_ERROR[ERROR_PLUGIN_PAGE_NOT_FOUND] = 'Sidan för insticksprogrammet kunde inte hittas.';
+$MANTIS_ERROR[ERROR_PLUGIN_INSTALL_FAILED] = 'Plugin-installation misslyckades: %1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_UPGRADE_FAILED] = 'Uppgraderingen av insticksprogrammets schema misslyckades i block #%1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_GENERIC] = 'Okänt fel "%1$s" vid exekvering av insticksprogrammet "%2$s".';
 $MANTIS_ERROR[ERROR_COLUMNS_DUPLICATE] = 'Fält "%1$s" innehåller duplicerade kolumner "%2$s".';
@@ -275,7 +283,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'Fält "%1$s" innehåller ogiltigt fält 
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Ogiltig sessionshanterare.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'Sessionsvariabel "%1$s" hittades inte.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'Din session är inte längre giltig.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Ogiltigt säkerhetselement.  Sände du in formuläret två gånger av misstag?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Ogiltigt säkerhetsnyckel för formuläret. Detta kan bero på en utgången session, eller att formuläret av misstag skickats två gånger.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Denna sida kan inte besökas med den här metoden.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Ogiltigt sorteringsfält.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Ogiltigt datumformat.';
@@ -465,8 +473,11 @@ $s_monitor_bug_button = 'Bevaka';
 $s_unmonitor_bug_button = 'Sluta bevaka ärendet';
 $s_file_upload_msg = 'Filskickningen lyckades';
 $s_upload_file = 'Skicka in fil';
+$s_upload_files = 'Ladda upp filer';
 $s_select_file = 'Välj fil';
+$s_select_files = 'Välj filer';
 $s_upload_file_button = 'Skicka fil';
+$s_upload_files_button = 'Ladda upp filer';
 $s_max_file_size = 'Maximal storlek';
 $s_bug_reopened_msg = 'Ärendet har återöppnats...';
 $s_reopen_add_bugnote_title = 'Lägg till meddelande om anledning till återöppning';
@@ -480,13 +491,17 @@ $s_from = 'Från';
 $s_to = 'Till';
 $s_sent_you_this_reminder_about = 'har skickat denna påminnelse till dig angående';
 $s_bug_reminder = 'Skicka en påminnelse';
-$s_reminder_sent_to = 'Påminnelse skickad till:';
+$s_reminder_sent_to = 'Påminnelse skickad till';
+$s_reminder_sent_none = 'Inga påminnelser kunde skickas';
+$s_reminder_list_truncated = 'mottagarlistan trunkerad, se Ärendehistorik för fullständig lista';
 $s_bug_send_button = 'Skicka';
 $s_reminder = 'Påminnelse';
 $s_reminder_explain = 'Meddelandet kommer att skickas till mottagare som begärt återkoppling till detta ärende.';
 $s_reminder_monitor = 'Mottagarna kommer också börja bevaka ärendet. De kan sluta bevaka det genom att använda motsvarande knapp.';
 $s_reminder_store = 'Detta meddelande kommer att sparas med ärendet.';
 $s_confirm_sponsorship = 'Bekräfta att du vill sponsra ärende %1$d med %2$s.';
+$s_stick_bug_button = 'Fästa';
+$s_unstick_bug_button = 'Avfästa';
 $s_bug_updated_msg = 'Ärendet har uppdaterats...';
 $s_back_to_bug_link = 'Tillbaka till ärende';
 $s_update_simple_link = 'Uppdatera enkel';
@@ -523,6 +538,8 @@ $s_view_revisions = 'Visa revisioner';
 $s_revision = 'Revision';
 $s_revision_by = '%1$s av %2$s';
 $s_revision_drop = 'Släpp';
+$s_bug_revision_dropped_history = 'Buggrevision tappad';
+$s_bugnote_revision_dropped_history = 'Kommentarsrevision tappad';
 $s_all_revisions = 'Alla revisioner';
 $s_back_to_issue = 'Tillbaka till ärende';
 $s_confirm_revision_drop = 'Är du säker på att du vill släppa denna ärenderevision?';
@@ -578,6 +595,7 @@ $s_site_information = 'Site information';
 $s_mantis_version = 'Version av MantisBT';
 $s_schema_version = 'Version av schema';
 $s_site_path = 'Sökväg till webbplats';
+$s_core_path = 'Coresökväg';
 $s_plugin_path = 'Sökväg till insticksmoduler';
 $s_created_user_part1 = 'Skapade användare';
 $s_created_user_part2 = 'med åtkomstnivån';
@@ -588,6 +606,7 @@ $s_protected = 'Skyddad';
 $s_create_user_button = 'Skapa konto';
 $s_hide_disabled = 'Göm avaktiverade';
 $s_filter_button = 'Filtrera';
+$s_default_filter = 'Standardfilter';
 $s_create_filter_link = 'Skapa permalänk';
 $s_create_short_link = 'Skapa kort länk';
 $s_filter_permalink = 'Följande är en permanent länk till följande konfigurerade filter:';
@@ -610,6 +629,7 @@ $s_1_week_title = '1 vecka';
 $s_never_logged_in_title = 'Har aldrig loggat in';
 $s_prune_accounts = 'Ta bort inaktiva konton';
 $s_hide_inactive = 'Göm inaktiva';
+$s_show_disabled = 'Visa avaktiverade';
 $s_manage_accounts_title = 'Hantera konton';
 $s_p = 'Skyddad';
 $s_date_created = 'Skapad';
@@ -762,6 +782,7 @@ $s_accounts_pruned_msg = 'Alla konton som aldrig loggat in och är äldre än en
 $s_prune_accounts_button = 'Ta bort';
 $s_confirm_account_pruning = 'Är du säker på att du vill ta bort äldre konton som aldrig loggat in?';
 $s_edit_user_title = 'Redigera användarkonto';
+$s_account_unlock_button = 'Låsa upp konto';
 $s_reset_password_button = 'Nollställ lösenord';
 $s_delete_user_button = 'Ta bort kontot';
 $s_reset_password_msg = 'Nollställ lösenord skickar godkännandelänk via e-post.';
@@ -772,7 +793,8 @@ $s_users_new = 'NY';
 $s_account_reset_protected_msg = 'Kontot skyddat. Kan inte nollställa lösenordet.';
 $s_account_reset_msg = 'Godkännandelänk har blivit skickat till angiven användares e-postadress. Med hjälp av denna kommer användaren att kunna ändra sitt lösenord.';
 $s_account_reset_msg2 = 'Lösenordet är tomt...';
-$s_manage_user_protected_msg = 'Kontot skyddat. Åtkomstnivå och aktivering skyddade. Utöver det har kontot uppdaterats...';
+$s_account_unlock_msg = 'Kontot har låsts upp.';
+$s_manage_user_protected_msg = 'Kontot är skyddat. Fälten \'Åtkomstnivå\' och \'Aktivering\' kan inte ändras. Andra fält har uppdaterats...';
 $s_manage_user_updated_msg = 'Kontot uppdaterat...';
 $s_email_user_updated_subject = 'Användarkonto uppdaterat';
 $s_email_user_updated_msg = 'Ditt konto har blivit uppdaterat av en administrator. En lista av ändringar är bifogad nedanför. Du kan uppdatera dina kontodetaljer och preferenser när du önskar genom att besöka följande URL:';
@@ -919,6 +941,9 @@ $s_issue_id = 'Ärende #';
 $s_recently_visited = 'Senast besökta';
 $s_priority_abbreviation = 'P';
 $s_note_user_id = 'Meddelande av';
+$s_filter_match_type = 'Matchningstyp';
+$s_filter_match_all = 'Alla villkor';
+$s_filter_match_any = 'Vilket villkor som helst';
 $s_none = 'ingen';
 $s_current = 'nuvarande';
 $s_search = 'Sök';
@@ -957,6 +982,7 @@ $s_update_bug_button = 'Modifiera';
 $s_bug_assign_to_button = 'Tilldela till:';
 $s_bug_status_to_button = 'Ändra status till:';
 $s_reopen_bug_button = 'Återöppna';
+$s_close_bug_button = 'Stäng';
 $s_move_bug_button = 'Flytta';
 $s_attached_files = 'Associerade filer';
 $s_publish = 'Publicera';
@@ -1054,6 +1080,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>VARNING</b>. Alla bar
 $s_create_child_bug_button = 'Klon';
 $s_bug_cloned_to = 'Ärende klonat';
 $s_bug_created_from = 'Ärende skapat från';
+$s_copy_from_parent = 'Kopiera utökad data från föräldrabuggen';
+$s_copy_notes_from_parent = 'Kopiera buggnoteringar';
+$s_copy_attachments_from_parent = 'Kopiera bilagor';
 $s_viewing_bug_relationship_graph_title = 'Graf över relationer';
 $s_viewing_bug_dependency_graph_title = 'Beroendegraf';
 $s_relation_graph = 'Graf över relationer';
@@ -1092,7 +1121,7 @@ $s_delete_attachments = 'Ta bort bilagor';
 $s_delete_attachment_button = 'Ta bort';
 $s_delete_attachment_sure_msg = 'Är du säker på att du vill ta bort denna bilaga?';
 $s_upload_issue_attachments = 'Skicka bilaga till ärende';
-$s_filters = 'filter';
+$s_filters = 'Filter';
 $s_save_filters = 'Spara filter';
 $s_save_filters_as_shared = 'Spara filter som delade';
 $s_use_saved_filters = 'Använda sparade filter';
@@ -1114,6 +1143,7 @@ $s_handle_sponsored_issue = 'Hantera sponsrat ärende';
 $s_others = 'ANNAT';
 $s_see_email_addresses_of_other_users = 'Se e-postadresser till andra användare';
 $s_send_reminders = 'Skicka påminnelser';
+$s_receive_reminders = 'Få påminnelser';
 $s_add_profiles = 'Lägg till profiler';
 $s_notify_of_new_user_created = 'Meddela nyskapade användare';
 $s_email_notification = 'E-postpåminnelse';
@@ -1165,8 +1195,9 @@ $s_tag_related_issues = 'Delade ärenden (%1$s)';
 $s_tag_stats_attached = 'Kopplade ärenden: %1$s';
 $s_tag_create = 'Skapa tagg';
 $s_show_all_tags = 'Alla';
-$s_time_tracking_billing_link = 'Kostnadsberäkning';
+$s_time_tracking_billing_link = 'Tidsspårning';
 $s_time_tracking = 'Tidsåtgång';
+$s_time_tracking_time_spent = 'Spenderad tid:';
 $s_time_tracking_get_info_button = 'Hämta information om tidsåtgång';
 $s_time_tracking_cost_per_hour = 'Kostnad / Timme';
 $s_time_tracking_cost = 'Kostnad';

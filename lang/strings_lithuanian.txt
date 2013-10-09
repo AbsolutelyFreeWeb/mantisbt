@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Lithuanian (Lietuvių)
+/** Lithuanian (lietuvių)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -171,7 +171,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Jūsų pranešime yra klaida.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Nenurodėte failo';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Neleistinas failo tipas';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Šis katalogas neegzistuoja. Prašome patikrinti projekto nustatymus.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Toks failas jau yra.  Prašome pirmiau ištrinti seną failą.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Projektas tokiu pavadinimu jau yra.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Privalomas laukas \'%1$s\' tuščias.  Prašome užpildyti iki galo.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Šis vartotojas apsaugotas.  Jūs neturite teisių prie jo prieiti, kol apsauga nebus išjungta.';
@@ -1058,6 +1057,7 @@ $s_vertical = 'Vertikalus';
 $s_horizontal = 'Horizontalus';
 $s_view_issue = 'Peržiūrėti klaidas';
 $s_checkin = 'Patikrinimas';
+$s_perm_rpt_capability = 'Pajėgumas';
 $s_view = 'Žiūrėti';
 $s_issues = 'Klaidos';
 $s_report_issue = 'Pranešti apie problemą';
@@ -1153,6 +1153,7 @@ $s_time_tracking_stopwatch_reset = 'Iš naujo';
 $s_access_denied = 'Neleidžiama.';
 $s_development_team = 'Kūrimo komanda';
 $s_manage_columns_config = 'Valdyti stulpelius';
+$s_csv_columns_title = 'CSV stulpeliai';
 $s_copy_columns_from = 'Kopijuoti stulpelius iš';
 $s_copy_columns_to = 'Kopijuoti stulpelius į';
 $s_view_account_title = 'Vartotojo informacija';

@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Latvian (Latviešu)
+/** Latvian (latviešu)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -25,6 +25,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Papuass
  * @author Sergis Kanters, "kanters at yahoo dot com"
  */
 
@@ -117,7 +118,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Jūsu ziņojumā konstatētas kļūdas.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Fails neeksistē';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Šādi faili ir aizliegti';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Katalogs neeksistē. Pārbaudiet projekta opcijas.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Faila dublikāts. Vispirms izdzēsiet veco failu.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Projekts ar šādu nosaukumu jau eksistē.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Nav aizpildīti visi lauki.  Pārbaudiet ievades pareizību.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Šis lietotājs ir aizsargāts. Jūs nevarat labot opcijas.';
@@ -180,7 +180,7 @@ $s_account_removed_msg = 'Jūsu lietotājs tika izdzēsts...';
 $s_confirm_delete_msg = 'Vai esat pārliecināti, ka vēlaties sevi dzēst no sistēmas?';
 $s_delete_account_button = 'Lietotāja dzēšana';
 $s_manage_profiles_link = 'Profilu vadība';
-$s_change_preferences_link = 'Opcijas';
+$s_change_preferences_link = 'Izvēles';
 $s_edit_account_title = 'Lietotāja konta labošana';
 $s_username = 'Lietotājs';
 $s_email = 'E-pasts';
@@ -222,7 +222,7 @@ $s_edit_profile = 'Profila labošana';
 $s_make_default = 'Izveidot profilu';
 $s_delete_profile = 'Dzēst profilu';
 $s_select_profile = 'Izvēlēties profilu';
-$s_submit_button = 'Nosūtīt';
+$s_submit_button = 'Iesniegt';
 $s_profile_updated_msg = 'Profils saglabāts...';
 $s_account_updated_msg = 'Lietotāja konts saglabāts...';
 $s_email_updated = 'Email address successfully updated';
@@ -315,7 +315,7 @@ $s_enabled = 'Atļauts';
 $s_protected = 'Aizsargāts konts';
 $s_create_user_button = 'Izveidot';
 $s_hide_disabled = 'Slēpt bloķētos';
-$s_filter_button = 'Atlasīt';
+$s_filter_button = 'Pielietot filtru';
 $s_manage_users_link = 'Lietotāju vadība';
 $s_manage_projects_link = 'Projektu vadība';
 $s_manage_custom_field_link = 'Custom lauku noteikšana';
@@ -357,7 +357,7 @@ $s_categories = 'Kategorijas';
 $s_add_category_button = 'Pielikt kategoriju';
 $s_versions = 'Versijas';
 $s_add_version_button = 'Pielikt versiju';
-$s_edit_link = 'labot';
+$s_edit_link = 'Labot';
 $s_actions = 'Darbības';
 $s_version = 'Versija';
 $s_timestamp = 'Laiks';
@@ -370,14 +370,14 @@ $s_name = 'Nosaukums';
 $s_project_updated_msg = 'Projekta izmaiņas saglabātas...';
 $s_version_added_msg = 'Versija tika pielikta...';
 $s_version_deleted_msg = 'Versija nodzēsta...';
-$s_version_delete_sure = 'Vai esat pārliecināti, ka vēlaties dzēst šo versiju?';
+$s_version_delete_sure = 'Vai tiešām vēlaties dzēst šo versiju?';
 $s_delete_version_button = 'Dzēst versiju';
 $s_edit_project_version_title = 'Projekta versijas labošana';
 $s_update_version_button = 'Labot projekta versiju';
 $s_version_updated_msg = 'Versija saglabāta...';
 $s_account_delete_protected_msg = 'Lietotāja konts ir aizsargāts. Dzēst nevar.';
 $s_account_deleted_msg = 'Lietotājs nodzēsts...';
-$s_delete_account_sure_msg = 'Vai esat pārliecināti, ka vēlaties dzēst šo lietotāju?';
+$s_delete_account_sure_msg = 'Vai tiešām vēlaties dzēst šo lietotāju?';
 $s_accounts_pruned_msg = 'Visi lietotāji, kas nekad nav lietojuši sistēmu un ir reģistrēti ilgāk nekā nedēļu atpakaļ tika nodzēsti';
 $s_confirm_account_pruning = 'Vai Jūs esat pārliecināti, ka vēlaties dzēst lietotājus, kas nekad nav pieslēgušies?';
 $s_edit_user_title = 'Lietotāja labošana';
@@ -437,7 +437,7 @@ $s_remove_user_sure_msg = 'Vai tiešām vēlaties dzēst lietotāju?';
 $s_add_user_title = 'Lietotāja pievienošana projektam';
 $s_add_user_button = 'Pievienot';
 $s_project_selection_title = 'Projekta izvēle';
-$s_remove_link = 'dzēst';
+$s_remove_link = 'Noņemt';
 $s_updated_user_msg = 'Lietotājs pievienots';
 $s_must_enter_category = 'Jums jāizvēlas kategorija';
 $s_must_enter_severity = 'Jums jāizvēlas kritiskums';
@@ -498,9 +498,9 @@ $s_any = 'visi';
 $s_show = 'Parādīt';
 $s_changed = 'Izmaiņas (pa stundu)';
 $s_viewing_bugs_title = 'Kļūdu apskate';
-$s_updated = 'Atjaunots';
+$s_updated = 'Atjaunināts';
 $s_none = 'nav';
-$s_search = 'meklēt';
+$s_search = 'Meklēt';
 $s_view_prev_link = 'iepriekšējos';
 $s_view_next_link = 'nākošos';
 $s_prev = 'iepr.';

@@ -17,7 +17,7 @@
 /**
  * @package Tests
  * @subpackage UnitTests
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -33,9 +33,9 @@ class UserTest extends SoapBase {
      */
     public function testGetPreference() {
         
-        $language = $this->client->mc_user_pref_get_pref( $this->userName, $this->password, 0 /*ALL_PROJECTS*/, 'language' );
-        
-        $this->assertEquals( 'english', $language );
+        $bugnote_order = $this->client->mc_user_pref_get_pref( $this->userName, $this->password, 0 /*ALL_PROJECTS*/, 'bugnote_order' );
+
+        $this->assertEquals( 'ASC', $bugnote_order );
         
     }
 }

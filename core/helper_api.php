@@ -19,7 +19,7 @@
  * @package CoreAPI
  * @subpackage HelperAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -68,13 +68,15 @@ function helper_alternate_class( $p_index = null, $p_odd_class = 'row-1', $p_eve
 }
 
 /**
- * get the color string for the given status
+ * get the color string for the given status, user and project
  * @param int $p_status
+ * @param int|null $p_user user id, defaults to null (all users)
+ * @param int|null $p_project project id, defaults to null (all projects)
  * @return string
  */
-function get_status_color( $p_status ) {
-	$t_status_label = MantisEnum::getLabel( config_get( 'status_enum_string' ), $p_status );
-	$t_status_colors = config_get( 'status_colors' );
+function get_status_color( $p_status, $p_user = null, $p_project = null ) {
+	$t_status_label = MantisEnum::getLabel( config_get( 'status_enum_string', null, $p_user, $p_project ), $p_status );
+	$t_status_colors = config_get( 'status_colors', null, $p_user, $p_project );
 	$t_color = '#ffffff';
 
 	if ( isset( $t_status_colors[$t_status_label] ) ) {
@@ -85,13 +87,16 @@ function get_status_color( $p_status ) {
 }
 
 /**
- * Given a enum string and num, return the appropriate string
+ * Given a enum string and num, return the appropriate string for the
+ * specified user/project
  * @param string $p_enum_name
  * @param int $p_val
+ * @param int|null $p_user user id, defaults to null (all users)
+ * @param int|null $p_project project id, defaults to null (all projects)
  * @return string
  */
-function get_enum_element( $p_enum_name, $p_val ) {
-	$config_var = config_get( $p_enum_name . '_enum_string' );
+function get_enum_element( $p_enum_name, $p_val, $p_user = null, $p_project = null ) {
+	$config_var = config_get( $p_enum_name . '_enum_string', null, $p_user, $p_project );
 	$string_var = lang_get( $p_enum_name . '_enum_string' );
 
 	return MantisEnum::getLocalizedLabel( $config_var, $string_var, $p_val );
@@ -149,7 +154,7 @@ function check_selected( $p_var, $p_val = true ) {
  * @param mixed $p_var
  * @param mixed $p_val
  * @return null
- */ 
+ */
 function check_checked( $p_var, $p_val = true ) {
 	if( $p_var == $p_val ) {
 		echo ' checked="checked" ';
@@ -260,8 +265,11 @@ function helper_get_current_project_trace() {
  * @return bool always true
  */
 function helper_set_current_project( $p_project_id ) {
+	global $g_cache_current_project;
+
 	$t_project_cookie_name = config_get( 'project_cookie' );
 
+	$g_cache_current_project = $p_project_id;
 	gpc_set_cookie( $t_project_cookie_name, $p_project_id, true );
 
 	return true;
@@ -273,7 +281,8 @@ function helper_set_current_project( $p_project_id ) {
  */
 function helper_clear_pref_cookies() {
 	gpc_clear_cookie( config_get( 'project_cookie' ) );
-	gpc_clear_cookie( config_get( 'manage_cookie' ) );
+	gpc_clear_cookie( config_get( 'manage_users_cookie' ) );
+	gpc_clear_cookie( config_get( 'manage_config_cookie' ) );
 }
 
 /**
@@ -360,7 +369,7 @@ function helper_project_specific_where( $p_project_id, $p_user_id = null ) {
 }
 
 /**
- * 
+ *
  * @param int $p_columns_target
  * @param bool $p_viewable_only
  * @param int $p_user_id
@@ -400,8 +409,8 @@ function helper_get_columns_to_view( $p_columns_target = COLUMNS_TARGET_VIEW_PAG
 		$t_keys_to_remove[] = 'sponsorship_total';
 	}
 
-	if( $p_columns_target == COLUMNS_TARGET_CSV_PAGE || $p_columns_target == COLUMNS_TARGET_EXCEL_PAGE || OFF == config_get( 'show_attachment_indicator' ) ) {
-		$t_keys_to_remove[] = 'attachment';
+	if( $p_columns_target == COLUMNS_TARGET_CSV_PAGE || $p_columns_target == COLUMNS_TARGET_EXCEL_PAGE ) {
+		$t_keys_to_remove[] = 'attachment_count';
 	}
 
 	$t_keys_to_remove[] = 'duplicate_id';

@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'In nunod oli ädabinon pöl.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Ragiv nonik pegivon.';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Ragivatip no pedälon.';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Ragiviär no dabinon. Kontrololös parametemi proyega.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Atos binon ragiv petelüköl. Büo moükolös ragivi.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Proyeg labü nem at ya dabinon.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Fel zesüdik: „$1$s“ ävagon. Kontrololös utosi, kelosi epenol.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Kal at pejelon. No dalol gebön ani jüs kalijel ponosükon.';

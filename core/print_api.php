@@ -19,7 +19,7 @@
  * @package CoreAPI
  * @subpackage PrintAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -144,6 +144,10 @@ function print_successful_redirect( $p_redirect_to ) {
 
 # Print avatar image for the given user ID
 function print_avatar( $p_user_id, $p_size = 80 ) {
+	if ( OFF === config_get( 'show_avatar' ) ) {
+		return;
+	}
+
 	if( !user_exists( $p_user_id ) ) {
 		return;
 	}
@@ -215,21 +219,39 @@ function print_captcha_input( $p_field_name ) {
 #
 # @todo from print_reporter_option_list
 function print_user_option_list( $p_user_id, $p_project_id = null, $p_access = ANYBODY ) {
-	$t_users = array();
+	$t_current_user = auth_get_current_user_id();
 
 	if( null === $p_project_id ) {
 		$p_project_id = helper_get_current_project();
 	}
 
-	$t_users = project_get_all_user_rows( $p_project_id, $p_access );
+	if( $p_project_id === ALL_PROJECTS ) {
+		$t_projects = user_get_accessible_projects( $t_current_user );
 
-	# handles ALL_PROJECTS case
+		# Get list of users having access level for all accessible projects
+		$t_users = array();
+		foreach( $t_projects as $t_project_id ) {
+			$t_project_users_list = project_get_all_user_rows( $t_project_id, $p_access );
+			# Do a 'smart' merge of the project's user list, into an
+			# associative array (to remove duplicates)
+			# Use a while loop for better performance
+			$i = 0;
+			while( isset( $t_project_users_list[$i] ) ) {
+				$t_users[ $t_project_users_list[$i]['id'] ] = $t_project_users_list[$i];
+				$i++;
+			}
+			unset( $t_project_users_list );
+		}
+		unset( $t_projects );
+	} else {
+		$t_users = project_get_all_user_rows( $p_project_id, $p_access );
+	}
 
 	$t_display = array();
 	$t_sort = array();
 	$t_show_realname = ( ON == config_get( 'show_realname' ) );
 	$t_sort_by_last_name = ( ON == config_get( 'sort_by_last_name' ) );
-	foreach( $t_users as $t_user ) {
+	foreach( $t_users as $t_key => $t_user ) {
 		$t_user_name = string_attribute( $t_user['username'] );
 		$t_sort_name = utf8_strtolower( $t_user_name );
 		if( $t_show_realname && ( $t_user['realname'] <> '' ) ) {
@@ -245,7 +267,8 @@ function print_user_option_list( $p_user_id, $p_project_id = null, $p_access = A
 		$t_sort[] = $t_sort_name;
 	}
 	array_multisort( $t_sort, SORT_ASC, SORT_STRING, $t_users, $t_display );
-	$t_count = count( $t_sort );
+	unset( $t_sort );
+	$t_count = count( $t_users );
 	for( $i = 0;$i < $t_count;$i++ ) {
 		$t_row = $t_users[$i];
 		echo '<option value="' . $t_row['id'] . '" ';
@@ -449,6 +472,15 @@ function print_assign_to_option_list( $p_user_id = '', $p_project_id = null, $p_
 
 	if( null === $p_threshold ) {
 		$p_threshold = config_get( 'handle_bug_threshold' );
+	}
+
+	print_user_option_list( $p_user_id, $p_project_id, $p_threshold );
+}
+
+
+function print_note_option_list( $p_user_id = '', $p_project_id = null, $p_threshold = null ) {
+	if ( null === $p_threshold ) {
+		$p_threshold = config_get( 'add_bugnote_threshold' );
 	}
 
 	print_user_option_list( $p_user_id, $p_project_id, $p_threshold );
@@ -764,6 +796,17 @@ function print_version_option_list( $p_version = '', $p_project_id = null, $p_re
 		null );
 	}
 
+	# Ensure the selected version (if specified) is included in the list
+	# Note: Filter API specifies selected versions as an array
+	if( !is_array( $p_version ) ) {
+		if( !empty( $p_version ) ) {
+			$t_version_id = version_get_id( $p_version, $c_project_id );
+			if( $t_version_id !== false ) {
+				$versions[] = version_cache_row( $t_version_id );
+			}
+		}
+	}
+
 	if( $p_leading_blank ) {
 		echo '<option value=""></option>';
 	}
@@ -784,7 +827,7 @@ function print_version_option_list( $p_version = '', $p_project_id = null, $p_re
 
 		$t_version = string_attribute( $version['version'] );
 
-		if ( !in_array( $t_version, $t_listed ) ) {
+		if ( !in_array( $t_version, $t_listed, true ) ) {
 			$t_listed[] = $t_version;
 			echo '<option value="' . $t_version . '"';
 			check_selected( string_attribute( $p_version ), $t_version );
@@ -845,10 +888,15 @@ function print_enum_string_option_list( $p_enum_name, $p_val = 0 ) {
 	}
 }
 
-# Select the proper enum values for status based on workflow
-# or the input parameter if workflows are not used
-# $p_enum_name : name of enumeration (eg: status)
-# $p_current_value : current value
+/**
+ * Returns a list of valid status options based on workflow
+ * @param int $p_user_auth User's access level
+ * @param int $p_current_value Current issue's status
+ * @param bool $p_show_current Add current status to return list
+ * @param bool $p_add_close Add 'closed' to return list
+ * @param int $p_project_id
+ * @return array
+ */
 function get_status_option_list( $p_user_auth = 0, $p_current_value = 0, $p_show_current = true, $p_add_close = false, $p_project_id = ALL_PROJECTS ) {
 	$t_config_var_value = config_get( 'status_enum_string', null, null, $p_project_id );
 	$t_enum_workflow = config_get( 'status_enum_workflow', null, null, $p_project_id );
@@ -862,15 +910,16 @@ function get_status_option_list( $p_user_auth = 0, $p_current_value = 0, $p_show
 			$t_enum_values = MantisEnum::getValues( $t_enum_workflow[$p_current_value] );
 		} else {
 			# workflow was not set for this status, this shouldn't happen
-			$t_enum_values = MantisEnum::getValues( $t_config_var_value );
+			# caller should be able to handle empty list
+			$t_enum_values = array();
 		}
 	}
-
 	$t_enum_list = array();
 
 	foreach ( $t_enum_values as $t_enum_value ) {
-		if ( ( access_compare_level( $p_user_auth, access_get_status_threshold( $t_enum_value, $p_project_id ) ) )
-				&& ( !(( false == $p_show_current ) && ( $p_current_value == $t_enum_value ) ) ) ) {
+		if (   ( $p_show_current || $p_current_value != $t_enum_value )
+			&& access_compare_level( $p_user_auth, access_get_status_threshold( $t_enum_value, $p_project_id ) )
+		) {
 			$t_enum_list[$t_enum_value] = get_enum_element( 'status', $t_enum_value );
 		}
 	}
@@ -881,7 +930,9 @@ function get_status_option_list( $p_user_auth = 0, $p_current_value = 0, $p_show
 
 	if ( $p_add_close && access_compare_level( $p_current_value, config_get( 'bug_resolved_status_threshold', null, null, $p_project_id ) ) ) {
 		$t_closed = config_get( 'bug_closed_status_threshold', null, null, $p_project_id );
-		$t_enum_list[$t_closed] = get_enum_element( 'status', $t_closed );
+		if( $p_show_current || $p_current_value != $t_closed ) {
+			$t_enum_list[$t_closed] = get_enum_element( 'status', $t_closed );
+		}
 	}
 
 	return $t_enum_list;
@@ -1143,13 +1194,13 @@ function print_bug_link( $p_bug_id, $p_detail_info = true ) {
 
 # formats the priority given the status
 # shows the priority in BOLD if the bug is NOT closed and is of significant priority
-function print_formatted_priority_string( $p_status, $p_priority ) {
-	$t_pri_str = get_enum_element( 'priority', $p_priority );
+function print_formatted_priority_string( $p_bug ) {
+	$t_pri_str = get_enum_element( 'priority', $p_bug->priority, auth_get_current_user_id(), $p_bug->project_id );
 	$t_priority_threshold = config_get( 'priority_significant_threshold' );
 
 	if( $t_priority_threshold >= 0 &&
-		$p_priority >= $t_priority_threshold &&
-		$p_status < config_get( 'bug_closed_status_threshold' ) ) {
+		$p_bug->priority >= $t_priority_threshold &&
+		$p_bug->status < config_get( 'bug_closed_status_threshold' ) ) {
 		echo "<span class=\"bold\">$t_pri_str</span>";
 	} else {
 		echo $t_pri_str;
@@ -1158,13 +1209,13 @@ function print_formatted_priority_string( $p_status, $p_priority ) {
 
 # formats the severity given the status
 # shows the severity in BOLD if the bug is NOT closed and is of significant severity
-function print_formatted_severity_string( $p_status, $p_severity ) {
-	$t_sev_str = get_enum_element( 'severity', $p_severity );
+function print_formatted_severity_string( $p_bug ) {
+	$t_sev_str = get_enum_element( 'severity', $p_bug->severity, auth_get_current_user_id(), $p_bug->project_id );
 	$t_severity_threshold = config_get( 'severity_significant_threshold' );
 
 	if( $t_severity_threshold >= 0 &&
-		$p_severity >= $t_severity_threshold &&
-		$p_status < config_get( 'bug_closed_status_threshold' ) ) {
+		$p_bug->severity >= $t_severity_threshold &&
+		$p_bug->status < config_get( 'bug_closed_status_threshold' ) ) {
 		echo "<span class=\"bold\">$t_sev_str</span>";
 	} else {
 		echo $t_sev_str;
@@ -1214,7 +1265,7 @@ function print_view_bug_sort_link( $p_string, $p_sort_field, $p_sort, $p_dir, $p
 	}
 }
 
-function print_manage_user_sort_link( $p_page, $p_string, $p_field, $p_dir, $p_sort_by, $p_hide = 0, $p_filter = ALL ) {
+function print_manage_user_sort_link( $p_page, $p_string, $p_field, $p_dir, $p_sort_by, $p_hide_inactive = 0, $p_filter = ALL, $p_show_disabled = 0 ) {
 	if( $p_sort_by == $p_field ) {
 
 		# If this is the selected field flip the order
@@ -1229,7 +1280,7 @@ function print_manage_user_sort_link( $p_page, $p_string, $p_field, $p_dir, $p_s
 	}
 
 	$t_field = rawurlencode( $p_field );
-	print_link( "$p_page?sort=$t_field&dir=$t_dir&save=1&hide=$p_hide&filter=$p_filter", $p_string );
+	print_link( "$p_page?sort=$t_field&dir=$t_dir&save=1&hideinactive=$p_hide_inactive&showdisabled=$p_show_disabled&filter=$p_filter", $p_string );
 }
 
 function print_manage_project_sort_link( $p_page, $p_string, $p_field, $p_dir, $p_sort_by ) {
@@ -1250,22 +1301,36 @@ function print_manage_project_sort_link( $p_page, $p_string, $p_field, $p_dir, $
 	print_link( "$p_page?sort=$t_field&dir=$t_dir", $p_string );
 }
 
-# print a button which presents a standalone form.
-# $p_action_page - The action page
-# $p_label - The button label
-# $p_args_to_post - An associative array with key => value to be posted, can be null.
-function print_button( $p_action_page, $p_label, $p_args_to_post = null ) {
+/**
+ * Print a button which presents a standalone form.
+ * If $p_security_token is OFF, the button's form will not contain a security
+ * field; this is useful when form does not result in modifications (CSRF is not
+ * needed). If otherwise specified (i.e. not null), the parameter must contain
+ * a valid security token, previously generated by form_security_token().
+ * Use this to avoid performance issues when loading pages having many calls to
+ * this function, such as adm_config_report.php.
+ * @param string $p_action_page The action page
+ * @param string $p_label The button label
+ * @param array $p_args_to_post Associative array of arguments to be posted, with
+ *                              arg name => value, defaults to null (no args)
+ * @param mixed $p_security_token Optional; null (default), OFF or security token string
+ * @see form_security_token()
+ */
+function print_button( $p_action_page, $p_label, $p_args_to_post = null, $p_security_token = null ) {
 	$t_form_name = explode( '.php', $p_action_page, 2 );
 	# TODO: ensure all uses of print_button supply arguments via $p_args_to_post (POST)
 	# instead of via $p_action_page (GET). Then only add the CSRF form token if
 	# arguments are being sent via the POST method.
 	echo '<form method="post" action="', htmlspecialchars( $p_action_page ), '">';
-	echo form_security_field( $t_form_name[0] );
+	if( $p_security_token !== OFF ) {
+		echo form_security_field( $t_form_name[0], $p_security_token );
+	}
 	echo '<input type="submit" class="button-small" value="', $p_label, '" />';
 
 	if( $p_args_to_post !== null ) {
 		foreach( $p_args_to_post as $t_var => $t_value ) {
-			echo "<input type=\"hidden\" name=\"$t_var\" value=\"$t_value\" />";
+			echo '<input type="hidden" name="' . $t_var .
+				'" value="' . htmlentities( $t_value ) . '" />';
 		}
 	}
 

@@ -20,7 +20,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -28,19 +28,26 @@
 	  */
 	require_once( 'core.php' );
 
-	if ( auth_is_user_authenticated() && !current_user_is_anonymous() ) {
-		print_header_redirect( config_get( 'default_home_page' ) );
-	}
-
-	$f_error		= gpc_get_bool( 'error' );
-	$f_cookie_error	= gpc_get_bool( 'cookie_error' );
-	$f_return		= string_sanitize_url( gpc_get_string( 'return', '' ) );
-	$f_username     = gpc_get_string( 'username', '' );
-	$f_perm_login	= gpc_get_bool( 'perm_login', false );
-	$f_secure_session = gpc_get_bool( 'secure_session', false );
+	$f_error		 = gpc_get_bool( 'error' );
+	$f_cookie_error		 = gpc_get_bool( 'cookie_error' );
+	$f_return		 = string_sanitize_url( gpc_get_string( 'return', '' ) );
+	$f_username		 = gpc_get_string( 'username', '' );
+	$f_perm_login		 = gpc_get_bool( 'perm_login', false );
+	$f_secure_session	 = gpc_get_bool( 'secure_session', false );
 	$f_secure_session_cookie = gpc_get_cookie( config_get_global( 'cookie_prefix' ) . '_secure_session', null );
 
 	$t_session_validation = ( ON == config_get_global( 'session_validation' ) );
+
+	// If user is already authenticated and not anonymous
+	if( auth_is_user_authenticated() && !current_user_is_anonymous() ) {
+		// If return URL is specified redirect to it; otherwise use default page
+		if( !is_blank( $f_return ) ) {
+			print_header_redirect( $f_return, false, false, true );
+		}
+		else {
+			print_header_redirect( config_get( 'default_home_page' ) );
+		}
+	}
 
 	# Check for automatic logon methods where we want the logon to just be handled by login.php
 	if ( auth_automatic_logon_bypass_form() ) {
@@ -132,6 +139,9 @@
 		<input type="password" name="password" size="32" maxlength="<?php echo auth_get_password_max_size(); ?>" />
 	</td>
 </tr>
+<?php
+	if( ON == config_get( 'allow_permanent_cookie' ) ) {
+?>
 <tr class="row-1">
 	<td class="category">
 		<?php echo lang_get( 'save_login' ) ?>
@@ -140,7 +150,11 @@
 	<input type="checkbox" name="perm_login" <?php echo ( $f_perm_login ? 'checked="checked" ' : '' ) ?>/>
 	</td>
 </tr>
-<?php if ( $t_session_validation ) { ?>
+<?php
+	}
+
+	if ( $t_session_validation ) {
+?>
 <tr class="row-2">
 	<td class="category">
 		<?php echo lang_get( 'secure_session' ) ?>

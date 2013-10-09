@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @author Marcello Scata' <marcelloscata at users.sourceforge.net> ITALY
 	 * @link http://www.mantisbt.org
 	 */
@@ -63,7 +63,7 @@
 	# fake login so the user can set their password
 	auth_attempt_script_login( user_get_field( $f_user_id, 'username' ) );
 
-	user_increment_failed_login_count( $f_user_id );
+	user_increment_login_count( $f_user_id );
 
 	include ( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'account_page.php' );
 

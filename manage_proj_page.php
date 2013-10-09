@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -42,13 +42,13 @@
 
 	print_manage_menu( 'manage_proj_page.php' );
 
-	# Project Menu Form BEGIN 
+	# Project Menu Form BEGIN
 ?>
 <br />
 <table class="width100" cellspacing="1">
 <tr>
 	<td class="form-title" colspan="5">
-		<?php 
+		<?php
 			echo lang_get( 'projects_title' );
 
 			# Check the user's global access level before allowing project creation
@@ -60,31 +60,31 @@
 </tr>
 <tr class="row-category">
 	<td width="20%">
-		<?php 
+		<?php
 			print_manage_project_sort_link( 'manage_proj_page.php', lang_get( 'name' ), 'name', $t_direction, $f_sort );
 			print_sort_icon( $t_direction, $f_sort, 'name' );
 		?>
 	</td>
 	<td width="10%">
-		<?php 
+		<?php
 			print_manage_project_sort_link( 'manage_proj_page.php', lang_get( 'status' ), 'status', $t_direction, $f_sort );
 			print_sort_icon( $t_direction, $f_sort, 'status' );
 		?>
 	</td>
 	<td width="10%">
-		<?php 
+		<?php
 			print_manage_project_sort_link( 'manage_proj_page.php', lang_get( 'enabled' ), 'enabled', $t_direction, $f_sort );
 			print_sort_icon( $t_direction, $f_sort, 'enabled' );
 		?>
 	</td>
 	<td width="10%">
-		<?php 
+		<?php
 			print_manage_project_sort_link( 'manage_proj_page.php', lang_get( 'view_status' ), 'view_state', $t_direction, $f_sort );
 			print_sort_icon( $t_direction, $f_sort, 'view_state' );
 		?>
 	</td>
 	<td width="40%">
-		<?php 
+		<?php
 			print_manage_project_sort_link( 'manage_proj_page.php', lang_get( 'description' ), 'description', $t_direction, $f_sort );
 			print_sort_icon( $t_direction, $f_sort, 'description' );
 		?>
@@ -166,6 +166,7 @@
 </tr>
 <?php
 	$t_categories = category_get_all_rows( ALL_PROJECTS );
+	$t_can_update_global_cat = access_has_global_level( config_get( 'manage_site_threshold' ) );
 
 	if ( count( $t_categories ) > 0 ) {
 ?>
@@ -176,31 +177,27 @@
 			<td>
 				<?php echo lang_get( 'assign_to' ) ?>
 			</td>
+<?php	if( $t_can_update_global_cat ) { ?>
 			<td class="center">
 				<?php echo lang_get( 'actions' ) ?>
 			</td>
+<?php	} ?>
 		</tr>
 <?php
 	}
 
-	foreach ( $t_categories as $t_category ) {
+	foreach( $t_categories as $t_category ) {
 		$t_id = $t_category['id'];
-
-		$t_name = $t_category['name'];
-		if ( NO_USER != $t_category['user_id'] && user_exists( $t_category['user_id'] )) {
-			$t_user_name = user_get_name( $t_category['user_id'] );
-		} else {
-			$t_user_name = '';
-		}
 ?>
 <!-- Repeated Info Row -->
 		<tr <?php echo helper_alternate_class() ?>>
 			<td>
-				<?php echo string_display( category_full_name( $t_category['id'], false ) )  ?>
+				<?php echo string_display( category_full_name( $t_id, false ) )  ?>
 			</td>
 			<td>
-				<?php echo string_display_line( $t_user_name ) ?>
+				<?php echo prepare_user_name( $t_category['user_id'] ) ?>
 			</td>
+<?php	if( $t_can_update_global_cat ) { ?>
 			<td class="center">
 				<?php
 					$t_id = urlencode( $t_id );
@@ -211,11 +208,13 @@
 					print_button( "manage_proj_cat_delete.php?id=$t_id&project_id=$t_project_id", lang_get( 'delete_link' ) );
 				?>
 			</td>
+<?php	} ?>
 		</tr>
 <?php
 	} # end for loop
-?>
 
+	if( $t_can_update_global_cat ) {
+?>
 <!-- Add Category Form -->
 <tr>
 	<td class="left" colspan="3">
@@ -227,6 +226,7 @@
 		</form>
 	</td>
 </tr>
+<?php } ?>
 
 </table>
 </div>

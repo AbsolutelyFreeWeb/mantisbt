@@ -17,7 +17,7 @@
 /**
  * @package MantisBT
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -224,9 +224,7 @@ function test_database_utf8() {
 <td class="form-title" width="30%" colspan="2"><?php echo 'Checking your installation' ?></td>
 </tr>
 
-<?php 
-
-	require_once( 'obsolete.php' );
+<?php
 
 print_test_row( 'MantisBT requires at least <b>PHP ' . PHP_MIN_VERSION . '</b>. You are running <b>PHP ' . phpversion(), $result = version_compare( phpversion(), PHP_MIN_VERSION, '>=' ) );
 
@@ -239,19 +237,30 @@ if( !db_is_connected() ) {
 	print_info_row( 'Database is not connected - Can not continue checks' );
 }
 
+require_once( 'obsolete.php' );
+
 if( isset( $ADODB_vers ) ) {
 	# ADOConnection::Version() is broken as it treats v5.1 the same as v5.10
 	# Therefore we must extract the correct version ourselves
 	# Upstream bug report: http://phplens.com/lens/lensforum/msgs.php?id=18320
+	# This bug has been fixed in ADOdb 5.11 (May 5, 2010) but we still
+	# need to use the backwards compatible approach to detect ADOdb <5.11.
 	if( preg_match( '/^[Vv]([0-9\.]+)/', $ADODB_vers, $t_matches ) == 1 ) {
 		$t_adodb_version_check_ok = version_compare( $t_matches[1], '5.10', '>=' );
 	}
 }
-print_test_warn_row( 'Checking adodb version...', $t_adodb_version_check_ok, $ADODB_vers );
+print_test_warn_row( 'Checking ADOdb version...', $t_adodb_version_check_ok, $ADODB_vers );
 
-print_test_row('Checking using bundled adodb with some drivers...', !(db_is_pgsql() || db_is_mssql() || db_is_db2()) || strstr($ADODB_vers, 'MantisBT Version') !== false );
+# Making sure we're not using the ADOdb extension (see #14552)
+print_test_row(
+	'Checking use of the <a href="http://adodb.sourceforge.net/#extension">ADOdb extension</a>',
+	!extension_loaded( 'ADOdb' ),
+	"The 'ADOdb' extension is not supported and must be disabled"
+);
+
+print_test_row( 'Checking using bundled ADOdb with some drivers...', !(db_is_pgsql() || db_is_mssql() || db_is_db2()) || strstr($ADODB_vers, 'MantisBT Version') !== false );
 $t_serverinfo = $g_db->ServerInfo();
-	
+
 print_info_row( 'Database Type (adodb)', $g_db->databaseType );
 print_info_row( 'Database Provider (adodb)', $g_db->dataProvider );
 print_info_row( 'Database Server Description (adodb)', $t_serverinfo['description'] );
@@ -277,6 +286,13 @@ while( list( $t_foo, $t_var ) = each( $t_vars ) ) {
 }
 
 if ( db_is_mssql() ) {
+	if( 'mssql' == config_get_global( 'db_type' ) ) {
+		print_test_warn_row( 'Checking PHP support for Microsoft SQL Server driver',
+			version_compare( phpversion(), '5.3' ) < 0,
+			"'mssql' driver is no longer supported in PHP >= 5.3, please use 'mssqlnative' instead"
+		);
+	}
+
 	if ( print_test_row( 'check mssql textsize in php.ini...', ini_get( 'mssql.textsize' ) != 4096, ini_get( 'mssql.textsize' ) ) ) {
 		print_test_warn_row( 'check mssql textsize in php.ini...', ini_get( 'mssql.textsize' ) == 2147483647, ini_get( 'mssql.textsize' ) );
 	}
@@ -284,6 +300,7 @@ if ( db_is_mssql() ) {
 		print_test_warn_row( 'check mssql textsize in php.ini...', ini_get( 'mssql.textsize' ) == 2147483647, ini_get( 'mssql.textsize' ) );
 	}
 }
+
 print_test_row( 'check variables_order includes GPCS', stristr( ini_get( 'variables_order' ), 'G' ) && stristr( ini_get( 'variables_order' ), 'P' ) && stristr( ini_get( 'variables_order' ), 'C' ) && stristr( ini_get( 'variables_order' ), 'S' ), ini_get( 'variables_order' ) );
 
 
@@ -347,13 +364,37 @@ print_test_row( 'Checking if ctype is enabled in php (required for rss feeds)...
 print_test_row( 'Checking for mysql is at least version 4.1...', !(db_is_mysql() && version_compare( $t_serverinfo['version'], '4.1.0', '<' ) ) );
 print_test_row( 'Checking for broken mysql version ( bug 10250)...', !(db_is_mysql() && $t_serverinfo['version'] == '4.1.21') );
 
-if ( !is_blank ( config_get_global( 'default_timezone' ) ) ) {
-	if ( print_test_row( 'Checking if a timezone is set in config.inc.php....', !is_blank ( config_get_global( 'default_timezone' ) ), config_get_global( 'default_timezone' ) ) ) {
-		print_test_row( 'Checking if timezone is valid from config.inc.php....', in_array( config_get_global( 'default_timezone' ), timezone_identifiers_list() ), config_get_global( 'default_timezone' ) );
-	}
+# Timezone checks
+$t_timezone = config_get_global( 'default_timezone' );
+$t_timezone_set = !is_blank( $t_timezone );
+if( $t_timezone_set ) {
+	$t_timezone_set_in = 'config_inc.php';
 } else {
-	if( print_test_row( 'Checking if timezone is set in php.ini....', ini_get( 'date.timezone' ) !== '' ) ) {
-		print_test_row( 'Checking if timezone is valid in php.ini....', in_array( ini_get( 'date.timezone' ), timezone_identifiers_list() ), ini_get( 'date.timezone' ) );
+	$t_timezone = ini_get( 'date.timezone' );
+	$t_timezone_set = !is_blank( $t_timezone );
+	if( $t_timezone_set ) {
+		$t_timezone_set_in = 'php.ini';
+	}
+}
+print_test_row(
+	'Checking if a timezone is set',
+	$t_timezone_set,
+	$t_timezone_set ?
+		"Defined in $t_timezone_set_in" :
+		'The default timezone must be defined either in config_inc.php '
+		. '($g_default_timezone) or php.ini (date.timezone)'
+);
+if( $t_timezone_set ) {
+	$t_timezone_valid = in_array( $t_timezone, timezone_identifiers_list() );
+	$t_msg = "Checking if the specified timezone is valid";
+	if( function_exists( 'timezone_identifiers_list' ) ) {
+		if( !$t_timezone_valid ) {
+			$t_timezone = "'$t_timezone' is not in the "
+				. ' <a href="http://php.net/timezones">List of Supported Timezones</a>';
+		}
+		print_test_row( $t_msg, $t_timezone_valid, $t_timezone );
+	} else {
+		print_test_warn_row( $t_msg, false, 'Cannot check timezone validity on PHP < 5.2.0');
 	}
 }
 
@@ -368,7 +409,7 @@ print_test_warn_row( 'Warn if CRYPT is used (not MD5) for passwords', ! ( CRYPT 
 
 if ( config_get_global( 'allow_file_upload' ) ) {
 	print_test_row( 'Checking that fileuploads are allowed in php (enabled in mantis config)', ini_get_bool( 'file_uploads' ) );
-	
+
 	print_info_row( 'PHP variable "upload_max_filesize"', ini_get_number( 'upload_max_filesize' ) );
 	print_info_row( 'PHP variable "post_max_size"', ini_get_number( 'post_max_size' ) );
 	print_info_row( 'MantisBT variable "max_file_size"', config_get_global( 'max_file_size' ) );
@@ -384,11 +425,11 @@ if ( config_get_global( 'allow_file_upload' ) ) {
 			break;
 		case DISK:
 			$t_upload_path = config_get_global( 'absolute_path_default_upload_folder' );
-			print_test_row( 'Checking that absolute_path_default_upload_folder has a trailing directory separator: "' . $t_upload_path . '"', 
+			print_test_row( 'Checking that absolute_path_default_upload_folder has a trailing directory separator: "' . $t_upload_path . '"',
 				( DIRECTORY_SEPARATOR == substr( $t_upload_path, -1, 1 ) ) );
 			break;
 	}
-	
+
 	print_info_row( 'There may also be settings in your web server that prevent you from  uploading files or limit the maximum file size.  See the documentation for those packages if you need more information.');
 }
 ?>
@@ -409,7 +450,7 @@ if ( config_get_global( 'allow_file_upload' ) ) {
 		<td bgcolor="#f4f4f4">All Tests Passed. If you would like to view passed tests click <a href="check.php?showall=1">here</a>.</td>
 	</tr>
 	</table>
-<?php	
+<?php
 	}
 ?>
 </body>

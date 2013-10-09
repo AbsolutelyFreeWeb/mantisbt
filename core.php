@@ -17,7 +17,7 @@
 /**
  * @package MantisBT
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -87,15 +87,13 @@ $g_core_path = $t_core_path;
 /*
  * Set include paths
  */
-$thisfolder = realpath( dirname(__FILE__) );
-if ($thisfolder == '') {$thisfolder = dirname(__FILE__);}; 
-define ( 'BASE_PATH' , $thisfolder );
+define ( 'BASE_PATH' , dirname( __FILE__ ) );
 $mantisLibrary = BASE_PATH . DIRECTORY_SEPARATOR . 'library';
 $mantisCore = $g_core_path;
 
 /*
  * Prepend the application/ and tests/ directories to the
- * include_path.  
+ * include_path.
  */
 $path = array(
     $mantisCore,
@@ -109,7 +107,27 @@ set_include_path( implode( PATH_SEPARATOR, $path ) );
  */
 unset($mantisRoot, $mantisLibrary, $mantisCore, $path);
 
-# load UTF8-capable string functions - anton comments these out
+require_once( 'mobile_api.php' );
+
+if ( strlen( $GLOBALS['g_mantistouch_url'] ) > 0 && mobile_is_mobile_browser() ) {
+	$t_url = sprintf( $GLOBALS['g_mantistouch_url'], $GLOBALS['g_path'] );
+
+	if ( OFF == $g_use_iis ) {
+		header( 'Status: 302' );
+	}
+
+	header( 'Content-Type: text/html' );
+
+	if ( ON == $g_use_iis ) {
+		header( "Refresh: 0;$t_url" );
+	} else {
+		header( "Location: $t_url" );
+	}
+
+	exit; # additional output can cause problems so let's just stop output here
+}
+
+# load UTF8-capable string functions //anton
  require_once( 'library/' . 'utf8/utf8.php' );
  require_once( UTF8 . DIRECTORY_SEPARATOR . 'str_pad.php' );
 
@@ -230,7 +248,11 @@ if ( function_exists( 'timezone_identifiers_list' ) ) {
 		// having a timezone set avoids a php warning
 		date_default_timezone_set( config_get_global( 'default_timezone' ) );
 	} else {
-		config_set_global( 'default_timezone', date_default_timezone_get(), true );
+		# To ensure proper detection of timezone settings issues, we must not
+		# initialize the default timezone when executing admin checks
+		if( basename( $_SERVER['SCRIPT_NAME'] ) != 'check.php' ) {
+			config_set_global( 'default_timezone', date_default_timezone_get(), true );
+		}
 	}
 	if ( auth_is_user_authenticated() ) {
 		date_default_timezone_set( user_pref_get_pref( auth_get_current_user_id(), 'timezone' ) );

@@ -19,16 +19,13 @@
  * @package CoreAPI
  * @subpackage UserAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ *
+ * @uses email_api.php
+ * @uses ldap_api.php
  */
 
-/**
- * requires email_api
- */
 require_once( 'email_api.php' );
-/**
- * requires ldap_api
- */
 require_once( 'ldap_api.php' );
 
 # ===================================
@@ -172,7 +169,7 @@ function user_exists( $p_user_id ) {
 }
 
 # --------------------
-# check to see if project exists by id
+# check to see if user exists by id
 # if it doesn't exist then error
 #  otherwise let execution continue undisturbed
 function user_ensure_exists( $p_user_id ) {
@@ -483,8 +480,8 @@ function user_create( $p_username, $p_password, $p_email = '',
 
 	# Users are added with protected set to FALSE in order to be able to update
 	# preferences.  Now set the real value of protected.
-	if( $c_protected ) {
-		user_set_field( $t_user_id, 'protected', 1 );
+	if( $p_protected ) {
+		user_set_field( $t_user_id, 'protected', $c_protected );
 	}
 
 	# Send notification email
@@ -722,7 +719,8 @@ function user_get_row( $p_user_id ) {
 # return the specified user field for the user id
 function user_get_field( $p_user_id, $p_field_name ) {
 	if( NO_USER == $p_user_id ) {
-		trigger_error( 'user_get_field() for NO_USER', WARNING );
+		error_parameters( NO_USER );
+		trigger_error( ERROR_USER_BY_ID_NOT_FOUND, WARNING );
 		return '@null@';
 	}
 
@@ -741,7 +739,7 @@ function user_get_field( $p_user_id, $p_field_name ) {
 # lookup the user's email in LDAP or the db as appropriate
 function user_get_email( $p_user_id ) {
 	$t_email = '';
-	if( ON == config_get( 'use_ldap_email' ) ) {
+	if( LDAP == config_get( 'login_method' ) && ON == config_get( 'use_ldap_email' ) ) {
 		$t_email = ldap_email( $p_user_id );
 	}
 	if( is_blank( $t_email ) ) {
@@ -755,7 +753,7 @@ function user_get_email( $p_user_id ) {
 function user_get_realname( $p_user_id ) {
 	$t_realname = '';
 
-	if ( ON == config_get( 'use_ldap_realname' ) ) {
+	if ( LDAP == config_get( 'login_method' ) && ON == config_get( 'use_ldap_realname' ) ) {
 		$t_realname = ldap_realname( $p_user_id );
 	}
 
@@ -797,33 +795,33 @@ function user_get_name( $p_user_id ) {
 * @return array|bool an array( URL, width, height ) or false when the given user has no avatar
 */
 function user_get_avatar( $p_user_id, $p_size = 80 ) {
-	$t_email = utf8_strtolower( user_get_email( $p_user_id ) );
-	if( is_blank( $t_email ) ) {
-		$t_result = false;
-	} else {
-		$t_default_image = config_get( 'default_avatar' );
-		$t_size = $p_size;
+	$t_default_avatar = config_get( 'show_avatar' );
 
-		$t_use_ssl = false;
-		if( isset( $_SERVER['HTTPS'] ) && ( utf8_strtolower( $_SERVER['HTTPS'] ) != 'off' ) ) {
-			$t_use_ssl = true;
-		}
-
-		if( !$t_use_ssl ) {
-			$t_gravatar_domain = 'http://www.gravatar.com/';
-		} else {
-			$t_gravatar_domain = 'https://secure.gravatar.com/';
-		}
-
-		$t_avatar_url = $t_gravatar_domain . 'avatar/' . md5( $t_email ) . '?default=' . urlencode( $t_default_image ) . '&size=' . $t_size . '&rating=G';
-		$t_result = array(
-			$t_avatar_url,
-			$t_size,
-			$t_size,
-		);
+	if( OFF === $t_default_avatar ) {
+		# Avatars are not used
+		return false;
+	}
+	# Set default avatar for legacy configuration
+	if( ON === $t_default_avatar ) {
+		$t_default_avatar = 'identicon';
 	}
 
-	return $t_result;
+	# Default avatar is either one of Gravatar's options, or
+	# assumed to be an URL to a default avatar image
+	$t_default_avatar = urlencode( $t_default_avatar );
+	$t_rating = 'G';
+
+	$t_email_hash = md5( utf8_strtolower( trim( user_get_email( $p_user_id ) ) ) );
+
+	# Build Gravatar URL
+	if( http_is_protocol_https() ) {
+		$t_avatar_url = 'https://secure.gravatar.com/';
+	} else {
+		$t_avatar_url = 'http://www.gravatar.com/';
+	}
+	$t_avatar_url .= "avatar/$t_email_hash?d=$t_default_avatar&r=$t_rating&s=$p_size";
+
+	return array( $t_avatar_url, $p_size, $p_size );
 }
 
 # --------------------
@@ -1231,25 +1229,50 @@ function user_increment_lost_password_in_progress_count( $p_user_id ) {
 	return true;
 }
 
-# --------------------
-# Set a user field
-function user_set_field( $p_user_id, $p_field_name, $p_field_value ) {
-	$c_user_id = db_prepare_int( $p_user_id );
-	$c_field_name = db_prepare_string( $p_field_name );
+/**
+ * Sets multiple fields on a user
+ *
+ * @param int $p_user_id
+ * @param array $p_fields keys are the field names and the values are the field values
+ */
+function user_set_fields( $p_user_id, $p_fields ) {
 
-	if( $p_field_name != 'protected' ) {
+	$c_user_id = db_prepare_int( $p_user_id );
+
+	if ( !array_key_exists('protected', $p_fields) ) {
 		user_ensure_unprotected( $p_user_id );
 	}
 
 	$t_user_table = db_get_table( 'mantis_user_table' );
 
-	$query = 'UPDATE ' . $t_user_table .
-		     ' SET ' . $c_field_name . '=' . db_param() .
-			 ' WHERE id=' . db_param();
+	$t_query = 'UPDATE ' . $t_user_table;
+	$t_parameters = Array();
 
-	db_query_bound( $query, Array( $p_field_value, $c_user_id ) );
+	foreach ( $p_fields as $t_field_name => $t_field_value ) {
+
+		$c_field_name = db_prepare_string( $t_field_name );
+
+		if ( count ( $t_parameters) == 0 )
+			$t_query .= ' SET '. $c_field_name. '=' . db_param();
+		else
+			$t_query .= ' , ' . $c_field_name. '=' . db_param();
+
+		array_push( $t_parameters, $t_field_value );
+	}
+
+	$t_query .= ' WHERE id=' . db_param();
+	array_push ( $t_parameters, $c_user_id );
+
+	db_query_bound( $t_query, $t_parameters );
 
 	user_clear_cache( $p_user_id );
+}
+
+# --------------------
+# Set a user field
+function user_set_field( $p_user_id, $p_field_name, $p_field_value ) {
+
+	user_set_fields($p_user_id, array ( $p_field_name => $p_field_value ) );
 
 	# db_query errors on failure so:
 	return true;

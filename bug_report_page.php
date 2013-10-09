@@ -19,7 +19,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 
@@ -37,11 +37,6 @@
 	require_once( 'collapse_api.php' );
 
 	$f_master_bug_id = gpc_get_int( 'm_id', 0 );
-
-	# this page is invalid for the 'All Project' selection except if this is a clone
-	if ( ( ALL_PROJECTS == helper_get_current_project() ) && ( 0 == $f_master_bug_id ) ) {
-		print_header_redirect( 'login_select_proj_page.php?ref=bug_report_page.php' );
-	}
 
 	if ( $f_master_bug_id > 0 ) {
 		# master bug exists...
@@ -82,6 +77,7 @@
 
 		$f_category_id			= $t_bug->category_id;
 		$f_reproducibility		= $t_bug->reproducibility;
+		$f_eta					= $t_bug->eta;
 		$f_severity				= $t_bug->severity;
 		$f_priority				= $t_bug->priority;
 		$f_summary				= $t_bug->summary;
@@ -93,7 +89,23 @@
 
 		$t_project_id			= $t_bug->project_id;
 	} else {
-	    access_ensure_project_level( config_get( 'report_bug_threshold' ) );
+		# Get Project Id and set it as current
+		$t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
+		if( ( ALL_PROJECTS == $t_project_id || project_exists( $t_project_id ) )
+		 && $t_project_id != helper_get_current_project()
+		) {
+			helper_set_current_project( $t_project_id );
+			# Reloading the page is required so that the project browser
+			# reflects the new current project
+			print_header_redirect( $_SERVER['REQUEST_URI'], true, false, true );
+		}
+
+		# New issues cannot be reported for the 'All Project' selection
+		if ( ( ALL_PROJECTS == helper_get_current_project() ) ) {
+			print_header_redirect( 'login_select_proj_page.php?ref=bug_report_page.php' );
+		}
+
+		access_ensure_project_level( config_get( 'report_bug_threshold' ) );
 
 		$f_build				= gpc_get_string( 'build', '' );
 		$f_platform				= gpc_get_string( 'platform', '' );
@@ -106,6 +118,7 @@
 
 		$f_category_id			= gpc_get_int( 'category_id', 0 );
 		$f_reproducibility		= gpc_get_int( 'reproducibility', config_get( 'default_bug_reproducibility' ) );
+		$f_eta					= gpc_get_int( 'eta', config_get( 'default_bug_eta' ) );
 		$f_severity				= gpc_get_int( 'severity', config_get( 'default_bug_severity' ) );
 		$f_priority				= gpc_get_int( 'priority', config_get( 'default_bug_priority' ) );
 		$f_summary				= gpc_get_string( 'summary', '' );
@@ -119,8 +132,6 @@
 			$f_due_date = date_get_null();
 		}
 
-		$t_project_id			= helper_get_current_project();
-
 		$t_changed_project		= false;
 	}
 
@@ -133,6 +144,7 @@
 
 	$tpl_show_category = in_array( 'category_id', $t_fields );
 	$tpl_show_reproducibility = in_array( 'reproducibility', $t_fields );
+	$tpl_show_eta = in_array( 'eta', $t_fields );
 	$tpl_show_severity = in_array( 'severity', $t_fields );
 	$tpl_show_priority = in_array( 'priority', $t_fields );
 	$tpl_show_steps_to_reproduce = in_array( 'steps_to_reproduce', $t_fields );
@@ -141,6 +153,8 @@
 	$tpl_show_platform = $tpl_show_profiles && in_array( 'platform', $t_fields );
 	$tpl_show_os = $tpl_show_profiles && in_array( 'os', $t_fields );
 	$tpl_show_os_version = $tpl_show_profiles && in_array( 'os_version', $t_fields );
+	$tpl_show_resolution = in_array('resolution', $t_fields);
+	$tpl_show_status = in_array('status', $t_fields);
 
 	$tpl_show_versions = version_should_show_product_version( $t_project_id );
 	$tpl_show_product_version = $tpl_show_versions && in_array( 'product_version', $t_fields );
@@ -202,6 +216,22 @@
 		<td>
 			<select <?php echo helper_get_tab_index() ?> name="reproducibility">
 				<?php print_enum_string_option_list( 'reproducibility', $f_reproducibility ) ?>
+			</select>
+		</td>
+	</tr>
+<?php
+	}
+
+	if ( $tpl_show_eta ) {
+?>
+
+	<tr <?php echo helper_alternate_class() ?>>
+		<td class="category">
+			<label for="eta"><?php print_documentation_link( 'eta' ) ?></label>
+		</td>
+		<td>
+			<select <?php echo helper_get_tab_index() ?> id="eta" name="eta">
+				<?php print_enum_string_option_list( 'eta', $f_eta ) ?>
 			</select>
 		</td>
 	</tr>
@@ -386,6 +416,43 @@
 	</tr>
 <?php } ?>
 
+<?php if ( $tpl_show_status ) { ?>
+	<tr <?php echo helper_alternate_class() ?>>
+		<td class="category">
+			<?php echo lang_get( 'status' ) ?>
+		</td>
+		<td>
+			<select <?php echo helper_get_tab_index() ?> name="status">
+			<?php 
+			$resolution_options = get_status_option_list(access_get_project_level( $t_project_id), 
+					config_get('bug_submit_status'), true, 
+					ON == config_get( 'allow_reporter_close' ), $t_project_id );
+			foreach ( $resolution_options as $key => $value ) {
+			?>
+				<option value="<?php echo $key ?>" <?php check_selected($key, config_get('bug_submit_status')); ?> >
+					<?php echo $value ?>
+				</option>
+			<?php } ?>
+			</select>
+		</td>
+	</tr>
+<?php } ?>
+
+<?php if ( $tpl_show_resolution ) { ?>
+	<tr <?php echo helper_alternate_class() ?>>
+		<td class="category">
+			<?php echo lang_get( 'resolution' ) ?>
+		</td>
+		<td>
+			<select <?php echo helper_get_tab_index() ?> name="resolution">
+				<?php 
+				print_enum_string_option_list('resolution', config_get('default_bug_resolution'));
+				?>
+			</select>
+		</td>
+	</tr>
+<?php } ?>
+
 <?php // Target Version (if permissions allow)
 	if ( $tpl_show_target_version ) { ?>
 	<tr <?php echo helper_alternate_class() ?>>
@@ -460,22 +527,36 @@
 		}
 	} # foreach( $t_related_custom_field_ids as $t_id )
 ?>
-<?php if ( $tpl_show_attachments ) { // File Upload (if enabled)
-	$t_max_file_size = (int)min( ini_get_number( 'upload_max_filesize' ), ini_get_number( 'post_max_size' ), config_get( 'max_file_size' ) );
+<?php
+	// File Upload (if enabled)
+	if ( $tpl_show_attachments ) {
+		$t_max_file_size = (int)min( ini_get_number( 'upload_max_filesize' ), ini_get_number( 'post_max_size' ), config_get( 'max_file_size' ) );
+		$t_file_upload_max_num = max( 1, config_get( 'file_upload_max_num' ) );
 ?>
 	<tr <?php echo helper_alternate_class() ?>>
 		<td class="category">
-			<?php echo lang_get( 'upload_file' ) ?>
+			<?php echo lang_get( $t_file_upload_max_num == 1 ? 'upload_file' : 'upload_files' ) ?>
 			<?php echo '<span class="small">(' . lang_get( 'max_file_size' ) . ': ' . number_format( $t_max_file_size/1000 ) . 'k)</span>'?>
 		</td>
 		<td>
 			<input type="hidden" name="max_file_size" value="<?php echo $t_max_file_size ?>" />
-			<input <?php echo helper_get_tab_index() ?> name="file" type="file" size="60" />
+<?php
+		// Display multiple file upload fields
+		for( $i = 0; $i < $t_file_upload_max_num; $i++ ) {
+?>
+			<input <?php echo helper_get_tab_index() ?> id="ufile[]" name="ufile[]" type="file" size="50" />
+<?php
+			if( $t_file_upload_max_num > 1 ) {
+				echo '<br />';
+			}
+		}
+	}
+?>
 		</td>
 	</tr>
-<?php
-	}
 
+
+<?php
 	if ( $tpl_show_view_state ) {
 ?>
 	<tr <?php echo helper_alternate_class() ?>>
@@ -498,7 +579,7 @@
 			<?php echo lang_get( 'relationship_with_parent' ) ?>
 		</td>
 		<td>
-			<?php relationship_list_box( /* none */ -2, "rel_type", false, true ) ?>
+			<?php relationship_list_box( config_get( 'default_bug_relationship_clone' ), "rel_type", false, true ) ?>
 			<?php echo '<b>' . lang_get( 'bug' ) . ' ' . bug_format_id( $f_master_bug_id ) . '</b>' ?>
 		</td>
 	</tr>

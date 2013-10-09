@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Interlingua (Interlingua)
+/** Interlingua (interlingua)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -45,3 +45,4 @@ $s_plugin_XmlImportExport_disable_desc = 'Disactivar le ligamine';
 $s_plugin_XmlImportExport_fallback = 'Strategia alternative (quando "Renumerar" non es applicabile):';
 $s_plugin_XmlImportExport_fallback_category = 'Categoria alternative:';
 $s_plugin_XmlImportExport_keep_same_category = 'Tenta mantener le mesme categoria';
+$s_plugin_XmlImportExport_error_no_xml = 'impossibile trovar le extensiones xmlreader e xmlwriter';

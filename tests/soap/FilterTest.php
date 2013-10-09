@@ -17,7 +17,7 @@
 /**
  * @package Tests
  * @subpackage UnitTests
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -27,6 +27,9 @@ require_once 'SoapBase.php';
  * Test fixture for filter related webservice method.
  */
 class FilterTest extends SoapBase {
+	
+	const ISSUES_TO_RETRIEVE = 50;
+	
 	/**
 	 * A test case that tests the following:
 	 * 1. Retrieving all the project's issues
@@ -187,28 +190,88 @@ class FilterTest extends SoapBase {
 	 * Verifies that after the last page no more issues are being returned
 	 */
 	public function testGetIssueHeadersPaged() {
-	    
-	    $issue = $this->getIssueToAdd('FilterTest.getIssueHeadersPaged');
-	    $issueId = $this->client->mc_issue_add($this->userName, $this->password, $issue);
-	    $this->deleteAfterRun($issueId);
-	    
-	    self::assertEquals(1, count($this->client->mc_project_get_issue_headers($this->userName, $this->password, $this->getProjectId(),1, 1 )));
-	    self::assertEquals(0, count($this->client->mc_project_get_issue_headers($this->userName, $this->password, $this->getProjectId(),2, 1 )));
+		
+		$this->doTestGetPages('mc_project_get_issue_headers');
+	}
+	
+	private function doTestGetPages( $methodName ) {
+
+		$issueCount;
+		$currentIssues = count($this->getProjectIssues());
+		if ( $currentIssues >= 3) {
+			$issueCount = $currentIssues;
+		} else {
+			// need to add
+				
+			$issueCount = 3;
+				
+			$toAdd = $issueCount - $currentIssues;
+				
+			while ( $toAdd > 0 ) {
+		
+				$issue = $this->getIssueToAdd('FilterTest.doTestGatePages.' .$methodName);
+				$issueId = $this->client->mc_issue_add($this->userName, $this->password, $issue);
+				$this->deleteAfterRun($issueId);
+		
+				$toAdd--;
+			}
+		}
+		
+		$pageSize = $issueCount - 1;
+		
+		// first page should be full
+		self::assertEquals($pageSize, count(call_user_func_array(array($this->client, $methodName), array($this->userName, $this->password, $this->getProjectId(), 1, $pageSize ))));
+		// second page should get just one issue, as $pageSize = $issueCount - 1;
+		self::assertEquals(1, count(call_user_func_array(array($this->client, $methodName), array($this->userName, $this->password, $this->getProjectId(), 2, $pageSize ))));
+		// third page should be empty
+		self::assertEquals(0, count(call_user_func_array(array($this->client, $methodName), array($this->userName, $this->password, $this->getProjectId(), 3, $pageSize ))));
 	}
 	
 	/**
 	 * Verifies that after the last page no more issues are being returned
 	 */
 	public function testGetIssuesPaged() {
-	    
-	    $issue = $this->getIssueToAdd('FilterTest.getIssuesPaged');
-	    $issueId = $this->client->mc_issue_add($this->userName, $this->password, $issue);
-	    $this->deleteAfterRun($issueId);
-	    
-	    self::assertEquals(1, count($this->client->mc_project_get_issues($this->userName, $this->password, $this->getProjectId(),1, 1 )));
-	    self::assertEquals(0, count($this->client->mc_project_get_issues($this->userName, $this->password, $this->getProjectId(),2, 1 )));
+
+		$this->doTestGetPages('mc_project_get_issues');
 	}
 	
+	public function testGetAllProjectsIssues() {
+	
+		$initialIssues = $this->getAllProjectsIssues();
+	
+		$issueToAdd = $this->getIssueToAdd( 'FilterTest.testGetAllProjectsIssues' );
+	
+		$issueId = $this->client->mc_issue_add(
+			$this->userName,
+			$this->password,
+			$issueToAdd);
+			
+		$this->deleteAfterRun( $issueId );
+	
+		$projectIssues = $this->getAllProjectsIssues();
+	
+		$this->assertEquals( 1, count( $projectIssues ) - count( $initialIssues ), "count(projectIssues) - count(initialIssues)");
+		$this->assertEquals( $issueId, $projectIssues[0]->id, "issueId");
+	}
+	
+	public function testGetAllProjectsIssueHeaders() {
+	
+		$initialIssues = $this->getAllProjectsIssueHeaders();
+	
+		$issueToAdd = $this->getIssueToAdd( 'FilterTest.testGetProjectIssueHeaders' );
+	
+		$issueId = $this->client->mc_issue_add(
+			$this->userName,
+			$this->password,
+			$issueToAdd);
+			
+		$this->deleteAfterRun( $issueId );
+	
+		$projectIssues = $this->getAllProjectsIssueHeaders();
+	
+		$this->assertEquals( 1, count( $projectIssues ) - count( $initialIssues ), "count(projectIssues) - count(initialIssues)" );
+		$this->assertEquals( $issueId, $projectIssues[0]->id, "issueId" );
+	}
 
 	/**
 	 *
@@ -221,7 +284,21 @@ class FilterTest extends SoapBase {
 			$this->password,
 			$this->getProjectId(),
 			0,
-			50);
+			self::ISSUES_TO_RETRIEVE);
+	}
+
+	/**
+	 *
+	 * @return Array the project issues
+	 */
+	private function getAllProjectsIssues() {
+
+		return $this->client->mc_project_get_issues(
+			$this->userName,
+			$this->password,
+			0,
+			0,
+			self::ISSUES_TO_RETRIEVE);
 	}
 	
 	/**
@@ -235,6 +312,20 @@ class FilterTest extends SoapBase {
 			$this->password,
 			$this->getProjectId(),
 			0,
-			50);
+			self::ISSUES_TO_RETRIEVE);
+	}
+
+	/**
+	 *
+	 * @return Array the project issues
+	 */
+	private function getAllProjectsIssueHeaders() {
+
+		return $this->client->mc_project_get_issue_headers(
+			$this->userName,
+			$this->password,
+			0,
+			0,
+			self::ISSUES_TO_RETRIEVE);
 	}
 }

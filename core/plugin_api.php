@@ -21,7 +21,7 @@
  * @package CoreAPI
  * @subpackage PluginAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -137,10 +137,27 @@ function plugin_file_include( $p_filename, $p_basename = null ) {
 		trigger_error( ERROR_GENERIC, ERROR );
 	}
 	
-	$t_extension = pathinfo( $t_file_path, PATHINFO_EXTENSION );
-	if ( $t_extension && array_key_exists( $t_extension , $g_plugin_mime_types ) ) {
-	    header('Content-Type: ' . $g_plugin_mime_types [ $t_extension ] );
+	$t_content_type = '';
+	$finfo = finfo_get_if_available();
+	
+	if ( $finfo ) {
+		$t_file_info_type = $finfo->file( $t_file_path );
+		if ( $t_file_info_type !== false ) {
+			$t_content_type = $t_file_info_type;
+		}
 	}
+	
+	// allow overriding the content type for specific text and image extensions
+	// see bug #13193 for details
+	if ( strpos($t_content_type, 'text/') === 0 || strpos( $t_content_type, 'image/') === 0 ) {
+		$t_extension = pathinfo( $t_file_path, PATHINFO_EXTENSION );
+		if ( $t_extension && array_key_exists( $t_extension , $g_plugin_mime_types ) ) {
+			$t_content_type =  $g_plugin_mime_types [ $t_extension ];
+		}
+	}
+
+	if ( $t_content_type )
+    	header('Content-Type: ' . $t_content_type );
 	
 	readfile( $t_file_path );
 }
@@ -165,15 +182,18 @@ function plugin_table( $p_name, $p_basename = null ) {
  * Get a plugin configuration option.
  * @param string Configuration option name
  * @param multi Default option value
+ * @param boolean Global value
+ * @param int User ID
+ * @param int Project ID
  */
-function plugin_config_get( $p_option, $p_default = null, $p_global = false ) {
+function plugin_config_get( $p_option, $p_default = null, $p_global = false, $p_user = null, $p_project = null ) {
 	$t_basename = plugin_get_current();
 	$t_full_option = 'plugin_' . $t_basename . '_' . $p_option;
 
 	if( $p_global ) {
 		return config_get_global( $t_full_option, $p_default );
 	} else {
-		return config_get( $t_full_option, $p_default );
+		return config_get( $t_full_option, $p_default, $p_user, $p_project );
 	}
 }
 
@@ -621,28 +641,32 @@ function plugin_upgrade( $p_plugin ) {
 
 		$t_target = $t_schema[$i][1][0];
 
-		if( $t_schema[$i][0] == 'InsertData' ) {
-			$t_sqlarray = array(
-				'INSERT INTO ' . $t_schema[$i][1][0] . $t_schema[$i][1][1],
-			);
-		} else if( $t_schema[$i][0] == 'UpdateSQL' ) {
-			$t_sqlarray = array(
-				'UPDATE ' . $t_schema[$i][1][0] . $t_schema[$i][1][1],
-			);
-		} else {
-			$t_sqlarray = call_user_func_array( Array( $t_dict, $t_schema[$i][0] ), $t_schema[$i][1] );
-		}
-		$t_status = $t_dict->ExecuteSQLArray( $t_sqlarray );
+        if ( $t_schema[$i][0] == "UpdateFunction" ) {
+            call_user_func_array( $t_schema[$i][1], $t_schema[$i][2] );
+        } else {
+            if ( $t_schema[$i][0] == 'InsertData' ) {
+                $t_sqlarray = array(
+                    'INSERT INTO ' . $t_schema[$i][1][0] . $t_schema[$i][1][1],
+                );
+            } else if ( $t_schema[$i][0] == 'UpdateSQL' ) {
+                $t_sqlarray = array(
+                    'UPDATE ' . $t_schema[$i][1][0] . $t_schema[$i][1][1],
+                );
+            } else {
+                $t_sqlarray = call_user_func_array( Array( $t_dict, $t_schema[$i][0] ), $t_schema[$i][1] );
+            }
 
-		if( 2 == $t_status ) {
-			plugin_config_set( 'schema', $i );
-		} else {
-			error_parameters( $i );
-			trigger_error( ERROR_PLUGIN_UPGRADE_FAILED, ERROR );
-			return null;
-		}
+            $t_status = $t_dict->ExecuteSQLArray( $t_sqlarray, /* continue_on_error */ false );
 
-		$i++;
+            if ( 2 != $t_status ) {
+                error_parameters( $i );
+                trigger_error( ERROR_PLUGIN_UPGRADE_FAILED, ERROR );
+                return null;
+            }
+        }
+
+        plugin_config_set( 'schema', $i );
+        $i++;
 	}
 
 	plugin_pop_current();

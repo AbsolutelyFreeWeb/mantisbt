@@ -16,7 +16,7 @@
 
 /**
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  * @package MantisBT
  */
@@ -405,9 +405,9 @@ $box_title = lang_get( 'my_view_title_' . $t_box_title );
 # -- Viewing range info --?>
 	<td class="form-title" colspan="2">
 <?php
-print_link( 'view_all_set.php?type=1&temporary=y&' . $url_link_parameters[$t_box_title], $box_title, false, 'subtle' );
+print_link( html_entity_decode( config_get( 'bug_count_hyperlink_prefix' ) ).'&' . $url_link_parameters[$t_box_title], $box_title, false, 'subtle' );
 echo '&#160;';
-print_bracket_link( 'view_all_set.php?type=1&temporary=y&' . $url_link_parameters[$t_box_title], '^', true, 'subtle' );
+print_bracket_link( html_entity_decode( config_get( 'bug_count_hyperlink_prefix' ) ).'&' . $url_link_parameters[$t_box_title], '^', true, 'subtle' );
 
 if( count( $rows ) > 0 ) {
 	$v_start = $t_filter[FILTER_PROPERTY_ISSUES_PER_PAGE] * ( $f_page_number - 1 ) + 1;
@@ -432,7 +432,7 @@ echo "($v_start - $v_end / $t_bug_count)";
 	$t_last_updated = date( config_get( 'normal_date_format' ), $t_bug->last_updated );
 
 	# choose color based on status
-	$status_color = get_status_color( $t_bug->status );
+	$status_color = get_status_color( $t_bug->status, auth_get_current_user_id(), $t_bug->project_id );
 
 	# Check for attachments
 	$t_attachment_count = 0;
@@ -461,7 +461,7 @@ echo "($v_start - $v_end / $t_bug_count)";
 	}
 
 	if( ON == config_get( 'show_priority_text' ) ) {
-		print_formatted_priority_string( $t_bug->status, $t_bug->priority );
+		print_formatted_priority_string( $t_bug );
 	} else {
 		print_status_icon( $t_bug->priority );
 	}

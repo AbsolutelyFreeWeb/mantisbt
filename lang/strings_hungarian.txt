@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Hungarian (Magyar)
+/** Hungarian (magyar)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -27,10 +27,12 @@
  *
  * @author Attila Vági, avagi@v-comp.hu
  * @author CSÉCSY László, boobaa@nospam.frugalware.org (complete retranslation)
+ * @author Dj
  * @author Gergő Bácskai, gergo@bacskai.hu
  * @author Glanthor Reviol
  * @author Istvan Back, back@webmuves.hu
  * @author Leiric
+ * @author Sucy
  */
 
 $s_actiongroup_menu_move = 'Mozgatás';
@@ -128,6 +130,8 @@ $s_select_option = '(válasszon)';
 $s_bug_actiongroup_access = 'Nem rendelkezik a szükséges jogosultságokkal a művelet végrehajtásához.';
 $s_bug_actiongroup_status = 'Ezt az ügyet nem lehet a kért státuszúra állítani';
 $s_bug_actiongroup_category = 'Ezt az ügyet nem lehet a kért kategóriájúra változtatni';
+$s_bug_actiongroup_handler = 'A kért felhasználó nem kezelheti ezt az ügyet';
+$s_bug_actiongroup_version = 'A kért verzió nem létezik a probléma projektjében';
 $s_close_bugs_conf_msg = 'Valóban le akarja zárni ezeket az ügyeket?';
 $s_delete_bugs_conf_msg = 'Valóban törölni akarja ezeket az ügyeket?';
 $s_move_bugs_conf_msg = 'Ügyek mozgatása ide:';
@@ -170,7 +174,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Hiba volt a jelentésében.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Nincs fájl megadva';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'A fájltípus nem megengedett';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'A könyvtár nem létezik. Ellenőrizze a projekt beállításait.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Ez a fájl már létezik, először törölnie kell.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Már létezik ilyen nevű projekt.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Egy kötelező \'%1$s\' mező üres. Ellenőrizze a megadott adatokat.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Ez egy védett felhasználó. Hozzáférés a felhasználó-védelem megszüntetetéséig megtagadva.';
@@ -273,7 +276,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'A(z) „%1$s” mező érvénytelen mez�
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Érvénytelen munkamenet-kezelő.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'A(z) „%1$s” munkamenet változó nem található.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'A munkameneted érvénytelenítetté vált.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Érvénytelen biztonsági token. Nem küldted el véletlenül kétszer az űrlapot?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Érvénytelen biztonsági token. Ezt a munkamenet időtúllépése, vagy az űrlap véletlen kétszer történő elküldése okozhatja.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Ez a lap nem elérhető ezzel a módszerrel.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Érvénytelen rendezési mező.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Érvénytelen dátumformátum.';
@@ -463,8 +466,11 @@ $s_monitor_bug_button = 'Figyelés';
 $s_unmonitor_bug_button = 'Ellenőrzés vége';
 $s_file_upload_msg = 'Sikeres fájlfeltöltés';
 $s_upload_file = 'Fájl feltöltése';
+$s_upload_files = 'Fájlok feltöltése';
 $s_select_file = 'Fájl kiválasztása';
+$s_select_files = 'Fájlok kiválasztása';
 $s_upload_file_button = 'Fájl feltöltése';
+$s_upload_files_button = 'Fájlok feltöltése';
 $s_max_file_size = 'Max. méret';
 $s_bug_reopened_msg = 'Ügy újranyitva...';
 $s_reopen_add_bugnote_title = 'Megjegyzés hozzáadása az ügy újranyitásához';
@@ -479,6 +485,7 @@ $s_to = 'Címzett';
 $s_sent_you_this_reminder_about = 'küldte Önnek ezt az emlékeztetőt a következőről:';
 $s_bug_reminder = 'Emlékeztető küldése';
 $s_reminder_sent_to = 'Emlékeztető elküldve a következőnek:';
+$s_reminder_sent_none = 'Nem sikerült elküldeni az emlékeztetőket';
 $s_bug_send_button = 'Küldés';
 $s_reminder = 'Emlékeztető';
 $s_reminder_explain = 'Ezen megjegyzést mindenki megkapja, aki visszajelzést kért az ügyről.';
@@ -591,6 +598,7 @@ $s_protected = 'Védett';
 $s_create_user_button = 'Felhasználó létrehozása';
 $s_hide_disabled = 'Letiltottak elrejtése';
 $s_filter_button = 'Szűrő alkalmazása';
+$s_default_filter = 'Alapértelmezett szűrő';
 $s_create_filter_link = 'Permalink létrehozása';
 $s_create_short_link = 'Rövid link létrehozása';
 $s_filter_permalink = 'Íme az éppen beállított szűrőhöz tartozó permalink:';
@@ -613,6 +621,7 @@ $s_1_week_title = '1 hét';
 $s_never_logged_in_title = 'Sosem lépett be';
 $s_prune_accounts = 'Felhasználók eltávolítása';
 $s_hide_inactive = 'Inaktívak elrejtése';
+$s_show_disabled = 'Letiltottak megjelenítése';
 $s_manage_accounts_title = 'Felhasználók kezelése';
 $s_date_created = 'Létrehozás dátuma';
 $s_last_visit = 'Utolsó látogatás';
@@ -764,6 +773,7 @@ $s_accounts_pruned_msg = 'Minden felhasználó törölve, aki sosem lépett be �
 $s_prune_accounts_button = 'Eltávolítás';
 $s_confirm_account_pruning = 'Valóban törölni szeretné a sosem belépett régi felhasználókat?';
 $s_edit_user_title = 'Felhasználó szerkesztése';
+$s_account_unlock_button = 'Fiók zárolásának feloldása';
 $s_reset_password_button = 'Jelszó visszaállítása';
 $s_delete_user_button = 'Felhasználó törlése';
 $s_reset_password_msg = 'A jelszó visszaállításakor emailben elküldjük a jóváhagyás URL-jét.';
@@ -774,7 +784,8 @@ $s_users_new = 'Új';
 $s_account_reset_protected_msg = 'Védett felhasználó. A jelszó nem állítható vissza.';
 $s_account_reset_msg = 'Egy jóváhagyási kérést küldtünk a kiválasztott felhasználó email-címére, melynek használatával megváltoztathatja a jelszavát.';
 $s_account_reset_msg2 = 'A felhasználó jelszavát üresre állítottuk...';
-$s_manage_user_protected_msg = 'Védett felhasználó. A hozzáférési szint és az engedélyezés nem módosítható. Egyébként a felhasználó frissítve...';
+$s_account_unlock_msg = 'A fiók zárolása feloldva.';
+$s_manage_user_protected_msg = 'Védett felhasználó. A hozzáférési szint és az engedélyezés nem módosítható. Egyébként a felhasználó frissítve.';
 $s_manage_user_updated_msg = 'Felhasználó sikeresen frissítve...';
 $s_email_user_updated_subject = 'Felhasználói fiók frissítve';
 $s_email_user_updated_msg = 'A felhasználói fiókodat frissítette egy adminisztrátor. A változások listáját alább láthatod. Bármikor frissítheted a fiókod részleteit és beállításaidat a következő URL felkeresésével:';
@@ -833,6 +844,7 @@ $s_project_document_updated = 'Projekt sikeresen frissítve';
 $s_project_user_added_msg = 'Felhasználó sikeresen hozzáadva a projekthez';
 $s_project_removed_user_msg = 'Felhasználó sikeresen törölve a projektből';
 $s_remove_user_sure_msg = 'Valóban törölni akarja ezt a felhasználót?';
+$s_remove_user_from_project_button = 'Felhasználó eltávolítása a(z) %s projektből';
 $s_remove_all_users_sure_msg = 'Valóban törölni akarja ezen projekt összes felhasználóját?';
 $s_remove_all_users_button = 'Minden felhasználó törlése';
 $s_add_user_title = 'Felhasználó hozzáadása projekthez';
@@ -919,6 +931,9 @@ $s_sort = 'Rendezés';
 $s_issue_id = 'Ügy #';
 $s_recently_visited = 'Nemrég megtekintett';
 $s_note_user_id = 'Megjegyzés tőle:';
+$s_filter_match_type = 'Egyezés típusa';
+$s_filter_match_all = 'Valamennyi feltétel';
+$s_filter_match_any = 'Egyik feltétel';
 $s_none = 'egyik sem';
 $s_current = 'aktuális';
 $s_search = 'Keresés';
@@ -957,6 +972,7 @@ $s_update_bug_button = 'Szerkesztés';
 $s_bug_assign_to_button = 'Hozzárendelés a következőhöz:';
 $s_bug_status_to_button = 'Státuszváltás a következőre:';
 $s_reopen_bug_button = 'Újranyitás';
+$s_close_bug_button = 'Bezárás';
 $s_move_bug_button = 'Áthelyezés';
 $s_attached_files = 'Csatolt fájlok';
 $s_publish = 'Publikálás';
@@ -1005,7 +1021,7 @@ $s_custom_field_type_enum_string = '0:Sztring,1:Numerikus,2:Lebegőpontos,3:Fels
 $s_confirm_used_custom_field_deletion = 'Ez a mező jelenleg legalább egy projekthez csatlakozik. Ha folytatja, a hozzá tartozó összes érték menthetetlenül elveszik. Ez a művelet nem visszavonható. Ha mégsem akarja törölni ezt a mezőt, nyomja meg a böngészője Vissza gombját. A törléshez nyomja meg az alábbi gombot';
 $s_confirm_custom_field_deletion = 'Valóban törölni szeretné ezt az egyedi mezőt és az összes társított értéket?';
 $s_field_delete_button = 'Mező törlése';
-$s_confirm_custom_field_unlinking = 'Valóban törölni (lecsatlakoztatni) szeretné ezt az egyedi mezőt a projektből, és törölni az összes társított értéket?';
+$s_confirm_custom_field_unlinking = 'Valóban törölni (lecsatlakoztatni) szeretné ezt az egyedi mezőt a projektből? Az értékek nem kerülnek törlésre, amíg maga az egyedi mező nem kerül eltörlésre.';
 $s_field_remove_button = 'Mező törlése a projektből';
 $s_hide_status = 'Státusz elrejtése';
 $s_filter_closed = 'Lezárva';
@@ -1053,6 +1069,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>FIGYELEM</b>. Ezen ü
 $s_create_child_bug_button = 'Klónozás';
 $s_bug_cloned_to = 'Ügy klónozva';
 $s_bug_created_from = 'Ügy generálva a következőből:';
+$s_copy_from_parent = 'Kiterjesztett adatok másolása a szülő ügyből';
+$s_copy_notes_from_parent = 'Ügy megjegyzés másolása';
+$s_copy_attachments_from_parent = 'Mellékletek másolása';
 $s_viewing_bug_relationship_graph_title = 'Kapcsolati háló';
 $s_viewing_bug_dependency_graph_title = 'Függőségi háló';
 $s_relation_graph = 'Kapcsolati grafikon';
@@ -1113,6 +1132,7 @@ $s_handle_sponsored_issue = 'Támogatott ügy kezelése';
 $s_others = 'EGYEBEK';
 $s_see_email_addresses_of_other_users = 'Többi felhasználó email-címének megtekintése';
 $s_send_reminders = 'Emlékeztetők küldése';
+$s_receive_reminders = 'Emlékeztetők fogadása';
 $s_add_profiles = 'Profilok hozzáadása';
 $s_notify_of_new_user_created = 'Értesítés új felhasználó létrehozásakor';
 $s_email_notification = 'E-mail értesítés';
@@ -1164,8 +1184,9 @@ $s_tag_related_issues = 'Osztozó ügyek (%1$s)';
 $s_tag_stats_attached = '%1$s ügyhöz csatolva';
 $s_tag_create = 'Címke létrehozása';
 $s_show_all_tags = 'Mind';
-$s_time_tracking_billing_link = 'Számlázás';
+$s_time_tracking_billing_link = 'Időkövetés';
 $s_time_tracking = 'Időkövetés';
+$s_time_tracking_time_spent = 'Eltöltött idő:';
 $s_time_tracking_get_info_button = 'Időkövetési információk megtekintése';
 $s_time_tracking_cost_per_hour = 'Óradíj';
 $s_time_tracking_cost = 'Költség';

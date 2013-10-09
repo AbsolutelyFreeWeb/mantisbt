@@ -23,7 +23,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -80,6 +80,9 @@
 
 	$result = filter_get_bug_rows( $f_page_number, $t_per_page, $t_page_count, $t_bug_count );
 	$row_count = count( $result );
+	
+	# pre-cache custom column data
+	columns_plugin_cache_issue_data( $result );
 
 	# for export
 	$t_show_flag = gpc_get_int( 'show_flag', 0 );

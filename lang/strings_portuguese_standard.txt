@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Portuguese (Português)
+/** Portuguese (português)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -28,6 +28,7 @@
  * @author Crazymadlover
  * @author Giro720
  * @author Hamilton Abreu
+ * @author Luckas Blade
  * @author Luís Martins, lmar@ualg.pt
  * @author M42
  * @author Malafaya
@@ -131,6 +132,8 @@ $s_select_option = '(seleccione)';
 $s_bug_actiongroup_access = 'Não tem as permissões apropriadas para executar essa acção.';
 $s_bug_actiongroup_status = 'O estado deste problema não pode ser alterado para o pretendido';
 $s_bug_actiongroup_category = 'Este problema não pode ser alterado para a categoria pretendida';
+$s_bug_actiongroup_handler = 'O utilizador solicitado não tem permissão para lidar com este problema';
+$s_bug_actiongroup_version = 'A versão solicitada não existe no projeto que contém este problema';
 $s_close_bugs_conf_msg = 'Tem a certeza que quer fechar estes problemas?';
 $s_delete_bugs_conf_msg = 'Tem a certeza que quer apagar estes problemas?';
 $s_move_bugs_conf_msg = 'Mover problemas para';
@@ -173,7 +176,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Houve um erro no seu relatório';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Nenhum ficheiro especificado';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'O tipo de ficheiro não é permitido.';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'A pasta não existe. Por favor verifique as definições do projecto.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Este é um ficheiro duplicado. Por favor, apague o ficheiro antes.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Já existe um projecto com esse nome.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'O campo necessário "%1$s" estava vazio. Por favor, verifique novamente as entradas.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Esta conta está protegida. Você não tem permissão para aceder a isto até que a proteção seja removida.';
@@ -231,6 +233,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = 'Já existe uma categoria com esse nom
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = 'Nenhuma acção de cópia foi especificada.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = 'Categoria não encontrada.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = 'Categoria "%1$s" não encontrada para o projecto "%2$s".';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = 'Esta categoria não pode ser eliminada, porque está definida como "categoria padrão para movimentos".';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'Já existe uma versão com esse nome.';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Versão "%1$s" não encontrada.';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = 'O nome de utilizador é inválido. Nomes de utilizador só podem conter letras, números, espaços, hífenes (-), pontos (.), sinais de mais (+) e sublinhados (_).';
@@ -276,7 +279,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'Campo "%1$s" contém campo inválido "%2
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Handler de sessão inválido.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'Variável de sessão "%1$s" não encontrada.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'A sua sessão tornou-se inválida.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Token de segurança de formulário inválido. Enviou o formulário duas vezes, por engano?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Token de segurança de formulário inválido. Isto pode ser causado por um timeout da sessão ou pelo envio acidental do formulário em duplicado.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Esta página não pode ser acedida por este método.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Campo de ordenação inválido.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Formato de data inválido.';
@@ -466,8 +469,11 @@ $s_monitor_bug_button = 'Acompanhar';
 $s_unmonitor_bug_button = 'Terminar acompanhamento';
 $s_file_upload_msg = 'Ficheiro Enviado com Sucesso';
 $s_upload_file = 'Enviar Ficheiro';
+$s_upload_files = 'Carregar Ficheiros';
 $s_select_file = 'Selecionar Ficheiro';
+$s_select_files = 'Selecionar Ficheiros';
 $s_upload_file_button = 'Enviar Ficheiro';
+$s_upload_files_button = 'Carregar Ficheiros';
 $s_max_file_size = 'Tamanho Máx.';
 $s_bug_reopened_msg = 'O problema foi reaberto...';
 $s_reopen_add_bugnote_title = 'Adicione uma nota com o motivo da reabertura do problema';
@@ -481,7 +487,7 @@ $s_from = 'De';
 $s_to = 'Para';
 $s_sent_you_this_reminder_about = 'enviou-lhe este aviso acerca de';
 $s_bug_reminder = 'Enviar um aviso';
-$s_reminder_sent_to = 'Aviso enviado a:';
+$s_reminder_sent_to = 'Aviso enviado a';
 $s_bug_send_button = 'Enviar';
 $s_reminder = 'Aviso';
 $s_reminder_explain = 'Esta nota será enviada aos destinatários indicados solicitando comentários a este problema.';
@@ -592,7 +598,7 @@ $s_verify_password = 'Verificar palavra-chave';
 $s_enabled = 'Activado';
 $s_protected = 'Protegido';
 $s_create_user_button = 'Criar Utilizador';
-$s_hide_disabled = 'Esconder Desabilitados';
+$s_hide_disabled = 'Esconder desativados';
 $s_filter_button = 'Aplicar Filtro';
 $s_create_filter_link = 'Criar Permalink';
 $s_create_short_link = 'Criar link curto';
@@ -616,6 +622,7 @@ $s_1_week_title = '1 Semana';
 $s_never_logged_in_title = 'Nunca Entrou';
 $s_prune_accounts = 'Cortar Contas';
 $s_hide_inactive = 'Esconder Inactivas';
+$s_show_disabled = 'Mostrar desativados';
 $s_manage_accounts_title = 'Gestor de Contas';
 $s_date_created = 'Data de Criação';
 $s_last_visit = 'Última Visita';
@@ -767,6 +774,7 @@ $s_accounts_pruned_msg = 'Todas as contas não utilizadas durante o período de 
 $s_prune_accounts_button = 'Limpar';
 $s_confirm_account_pruning = 'Tem a certeza que quer apagar as contas antigas que nunca tenham entrado?';
 $s_edit_user_title = 'Editar Utilizador';
+$s_account_unlock_button = 'Desbloquear conta';
 $s_reset_password_button = 'Repor Palavra-Chave';
 $s_delete_user_button = 'Apagar utilizador';
 $s_reset_password_msg = 'Repor Palavra-Chave envia o URL de confirmação via e-mail';
@@ -777,7 +785,8 @@ $s_users_new = 'Novo';
 $s_account_reset_protected_msg = 'Conta protegida. Não é possível limpar a palavra-chave.';
 $s_account_reset_msg = 'Um pedido de confirmação foi enviado para o email do utilizador. Através deste pedido, o utilizador poderá modificar a sua palavra-passe.';
 $s_account_reset_msg2 = 'Palavra-chave da conta definida para vazia...';
-$s_manage_user_protected_msg = 'Conta protegida. Nível de acesso e protecção activa. Caso contrário a conta foi actualizada...';
+$s_account_unlock_msg = 'A conta foi desbloqueada.';
+$s_manage_user_protected_msg = 'Conta protegida; os campos \'Nível de acesso\' e \'Ativa\' não podem ser modificados. Os outros campos foram atualizados com sucesso.';
 $s_manage_user_updated_msg = 'Conta Actualizada com Sucesso...';
 $s_email_user_updated_subject = 'Conta actualizada';
 $s_email_user_updated_msg = 'A sua conta foi actualizada por um administrador. Segue-se uma lista destas alterações. Pode actualizar os detalhes e preferências da sua conta em qualquer altura através do URL:';
@@ -923,6 +932,9 @@ $s_sort = 'Ordenar por';
 $s_issue_id = 'Problema #';
 $s_recently_visited = 'Recentemente visitado';
 $s_note_user_id = 'Nota por';
+$s_filter_match_type = 'Tipo de correspondência';
+$s_filter_match_all = 'Todas as condições';
+$s_filter_match_any = 'Qualquer condição';
 $s_none = 'Nenhum';
 $s_current = 'actual';
 $s_search = 'Pesquisar';
@@ -961,6 +973,7 @@ $s_update_bug_button = 'Editar';
 $s_bug_assign_to_button = 'Atribuir a:';
 $s_bug_status_to_button = 'Mudar estado para:';
 $s_reopen_bug_button = 'Reabrir';
+$s_close_bug_button = 'Fechar';
 $s_move_bug_button = 'Mover';
 $s_attached_files = 'Ficheiros anexos';
 $s_publish = 'Publicar';
@@ -1057,6 +1070,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>Atenção:</b> Nem to
 $s_create_child_bug_button = 'Clonar';
 $s_bug_cloned_to = 'Problema clonado';
 $s_bug_created_from = 'Problema gerado a partir de';
+$s_copy_from_parent = 'Copiar os dados adicionais do problema principal';
+$s_copy_notes_from_parent = 'Copiar notas de bug';
+$s_copy_attachments_from_parent = 'Copiar anexos';
 $s_viewing_bug_relationship_graph_title = 'Gráfico de relacionamento';
 $s_viewing_bug_dependency_graph_title = 'Gráfico de dependências';
 $s_relation_graph = 'Gráfico de relacionamentos';
@@ -1095,7 +1111,7 @@ $s_delete_attachments = 'Apagar anexos';
 $s_delete_attachment_button = 'Apagar';
 $s_delete_attachment_sure_msg = 'Tem a certeza que quer apagar este anexo?';
 $s_upload_issue_attachments = 'Fazer o upload de anexos do problema';
-$s_filters = 'filtros';
+$s_filters = 'Filtros';
 $s_save_filters = 'Gravar filtros';
 $s_save_filters_as_shared = 'Gravar como filtros partilhados';
 $s_use_saved_filters = 'Usar filtros gravados';
@@ -1124,7 +1140,7 @@ $s_status_changed_to = 'Estado muda para';
 $s_email_on_deleted = 'Email quando for apagado';
 $s_email_on_sponsorship_changed = 'Email ao mudar de patrocínio';
 $s_email_on_relationship_changed = 'Email quando houver alterações de relacionamento';
-$s_loading = 'A carregar...';
+$s_loading = 'A carregar…';
 $s_between_date = 'Entre';
 $s_on_or_before_date = 'Em ou antes de';
 $s_before_date = 'Antes de';
@@ -1168,8 +1184,9 @@ $s_tag_related_issues = 'Problemas partilhados (%1$s)';
 $s_tag_stats_attached = 'Problemas anexos: %1$s';
 $s_tag_create = 'Criar etiqueta';
 $s_show_all_tags = 'Todas';
-$s_time_tracking_billing_link = 'Facturação';
+$s_time_tracking_billing_link = 'Acompanhamento de Tempo';
 $s_time_tracking = 'Acompanhamento de tempo';
+$s_time_tracking_time_spent = 'Tempo gasto:';
 $s_time_tracking_get_info_button = 'Obter informação de acompanhamento de tempo';
 $s_time_tracking_cost_per_hour = 'Custo / Hora';
 $s_time_tracking_cost = 'Custo';

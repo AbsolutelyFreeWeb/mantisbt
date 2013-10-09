@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -165,7 +165,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'كان هناك خطأ فى تقريرك.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'لا ملف تم تحديده';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'نوع الملف غير مسموح به';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'المجلد غير موجود. من فضلك تحقق من إعدادات المشروع.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'هذا ملف مكرر. من فضلك احذف الملف أولا.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'هناك مشروع بهذا الاسم بالفعل.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'حقل ضرورى "%1$s" كان فارغا. من فضلك تحقق مره أخرى من مدخلاتك.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'هذا الحساب محمى.  أنت غير مسموح لك بالدخول إلى هذا حتى يتم رفع حمايه الحساب.';

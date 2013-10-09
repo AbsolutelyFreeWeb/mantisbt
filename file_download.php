@@ -18,7 +18,7 @@
 	 * Add file and redirect to the referring page
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 
@@ -119,7 +119,7 @@
 	# attached files via HTTPS, we disable the "Pragma: no-cache"
 	# command when IE is used over HTTPS.
 	global $g_allow_file_cache;
-	if ( ( isset( $_SERVER["HTTPS"] ) && ( "on" == utf8_strtolower( $_SERVER["HTTPS"] ) ) ) && is_browser_internet_explorer() ) {
+	if ( http_is_protocol_https() && is_browser_internet_explorer() ) {
 		# Suppress "Pragma: no-cache" header.
 	} else {
 		if ( !isset( $g_allow_file_cache ) ) {
@@ -140,22 +140,11 @@
 	header( 'Content-Length: ' . $v_filesize );
 
 	# If finfo is available (always true for PHP >= 5.3.0) we can use it to determine the MIME type of files
-	$finfo_available = false;
-	if ( class_exists( 'finfo' ) ) {
-		$t_info_file = config_get( 'fileinfo_magic_db_file' );
-
-		if ( is_blank( $t_info_file ) ) {
-			$finfo = new finfo( FILEINFO_MIME );
-		} else {
-			$finfo = new finfo( FILEINFO_MIME, $t_info_file );
-		}
-
-		if ( $finfo ) {
-			$finfo_available = true;
-		}
-	}
+	$finfo = finfo_get_if_available();
 
 	$t_content_type = $v_file_type;
+
+	$t_content_type_override = file_get_content_type_override ( $t_filename );
 
 	# dump file content to the connection.
 	switch ( config_get( 'file_upload_method' ) ) {
@@ -163,12 +152,16 @@
 			$t_local_disk_file = file_normalize_attachment_path( $v_diskfile, $t_project_id );
 
 			if ( file_exists( $t_local_disk_file ) ) {
-				if ( $finfo_available ) {
+				if ( $finfo ) {
 					$t_file_info_type = $finfo->file( $t_local_disk_file );
 
 					if ( $t_file_info_type !== false ) {
 						$t_content_type = $t_file_info_type;
 					}
+				}
+
+				if ( $t_content_type_override ) {
+					$t_content_type = $t_content_type_override;
 				}
 
 				header( 'Content-Type: ' . $t_content_type );
@@ -184,7 +177,7 @@
 				file_ftp_disconnect( $ftp );
 			}
 
-			if ( $finfo_available ) {
+			if ( $finfo ) {
 				$t_file_info_type = $finfo->file( $t_local_disk_file );
 
 				if ( $t_file_info_type !== false ) {
@@ -192,16 +185,24 @@
 				}
 			}
 
+			if ( $t_content_type_override ) {
+				$t_content_type = $t_content_type_override;
+			}
+
 			header( 'Content-Type: ' . $t_content_type );
 			readfile( $t_local_disk_file );
 			break;
 		default:
-			if ( $finfo_available ) {
+			if ( $finfo ) {
 				$t_file_info_type = $finfo->buffer( $v_content );
 
 				if ( $t_file_info_type !== false ) {
 					$t_content_type = $t_file_info_type;
 				}
+			}
+
+			if ( $t_content_type_override ) {
+				$t_content_type = $t_content_type_override;
 			}
 
 			header( 'Content-Type: ' . $t_content_type );

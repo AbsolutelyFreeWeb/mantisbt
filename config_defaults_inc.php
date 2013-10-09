@@ -28,7 +28,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 
@@ -80,11 +80,12 @@
 	 * MantisBT Path Settings *
 	 **************************/
 
+	$t_protocol = 'http';
+	$t_host = 'localhost';
 	if ( isset ( $_SERVER['SCRIPT_NAME'] ) ) {
-		$t_protocol = 'http';
 		if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
 			$t_protocol= $_SERVER['HTTP_X_FORWARDED_PROTO'];
-		} else if ( isset( $_SERVER['HTTPS'] ) && ( strtolower( $_SERVER['HTTPS'] ) != 'off' ) ) {
+		} else if ( !empty( $_SERVER['HTTPS'] ) && ( strtolower( $_SERVER['HTTPS'] ) != 'off' ) ) {
 			$t_protocol = 'https';
 		}
 
@@ -108,26 +109,27 @@
 			$t_host = $_SERVER['SERVER_NAME'] . $t_port;
 		} else if ( isset( $_SERVER['SERVER_ADDR'] ) ) {
 			$t_host = $_SERVER['SERVER_ADDR'] . $t_port;
-		} else {
-			$t_host = 'localhost';
 		}
 
-		$t_self = $_SERVER['SCRIPT_NAME'];
-		$t_self = trim( str_replace( "\0", '', $t_self ) );
+		$t_self = trim( str_replace( "\0", '', $_SERVER['SCRIPT_NAME'] ) );
 		$t_path = str_replace( basename( $t_self ), '', $t_self );
-		$t_path = basename( $t_path ) == "admin" ? dirname( $t_path ) . '/' : $t_path;
-		$t_path = basename( $t_path ) == "soap" ? dirname( dirname( $t_path ) ) . '/' : $t_path;
+		switch( basename( $t_path ) ) {
+			case 'admin':
+				$t_path = rtrim( dirname( $t_path ), '/\\' ) . '/';
+				break;
+			case 'soap':
+				$t_path = rtrim( dirname( dirname( $t_path ) ), '/\\' ) . '/';
+				break;
+			case '':
+				$t_path = '/';
+				break;
+		}
 		if ( strpos( $t_path, '&#' ) ) {
 			echo 'Can not safely determine $g_path. Please set $g_path manually in config_inc.php';
 			die;
 		}
-
-		$t_url	= $t_protocol . '://' . $t_host . $t_path;
-
 	} else {
-		$t_path = '';
-		$t_host = '';
-		$t_protocol = '';
+		$t_path = 'mantisbt/';
 	}
 
 	/**
@@ -135,7 +137,7 @@
 	 * requires trailing /
 	 * @global string $g_path
 	 */
-	$g_path	= isset( $t_url ) ? $t_url : 'http://localhost/mantisbt/';
+	$g_path	= $t_protocol . '://' . $t_host . $t_path;
 
 	/**
 	 * path to your images directory (for icons)
@@ -233,8 +235,10 @@
 	 ****************************/
 
 	/**
-	 * allow users to signup for their own accounts.
-	 * Mail settings must be correctly configured in order for this to work
+	 * Allow users to signup for their own accounts.
+	 * If ON, then $g_send_reset_password must be ON as well, and mail settings
+	 * must be correctly configured
+	 * @see $g_send_reset_password
 	 * @global int $g_allow_signup
 	 */
 	$g_allow_signup			= ON;
@@ -255,9 +259,10 @@
 	$g_notify_new_user_created_threshold_min = ADMINISTRATOR;
 
 	/**
-	 * if ON users will be sent their password when reset.
-	 * if OFF the password will be set to blank. If set to ON, mail settings must be
-	 * correctly configured.
+	 * If ON, users will be sent their password when their account is created
+	 * or password reset (this requires mail settings to be correctly configured).
+	 * If OFF, then the Administrator will have to provide a password when
+	 * creating new accounts, and the password will be set to blank when reset.
 	 * @global int $g_send_reset_password
 	 */
 	$g_send_reset_password	= ON;
@@ -634,6 +639,7 @@
 		'romanian',
 		'russian',
 		'serbian',
+		'serbian_latin',
 		'slovak',
 		'slovene',
 		'spanish',
@@ -693,6 +699,7 @@
 		'ro-mo, ro' => 'romanian',
 		'ru-mo, ru-ru, ru-ua, ru' => 'russian',
 		'sr' => 'serbian',
+		'sr-el' => 'serbian_latin',
 		'sk' => 'slovak',
 		'sl' => 'slovene',
 		'es-mx, es-co, es-ar, es-cl, es-pr, es' => 'spanish',
@@ -742,7 +749,7 @@
 	 * Logo
 	 * @global string $g_logo_image
 	 */
-	$g_logo_image			= 'images/mantis_logo.gif';
+	$g_logo_image			= 'images/mantis_logo.png';
 
 	/**
 	 * Logo URL link
@@ -823,14 +830,16 @@
 	 * To include custom field 'xyz', include the column name as 'custom_xyz'.
 	 *
 	 * Standard Column Names (i.e. names to choose from):
-	 * selection, edit, id, project_id, reporter_id, handler_id, priority, reproducibility, projection, eta,
-	 * resolution, fixed_in_version, view_state, os, os_build, build (for product build), platform, version, date_submitted, attachment,
-	 * category, sponsorship_total, severity, status, last_updated, summary, bugnotes_count, description,
-	 * steps_to_reproduce, additional_information
+	 * id, project_id, reporter_id, handler_id, duplicate_id, priority, severity,
+	 * reproducibility, status, resolution, category_id, date_submitted, last_updated,
+	 * os, os_build, platform, version, fixed_in_version, target_version, view_state,
+	 * summary, sponsorship_total, due_date, description, steps_to_reproduce,
+	 * additional_info, attachment_count, bugnotes_count, selection, edit,
+	 * overdue
 	 *
 	 * @global array $g_view_issues_page_columns
 	 */
-	$g_view_issues_page_columns = array ( 'selection', 'edit', 'priority', 'id', 'sponsorship_total', 'bugnotes_count', 'attachment', 'category_id', 'severity', 'status', 'last_updated', 'summary' );
+	$g_view_issues_page_columns = array ( 'selection', 'edit', 'priority', 'id', 'sponsorship_total', 'bugnotes_count', 'attachment_count', 'category_id', 'severity', 'status', 'last_updated', 'summary' );
 
 	/**
 	 * The default columns to be included in the Print Issues Page.
@@ -838,7 +847,7 @@
 	 * Also each user can configure their own columns using My Account -> Manage Columns
 	 * @global array $g_print_issues_page_columns
 	 */
-	$g_print_issues_page_columns = array ( 'selection', 'priority', 'id', 'sponsorship_total', 'bugnotes_count', 'attachment', 'category_id', 'severity', 'status', 'last_updated', 'summary' );
+	$g_print_issues_page_columns = array ( 'selection', 'priority', 'id', 'sponsorship_total', 'bugnotes_count', 'attachment_count', 'category_id', 'severity', 'status', 'last_updated', 'summary' );
 
 	/**
 	 * The default columns to be included in the CSV export.
@@ -929,12 +938,25 @@
 
 	/**
 	 * Show user avatar
-	 * the current implementation is based on http://www.gravatar.com
-	 * users will need to register there the same address used in
-	 * this MantisBT installation to have their avatar shown
+	 *
+	 * The current implementation is based on http://www.gravatar.com
+	 * Users will need to register there the same email address used in this
+	 * MantisBT installation to have their avatar shown.
 	 * Please note: upon registration or avatar change, it takes some time for
 	 * the updated gravatar images to show on sites
-	 * @global int $g_show_avatar
+	 *
+	 * The config can be either set to OFF (avatars disabled) or set to a string
+	 * defining the default avatar to be used when none is associated with the
+	 * user's email. Valid values:
+	 * - OFF (default)
+	 * - ON (equivalent to 'identicon')
+	 * - One of Gravatar's defaults (mm, identicon, monsterid, wavatar, retro)
+	 *   @link http://en.gravatar.com/site/implement/images/
+	 * - An URL to the default image to be used (for example,
+	 *   "http:/path/to/unknown.jpg" or "%path%images/no_avatar.png")
+	 *
+	 * @global int|string $g_show_avatar
+	 * @see $g_show_avatar_threshold
 	 */
 	$g_show_avatar = OFF;
 
@@ -943,12 +965,6 @@
 	 * @global int $g_show_avatar_threshold
 	 */
 	$g_show_avatar_threshold = DEVELOPER;
-
-	/**
-	 * Default avatar for users without a gravatar account
-	 * @global string $g_default_avatar
-	 */
-	$g_default_avatar = "%path%images/no_avatar.png";
 
 	/**
 	 * Show release dates on changelog
@@ -971,6 +987,15 @@
 	 * @global int $g_cookie_time_length
 	 */
 	$g_cookie_time_length	= 30000000;
+
+	/**
+	 * Allow users to opt for a 'permanent' cookie when logging in
+	 * Controls the display of the 'Remember my login in this browser' checkbox
+	 * on the login page
+	 * @see $g_cookie_time_length
+	 * @global int $g_allow_permanent_cookie
+	 */
+	$g_allow_permanent_cookie = ON;
 
 	/**
 	 * minutes to wait before document is stale (in minutes)
@@ -1031,20 +1056,19 @@
 	 */
 	$g_calendar_date_format   = 'Y-m-d H:i';
 
-	/**************************
+	/******************************
 	 * MantisBT TimeZone Settings *
-	 **************************/
+	 ******************************/
 
 	/**
-	 * Default timezone to use in mantis.
-	 * See http://us.php.net/manual/en/timezones.php
-	 * for a list of valid timezones.
-	 * Note: if this is left blank, we use the result of
-	 * date_default_timezone_get() i.e. in order:
-	 * 1. Reading the TZ environment variable (if non empty)
-	 * 2. Reading the value of the date.timezone php.ini option (if set)
-	 * 3. Querying the host operating system (if supported and allowed by the OS)
-	 * 4. If none of the above succeed, will return a default timezone of UTC.
+	 * Default timezone to use in MantisBT
+	 *
+	 * If this config is left blank, it will be initialized by calling function
+	 * {@link http://php.net/date-default-timezone-get date_default_timezone_get()}
+	 * to determine the default timezone.
+	 * Note that this function's behavior was modified in PHP 5.4.0.
+	 *
+	 * @link http://php.net/timezones List of Supported Timezones
 	 * @global string $g_default_timezone
 	 */
 	$g_default_timezone = '';
@@ -1157,6 +1181,18 @@
 	 * @global int $g_default_bug_eta
 	 */
 	$g_default_bug_eta = ETA_NONE;
+
+	/**
+	 * Default for new bug relationships
+	 * @global int $g_default_bug_relationship
+	 */
+	$g_default_bug_relationship = BUG_RELATED;
+
+	/**
+	 * Default relationship between a new bug and its parent when cloning it
+	 * @global int $g_default_bug_relationship_clone
+	 */
+	$g_default_bug_relationship_clone = BUG_REL_NONE;
 
 	/**
 	 * Default global category to be used when an issue is moved from a project to another
@@ -1558,6 +1594,12 @@
 	$g_file_upload_ftp_pass		= 'readwritepass';
 
 	/**
+	 * Maximum number of files that can be uploaded simultaneously
+	 * @global int $g_file_upload_max_num
+	 */
+	$g_file_upload_max_num = 1;
+
+	/**
 	 * Maximum file size that can be uploaded
 	 * Also check your PHP settings (default is usually 2MBs)
 	 * @global int $g_max_file_size
@@ -1628,9 +1670,9 @@
 	$g_max_dropdown_length = 40;
 
 	/**
-	 * This flag conntrolls whether pre-formatted text (delimited by <pre> tags
-	 *  is wrapped to a maximum linelength (defaults to 100 chars in strings_api)
-	 *  If turned off, the display may be wide when viewing the text
+	 * This flag controls whether pre-formatted text (delimited by HTML pre tags
+	 * is wrapped to a maximum line length (defaults to 100 chars in strings_api)
+	 * If turned off, the display may be wide when viewing the text
 	 * @global int $g_wrap_in_preformatted_text
 	 */
 	$g_wrap_in_preformatted_text = ON;
@@ -1694,7 +1736,7 @@
 
 	/**
 	 * The LDAP field for real name (i.e. common name).
-	 * @global string $g_ldap_uid_field
+	 * @global string $g_ldap_realname_field
 	 */
 	$g_ldap_realname_field  = 'cn';
 
@@ -1904,18 +1946,6 @@
 	 * @global int $g_preview_max_height
 	 */
 	$g_preview_max_height = 250;
-
-	/**
-	 * Show an attachment indicator on bug list
-	 * Show a clickable attachment indicator on the bug
-	 * list page if the bug has one or more files attached.
-	 * Note: This option is disabled by default since it adds
-	 * 1 database query per bug listed and thus might slow
-	 * down the page display.
-	 *
-	 * @global int $g_show_attachment_indicator
-	 */
-	$g_show_attachment_indicator = OFF;
 
 	/**
 	 * access level needed to view bugs attachments.  View means to see the file names
@@ -2216,7 +2246,7 @@
 	 * Access level needed to delete other users from the list of users
 	 * monitoring a bug.
 	 * Look in the constant_inc.php file if you want to set a different value.
-	 * @global int $g_monitor_add_others_bug_threshold
+	 * @global int $g_monitor_delete_others_bug_threshold
 	 */
 	$g_monitor_delete_others_bug_threshold = DEVELOPER;
 
@@ -2496,7 +2526,7 @@
 	 * example: $g_set_status_threshold = array( ACKNOWLEDGED => MANAGER, CONFIRMED => DEVELOPER, CLOSED => MANAGER );
 	 * @global array $g_set_status_threshold
 	 */
-	$g_set_status_threshold = array();
+	$g_set_status_threshold = array( NEW_ => REPORTER );
 
 	/**
 	 * Allow a bug to have no category
@@ -2698,6 +2728,13 @@
 	$g_csv_separator = ',';
 
 	/**
+	  * CSV Export
+	  * Add Byte Order Mark (BOM) at the begining of the file as it helps Excel display the file in UTF-8
+	  * @global string $g_csv_add_bom
+	  */
+	$g_csv_add_bom = OFF;
+
+	/**
 	 * threshold for users to view the system configurations
 	 * @global int $g_view_configuration_threshold
 	 */
@@ -2766,28 +2803,36 @@
 	 *****************************/
 
 	/**
-	 * --- cookie path ---------------
-	 * set this to something more restrictive if needed
-	 * http://www.php.net/manual/en/function.setcookie.php
+	 * Specifies the path under which a cookie is visible
+	 * All scripts in this directory and its sub-directories will be able
+	 * to access MantisBT cookies.
+	 * It is recommended to set this to the actual MantisBT path.
+	 * @link http://php.net/function.setcookie
 	 * @global string $g_cookie_path
 	 */
 	$g_cookie_path			= '/';
 
 	/**
-	 *
+	 * The domain that the MantisBT cookies are available to
 	 * @global string $g_cookie_domain
 	 */
 	$g_cookie_domain		= '';
 
 	/**
-	 * cookie version for view_all_page
+	 * Version of the view_all_page cookie
+	 * It is not expected for the user to need to change this setting
+	 * @see $g_view_all_cookie
 	 * @global string $g_cookie_version
 	 */
 	$g_cookie_version		= 'v8';
 
 	/**
-	 * --- cookie prefix ---------------
-	 * set this to a unique identifier.  No spaces or periods.
+	 * Prefix for all MantisBT cookies
+	 * This should be an identifier which does not include spaces or periods,
+	 * and should be unique per MantisBT installation, especially if
+	 * $g_cookie_path is not restricting the cookies' scope to the actual
+	 * MantisBT directory.
+	 * @see $g_cookie_path
 	 * @global string $g_cookie_prefix
 	 */
 	$g_cookie_prefix		= 'MANTIS';
@@ -2811,10 +2856,16 @@
 	$g_view_all_cookie		= '%cookie_prefix%_VIEW_ALL_COOKIE';
 
 	/**
-	 *
-	 * @global string $g_manage_cookie
+	 * Stores the filter criteria for the Manage User page
+	 * @global string $g_manage_users_cookie
 	 */
-	$g_manage_cookie		= '%cookie_prefix%_MANAGE_COOKIE';
+	$g_manage_users_cookie		= '%cookie_prefix%_MANAGE_USERS_COOKIE';
+
+	/**
+	 * Stores the filter criteria for the Manage Config Report page
+	 * @global string $g_manage_config_cookie
+	 */
+	$g_manage_config_cookie		= '%cookie_prefix%_MANAGE_CONFIG_COOKIE';
 
 	/**
 	 *
@@ -3253,6 +3304,22 @@
 		'?'		=> 'generic.gif' );
 
 	/**
+	 *
+	 * Content types which will be overriden when downloading files
+	 *
+	 * @global array $g_file_download_content_type_overrides
+	 */
+	$g_file_download_content_type_overrides = array (
+		'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'dotx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+		'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+		'ppsx' => 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+		'potx' => 'application/vnd.openxmlformats-officedocument.presentationml.template',
+		'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'xltx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.template'
+	);
+
+	/**
 	 * Icon associative arrays
 	 * Status to icon mapping
 	 * @global array $g_status_icon_arr
@@ -3671,11 +3738,10 @@
 	 * @global int $g_manage_plugin_threshold
 	 */
 	$g_manage_plugin_threshold = ADMINISTRATOR;
-	
-	
+
 	/**
 	 * A mapping of file extensions to mime types, used when serving resources from plugins
-	 * 
+	 *
 	 * @global array $g_plugin_mime_types
 	 */
 	$g_plugin_mime_types = array(
@@ -3723,7 +3789,7 @@
 	 * Sub-projects should inherit versions from parent projects.
 	 */
 	$g_subprojects_inherit_versions = ON;
-	
+
 	/**********************************
 	 * Debugging / Developer Settings *
 	 **********************************/
@@ -3841,7 +3907,7 @@
 	 * @global string $g_log_destination
 	 */
 	$g_log_destination = '';
-	
+
 	/**
 	 * if OFF, will include original javascript files
 	 * if ON, will include javascript files that have been compressed by yuicompressor if available
@@ -3855,13 +3921,42 @@
 
 	/**
 	 * The following list of variables should never be in the database.
-	 * These patterns will be concatenated and used as a regular expression
-	 * to bypass the database lookup and look here for appropriate global settings.
+	 * It is used to bypass the database lookup and look here for appropriate global settings.
 	 * @global array $g_global_settings
 	 */
 	$g_global_settings = array(
-		'_table$', 'cookie', '^db_', 'hostname', 'allow_signup', 'database_name', 'show_queries_', 'admin_checks', 'version_suffix', 'global_settings',
-		'_path$', 'use_iis', 'language', 'use_javascript', 'minimal_jscss', 'display_errors', 'show_detailed_errors', 'stop_on_errors', 'login_method', '_file$',
-		'anonymous', 'content_expire', 'html_valid_tags', 'custom_headers', 'rss_key_seed', 'plugins_enabled', 'session_', 'form_security_',
-		'compress_html', '_page$', '_url$',
+		'path', 'icon_path', 'short_path', 'absolute_path', 'core_path', 'class_path',
+		'absolute_path_default_upload_folder', 'ldap_simulation_file_path', 'cookie_path',
+		'plugin_path', 'db_table_prefix', 'db_table_suffix', 'db_table', 'allow_permanent_cookie',
+		'cookie_time_length', 'cookie_domain', 'cookie_version', 'cookie_prefix',
+		'string_cookie', 'project_cookie', 'view_all_cookie', 'manage_users_cookie',
+		'manage_config_cookie', 'logout_cookie', 'bug_list_cookie',
+		'db_username', 'db_password', 'db_schema', 'db_type', 'hostname',
+		'allow_signup', 'database_name', 'show_queries_count', 'show_queries_threshold',
+		'show_queries_list', 'admin_checks', 'version_suffix', 'global_settings', 'use_iis',
+		'default_language', 'language_choices_arr', 'language_auto_map', 'fallback_language',
+		'use_javascript', 'minimal_jscss', 'display_errors', 'show_detailed_errors',
+		'stop_on_errors', 'login_method', 'fileinfo_magic_db_file', 'css_include_file',
+		'css_rtl_include_file', 'meta_include_file', 'allow_anonymous_login', 'anonymous_account',
+		'content_expire', 'html_valid_tags', 'html_valid_tags_single_line', 'custom_headers',
+		'rss_key_seed', 'plugins_enabled', 'session_handler', 'session_key', 'session_save_path',
+		'session_validation', 'form_security_validation', 'compress_html', 'bottom_include_page',
+		'top_include_page', 'default_home_page', 'logout_redirect_page', 'manual_url',
+		'logo_url', 'create_short_url', 'wiki_engine_url',
 	);
+
+	/***************
+	 * MantisTouch *
+	 ***************/
+
+	/**
+	 * The MantisTouch URL to direct to.  The %s will be replaced by the contents of $g_path.
+	 * A blank value will disable redirection.  The %s is not required when redirecting to
+	 * MantisTouch instances that point to a single MantisBT instance and hence have a hard-coded URL.
+	 *
+	 * Following are three examples:
+	 * - 'http://mantisbt.mobi?url=%s'
+	 * - 'http://MyOwnMantisTouch.com/'
+	 * - ''
+	 */
+	$g_mantistouch_url = '';

@@ -19,23 +19,23 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
 	  * MantisBT Core API's
 	  */
-	require_once( 'core.php' );
 
+	require_once( 'core.php' );
 	require_once( 'file_api.php' );
 	
 	//anton
 	set_time_limit(0);
 
-	$f_bug_id	= gpc_get_int( 'bug_id', -1 );
-	$f_file		= gpc_get_file( 'file', -1 );
+	$f_bug_id = gpc_get_int( 'bug_id', -1 );
+	$f_files  = gpc_get_file( 'ufile', -1 );
 
-	if ( $f_bug_id == -1 && $f_file	== -1 ) {
+	if ( $f_bug_id == -1 && $f_files == -1 ) {
 		# _POST/_FILES does not seem to get populated if you exceed size limit so check if bug_id is -1
 		trigger_error( ERROR_FILE_TOO_BIG, ERROR );
 	}
@@ -55,7 +55,18 @@
 
 	access_ensure_bug_level( config_get( 'upload_bug_file_threshold' ), $f_bug_id );
 
-	file_add( $f_bug_id, $f_file, 'bug' );
+	// Process array of files to upload
+	for( $i = 0; $i < count( $f_files ); $i++ ) {
+		if( !empty( $f_files['name'][$i] ) ) {
+			$t_file['name']     = $f_files['name'][$i];
+			$t_file['tmp_name'] = $f_files['tmp_name'][$i];
+			$t_file['type']     = $f_files['type'][$i];
+			$t_file['error']    = $f_files['error'][$i];
+			$t_file['size']     = $f_files['size'][$i];
+
+			file_add( $f_bug_id, $t_file, 'bug' );
+		}
+	}
 
 	form_security_purge( 'bug_file_add' );
 

@@ -20,7 +20,7 @@
     </revhistory-->
 
     <copyright>
-      <year>2011</year>
+      <year>2013</year>
       <holder>The MantisBT Team</holder>
     </copyright>
 
@@ -55,6 +55,7 @@
         &configuration;
         &pagedescriptions;
         &customizing;
+        &troubleshooting;
         &authentication;
         &projectmanagement;
         &contributing;

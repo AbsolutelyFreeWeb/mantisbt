@@ -19,7 +19,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -58,45 +58,37 @@
 	access_ensure_project_level( config_get('report_bug_threshold' ) );
 
 	$t_bug_data = new BugData;
-	$t_bug_data->build				= gpc_get_string( 'build', '' );
-	$t_bug_data->platform				= gpc_get_string( 'platform', '' );
-	$t_bug_data->os					= gpc_get_string( 'os', '' );
-	$t_bug_data->os_build				= gpc_get_string( 'os_build', '' );
-	$t_bug_data->version			= gpc_get_string( 'product_version', '' );
-	$t_bug_data->profile_id			= gpc_get_int( 'profile_id', 0 );
-	$t_bug_data->handler_id			= gpc_get_int( 'handler_id', 0 );
-	$t_bug_data->view_state			= gpc_get_int( 'view_state', config_get( 'default_bug_view_status' ) );
-
-	$t_bug_data->category_id			= gpc_get_int( 'category_id', 0 );
-	$t_bug_data->reproducibility		= gpc_get_int( 'reproducibility', config_get( 'default_bug_reproducibility' ) );
-	$t_bug_data->severity				= gpc_get_int( 'severity', config_get( 'default_bug_severity' ) );
-	$t_bug_data->priority				= gpc_get_int( 'priority', config_get( 'default_bug_priority' ) );
-	$t_bug_data->projection				= gpc_get_int( 'projection', config_get( 'default_bug_projection' ) );
-	$t_bug_data->eta					= gpc_get_int( 'eta', config_get( 'default_bug_eta' ) );
-	$t_bug_data->resolution				= config_get( 'default_bug_resolution' );
-	$t_bug_data->status					= config_get( 'bug_submit_status' );
-	$t_bug_data->summary				= gpc_get_string( 'summary' );
-	$t_bug_data->description			= gpc_get_string( 'description' );
-	$t_bug_data->steps_to_reproduce	= gpc_get_string( 'steps_to_reproduce', config_get( 'default_bug_steps_to_reproduce' ) );
-	$t_bug_data->additional_information	= gpc_get_string( 'additional_info', config_get ( 'default_bug_additional_info' ) );
-	$t_bug_data->due_date 				= gpc_get_string( 'due_date', '');
+	$t_bug_data->project_id             = $t_project_id;
+	$t_bug_data->reporter_id            = auth_get_current_user_id();
+	$t_bug_data->build                  = gpc_get_string( 'build', '' );
+	$t_bug_data->platform               = gpc_get_string( 'platform', '' );
+	$t_bug_data->os                     = gpc_get_string( 'os', '' );
+	$t_bug_data->os_build               = gpc_get_string( 'os_build', '' );
+	$t_bug_data->version                = gpc_get_string( 'product_version', '' );
+	$t_bug_data->profile_id             = gpc_get_int( 'profile_id', 0 );
+	$t_bug_data->handler_id             = gpc_get_int( 'handler_id', 0 );
+	$t_bug_data->view_state             = gpc_get_int( 'view_state', config_get( 'default_bug_view_status' ) );
+	$t_bug_data->category_id            = gpc_get_int( 'category_id', 0 );
+	$t_bug_data->reproducibility        = gpc_get_int( 'reproducibility', config_get( 'default_bug_reproducibility' ) );
+	$t_bug_data->severity               = gpc_get_int( 'severity', config_get( 'default_bug_severity' ) );
+	$t_bug_data->priority               = gpc_get_int( 'priority', config_get( 'default_bug_priority' ) );
+	$t_bug_data->projection             = gpc_get_int( 'projection', config_get( 'default_bug_projection' ) );
+	$t_bug_data->eta                    = gpc_get_int( 'eta', config_get( 'default_bug_eta' ) );
+	$t_bug_data->resolution             = gpc_get_string('resolution', config_get( 'default_bug_resolution' ) );
+	$t_bug_data->status                 = gpc_get_string( 'status', config_get( 'bug_submit_status' ) );
+	$t_bug_data->summary                = trim( gpc_get_string( 'summary' ) );
+	$t_bug_data->description            = gpc_get_string( 'description' );
+	$t_bug_data->steps_to_reproduce     = gpc_get_string( 'steps_to_reproduce', config_get( 'default_bug_steps_to_reproduce' ) );
+	$t_bug_data->additional_information = gpc_get_string( 'additional_info', config_get ( 'default_bug_additional_info' ) );
+	$t_bug_data->due_date               = gpc_get_string( 'due_date', '');
 	if ( is_blank ( $t_bug_data->due_date ) ) {
 		$t_bug_data->due_date = date_get_null();
-	} else {
-		$t_bug_data->due_date = $t_bug_data->due_date;
 	}
 
-	$f_file					= gpc_get_file( 'file', null ); /** @todo (thraxisp) Note that this always returns a structure */
-															# size = 0, if no file
-	$f_report_stay			          = gpc_get_bool( 'report_stay', false );
-	$f_copy_notes_from_parent         = gpc_get_bool( 'copy_notes_from_parent', false);
-	$f_copy_attachments_from_parent   = gpc_get_bool( 'copy_attachments_from_parent', false);
-
-	$t_bug_data->project_id			= $t_project_id;
-
-	$t_bug_data->reporter_id		= auth_get_current_user_id();
-
-	$t_bug_data->summary			= trim( $t_bug_data->summary );
+	$f_files                            = gpc_get_file( 'ufile', null ); /** @todo (thraxisp) Note that this always returns a structure */
+	$f_report_stay                      = gpc_get_bool( 'report_stay', false );
+	$f_copy_notes_from_parent           = gpc_get_bool( 'copy_notes_from_parent', false);
+	$f_copy_attachments_from_parent     = gpc_get_bool( 'copy_attachments_from_parent', false);
 
 	if ( access_has_project_level( config_get( 'roadmap_update_threshold' ), $t_bug_data->project_id ) ) {
 		$t_bug_data->target_version = gpc_get_string( 'target_version', '' );
@@ -142,6 +134,11 @@
 
 	# Allow plugins to pre-process bug data
 	$t_bug_data = event_signal( 'EVENT_REPORT_BUG_DATA', $t_bug_data );
+	
+	# Ensure that resolved bugs have a handler
+	if ( $t_bug_data->handler_id == NO_USER && $t_bug_data->status >= config_get( 'bug_resolved_status_threshold' ) ) {
+		$t_bug_data->handler_id = auth_get_current_user_id();
+	}
 
 	# Create the bug
 	$t_bug_id = $t_bug_data->create();
@@ -150,8 +147,16 @@
 	last_visited_issue( $t_bug_id );
 
 	# Handle the file upload
-	if ( !is_blank( $f_file['tmp_name'] ) && ( 0 < $f_file['size'] ) ) {
-		file_add( $t_bug_id, $f_file, 'bug' );
+	for( $i = 0; $i < count( $f_files ); $i++ ) {
+		if( !empty( $f_files['name'][$i] ) ) {
+			$t_file['name']     = $f_files['name'][$i];
+			$t_file['tmp_name'] = $f_files['tmp_name'][$i];
+			$t_file['type']     = $f_files['type'][$i];
+			$t_file['error']    = $f_files['error'][$i];
+			$t_file['size']     = $f_files['size'][$i];
+
+			file_add( $t_bug_id, $t_file, 'bug' );
+		}
 	}
 
 	# Handle custom field submission
@@ -162,7 +167,7 @@
 		}
 
 		$t_def = custom_field_get_definition( $t_id );
-		if( !custom_field_set_value( $t_id, $t_bug_id, gpc_get_custom_field( "custom_field_$t_id", $t_def['type'], '' ), false ) ) {
+		if( !custom_field_set_value( $t_id, $t_bug_id, gpc_get_custom_field( "custom_field_$t_id", $t_def['type'], $t_def['default_value'] ), false ) ) {
 			error_parameters( lang_get_defaulted( custom_field_get_field( $t_id, 'name' ) ) );
 			trigger_error( ERROR_CUSTOM_FIELD_INVALID_VALUE, ERROR );
 		}
@@ -191,26 +196,26 @@
 
 			# update relationship target bug last updated
 			bug_update_date( $t_bug_id );
-			
+
 			# Send the email notification
 			email_relationship_added( $f_master_bug_id, $t_bug_id, relationship_get_complementary_type( $f_rel_type ) );
 		}
-		
+
 		# copy notes from parent
 		if ( $f_copy_notes_from_parent ) {
-		    
+
 		    $t_parent_bugnotes = bugnote_get_all_bugnotes( $f_master_bug_id );
-		    
+
 		    foreach ( $t_parent_bugnotes as $t_parent_bugnote ) {
-		        
+
 		        $t_private = $t_parent_bugnote->view_state == VS_PRIVATE;
 
-		        bugnote_add( $t_bug_id, $t_parent_bugnote->note, $t_parent_bugnote->time_tracking, 
+		        bugnote_add( $t_bug_id, $t_parent_bugnote->note, $t_parent_bugnote->time_tracking,
 		            $t_private, $t_parent_bugnote->note_type, $t_parent_bugnote->note_attr,
 		            $t_parent_bugnote->reporter_id, /* send_email */ FALSE , /* log history */ FALSE);
 		    }
 		}
-		
+
 		# copy attachments from parent
 		if ( $f_copy_attachments_from_parent ) {
             file_copy_attachments( $f_master_bug_id, $t_bug_id );
@@ -223,6 +228,13 @@
 	event_signal( 'EVENT_REPORT_BUG', array( $t_bug_data, $t_bug_id ) );
 
 	email_new_bug( $t_bug_id );
+	
+	// log status and resolution changes if they differ from the default
+	if ( $t_bug_data->status != config_get('bug_submit_status') )
+		history_log_event($t_bug_id, 'status', config_get('bug_submit_status') );
+	
+	if ( $t_bug_data->resolution != config_get('default_bug_resolution') )
+		history_log_event($t_bug_id, 'resolution', config_get('default_bug_resolution') );
 
 	form_security_purge( 'bug_report' );
 

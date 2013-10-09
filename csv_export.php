@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -46,6 +46,9 @@
 	if ( $t_rows === false ) {
 		print_header_redirect( 'view_all_set.php?type=0' );
 	}
+	
+	# pre-cache custom column data
+	columns_plugin_cache_issue_data( $t_rows );
 
 	$t_filename = csv_get_default_filename();
 
@@ -54,7 +57,7 @@
 	# Make sure that IE can download the attachments under https.
 	header( 'Pragma: public' );
 
-	header( 'Content-Type: text/plain; name=' . urlencode( file_clean_name( $t_filename ) ) );
+	header( 'Content-Type: text/csv; name=' . urlencode( file_clean_name( $t_filename ) ) );
 	header( 'Content-Transfer-Encoding: BASE64;' );
 
 	# Added Quotes (") around file name.
@@ -62,6 +65,11 @@
 
 	# Get columns to be exported
 	$t_columns = csv_get_columns();
+
+	# export BOM
+	if ( config_get( 'csv_add_bom' ) == ON ) {
+		echo "\xEF\xBB\xBF";
+	}
 
 	# export the titles
 	$t_first_column = true;
@@ -103,17 +111,16 @@
 				$t_first_column = false;
 			}
 
-			$t_custom_field = column_get_custom_field_name( $t_column );
-			if ( $t_custom_field !== null ) {
+			if ( column_get_custom_field_name( $t_column ) !== null || column_is_plugin_column( $t_column ) ) {
 				ob_start();
 				$t_column_value_function = 'print_column_value';
 				helper_call_custom_function( $t_column_value_function, array( $t_column, $t_row, COLUMNS_TARGET_CSV_PAGE ) );
 				$t_value = ob_get_clean();
 
-				echo csv_escape_string($t_value);
+				echo csv_escape_string( $t_value );
 			} else {
 				$t_function = 'csv_format_' . $t_column;
-				echo $t_function( $t_row->$t_column );
+				echo $t_function( $t_row );
 			}
 		}
 

@@ -5,6 +5,7 @@ custom_functions_inc.php
 custom_relationships_inc.php
 custom_strings_inc.php
 mantis_offline.php
+api/soap/mc_config_inc.php
 
 # Files to be deprecated in v1.3
 custom_constant_inc.php
@@ -14,6 +15,7 @@ docbook/*/*/builddate
 docbook/*/*/build
 docbook/*/*/install
 docbook/*/builddate
+docbook/*/tmp
 
 # Build output
 build/
@@ -32,6 +34,9 @@ plugins/*
 .cache
 .project
 .settings
+.idea/
+*.kdev4
+nbproject/
 
 # IIS7 
 web.config

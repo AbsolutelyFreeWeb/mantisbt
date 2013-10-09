@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -32,12 +32,12 @@
 	$f_category_id		= gpc_get_int( 'id' );
 	$f_project_id		= gpc_get_int( 'project_id' );
 
-	access_ensure_project_level( config_get( 'manage_project_threshold' ), $f_project_id );
-
 	$t_row = category_get_row( $f_category_id );
 	$t_assigned_to = $t_row['user_id'];
 	$t_project_id = $t_row['project_id'];
 	$t_name = $t_row['name'];
+
+	access_ensure_project_level( config_get( 'manage_project_threshold' ), $t_project_id );
 
 	html_page_top();
 

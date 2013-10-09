@@ -19,7 +19,7 @@
 	 *
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -42,7 +42,11 @@
 		$g_project_override = $t_bug->project_id;
 	}
 
-	access_ensure_bug_level( config_get( 'update_bug_threshold' ), $t_bug_id );
+	$t_attachment_owner = file_get_field( $f_file_id, 'user_id' );
+	$t_current_user_is_attachment_owner = $t_attachment_owner == auth_get_current_user_id();
+	if ( !$t_current_user_is_attachment_owner || ( $t_current_user_is_attachment_owner && !config_get( 'allow_delete_own_attachments' ) ) ) {
+		access_ensure_bug_level( config_get( 'delete_attachments_threshold'), $t_bug_id );
+	}
 
 	helper_ensure_confirmed( lang_get( 'delete_attachment_sure_msg' ), lang_get( 'delete_attachment_button' ) );
 

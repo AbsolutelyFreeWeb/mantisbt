@@ -17,7 +17,7 @@
 /**
  * @package MantisBT
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -28,9 +28,9 @@ error_reporting( E_ALL );
 $g_skip_open_db = true;  # don't open the database in database_api.php
 define( 'MANTIS_INSTALLER', true );
 define( 'PLUGINS_DISABLED', true );
-@require_once( dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . 'core.php' );
-@require_once( 'install_functions.php' );
-@require_once( 'install_helper_functions.php' );
+require_once( dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . 'core.php' );
+require_once( 'install_functions.php' );
+require_once( 'install_helper_functions.php' );
 $g_error_send_page_header = false; # bypass page headers in error handler
 
 $g_failed = false;
@@ -166,7 +166,16 @@ if( $t_config_exists ) {
 	if( 0 == $t_install_state ) {
 		print_test( 'Setting Database Type', '' !== $f_db_type, true, 'database type is blank?' );
 		print_test( 'Checking Database connection settings exist', ( $f_dsn !== '' || ( $f_database_name !== '' && $f_db_username !== '' && $f_hostname !== '' ) ), true, 'database connection settings do not exist?' );
-		print_test( 'Checking PHP support for database type', db_check_database_support( $f_db_type ), true, 'database is not supported by PHP. Check that it has been compiled into your server.' );
+		print_test( 'Checking PHP support for database type',
+			db_check_database_support( $f_db_type ), true,
+			'database is not supported by PHP. Check that it has been compiled into your server.'
+		);
+		if( $f_db_type == 'mssql' ) {
+			print_test( 'Checking PHP support for Microsoft SQL Server driver',
+				version_compare( phpversion(), '5.3' ) < 0, true,
+				'mssql driver is no longer supported in PHP >= 5.3, please use mssqlnative instead'
+			);
+		}
 	}
 
 	$g_db = ADONewConnection( $f_db_type );
@@ -241,16 +250,17 @@ if( 2 == $t_install_state ) {
 <?php print_test( 'Setting Database Type', '' !== $f_db_type, true, 'database type is blank?' )?>
 
 <!-- Checking DB support-->
-<?php print_test( 'Checking PHP support for database type', db_check_database_support( $f_db_type ), true, 'database is not supported by PHP. Check that it has been compiled into your server.' )?>
-
-<?php print_test( 'Setting Database Username', '' !== $f_db_username, true, 'database username is blank' )?>
-<?php print_test( 'Setting Database Password', '' !== $f_db_password, false, 'database password is blank' )?>
-<?php print_test( 'Setting Database Name', '' !== $f_database_name, true, 'database name is blank' )?>
 <?php
+	print_test( 'Checking PHP support for database type', db_check_database_support( $f_db_type ), true, 'database is not supported by PHP. Check that it has been compiled into your server.' );
+
+	print_test( 'Setting Database Username', '' !== $f_db_username, true, 'database username is blank' );
+	print_test( 'Setting Database Password', '' !== $f_db_password, false, 'database password is blank' );
+	print_test( 'Setting Database Name', '' !== $f_database_name, true, 'database name is blank' );
+
 	if( $f_db_type == 'db2' ) {
 		print_test( 'Setting Database Schema', !is_blank( $f_db_schema ), true, 'must have a schema name for AS400 in the form of DBNAME/SCHEMA' );
 	}
-	?>
+?>
 <tr>
 	<td bgcolor="#ffffff">
 		Setting Admin Username
@@ -365,8 +375,13 @@ if( 2 == $t_install_state ) {
 					$t_error = 'MySQL 4.1.0 or later is required for installation.';
 				}
 				break;
-			case 'pgsql':
 			case 'mssql':
+			case 'mssqlnative':
+				if( version_compare( $t_version_info['version'], '9.0.0', '<' ) ) {
+					$t_error = 'SQL Server 2005 or later is required for installation.';
+				}
+				break;
+			case 'pgsql':
 			case 'db2':
 			default:
 				break;
@@ -394,7 +409,6 @@ if( 1 == $t_install_state ) {
 		<span class="title"><?php echo $g_database_upgrade ? 'Upgrade Options' : 'Installation Options'?></span>
 	</td>
 </tr>
-
 <?php if( !$g_database_upgrade ) {?>
 <tr>
 	<td>
@@ -403,41 +417,27 @@ if( 1 == $t_install_state ) {
 	<td>
 		<select name="db_type">
 		<?php
-			if( $f_db_type == 'mysql' ) {
-			echo '<option value="mysql" selected="selected">MySQL (default)</option>';
-		} else {
-			echo '<option value="mysql">MySQL (default)</option>';
-		}
+			// Build selection list of available DB types
+			$t_db_list = array(
+				'mysql'       => 'MySQL (default)',
+				'mysqli'      => 'MySQLi',
+				'mssql'       => 'Microsoft SQL Server',
+				'mssqlnative' => 'Microsoft SQL Server Native Driver',
+				'pgsql'       => 'PostgreSQL',
+				'oci8'        => 'Oracle',
+				'db2'         => 'IBM DB2',
+			);
 
-		if( $f_db_type == 'mysqli' ) {
-			echo '<option value="mysqli" selected="selected">MySQLi</option>';
-		} else {
-			echo '<option value="mysqli">MySQLi</option>';
-		}
+			// mssql is not supported with PHP >= 5.3
+			if( version_compare( phpversion(), '5.3' ) >= 0 ) {
+				unset( $t_db_list['mssql']);
+			}
 
-		if( $f_db_type == 'mssql' ) {
-			echo '<option value="mssql" selected="selected">Microsoft SQL Server</option>';
-		} else {
-			echo '<option value="mssql">Microsoft SQL Server</option>';
-		}
-
-		if( $f_db_type == 'pgsql' ) {
-			echo '<option value="pgsql" selected="selected">PostgreSQL</option>';
-		} else {
-			echo '<option value="pgsql">PostgreSQL</option>';
-		}
-
-		if( $f_db_type == 'oci8' ) {
-			echo '<option value="oci8" selected="selected">Oracle</option>';
-		} else {
-			echo '<option value="oci8">Oracle</option>';
-		}
-
-		if( $f_db_type == 'db2' ) {
-			echo '<option value="db2" selected="selected">IBM DB2</option>';
-		} else {
-			echo '<option value="db2">IBM DB2</option>';
-		}
+			foreach( $t_db_list as $t_db => $t_db_descr ) {
+				echo '<option value="' . $t_db . '"' .
+					( $t_db == $f_db_type ? ' selected="selected"' : '' ) . '>' .
+					$t_db_descr . '</option>';
+			}
 		?>
 		</select>
 	</td>
@@ -525,7 +525,7 @@ if( !$g_database_upgrade ) {?>
 		Attempt Installation
 	</td>
 	<td>
-		<input name="go" type="submit" value="Install/Upgrade Database"></input>
+		<input name="go" type="submit" class="button" value="Install/Upgrade Database"></input>
 	</td>
 </tr>
 <input name="install" type="hidden" value="2"></input>
@@ -590,7 +590,7 @@ if( 3 == $t_install_state ) {
 				}
 			} else {
 				$sqlarray = $dict->CreateDatabase( $f_database_name, Array( 'mysql' => 'DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci' ) );
-				$ret = $dict->ExecuteSQLArray( $sqlarray );
+				$ret = $dict->ExecuteSQLArray( $sqlarray, false );
 				if( $ret == 2 ) {
 					print_test_result( GOOD );
 					$t_db_open = true;
@@ -717,7 +717,7 @@ if( 3 == $t_install_state ) {
 			} else {
 				echo 'Schema ' . $upgrade[$i][0] . ' ( ' . $t_target . ' )</td>';
 				if( $t_sql ) {
-					$ret = $dict->ExecuteSQLArray( $sqlarray );
+					$ret = $dict->ExecuteSQLArray( $sqlarray, false );
 				} else {
 					if( isset( $sqlarray[1] ) ) {
 						$ret = call_user_func( 'install_' . $sqlarray[0], $sqlarray[1] );
@@ -1002,8 +1002,8 @@ if( $g_failed ) {
 		<input name="admin_username" type="hidden" value="<?php echo $f_admin_username?>"></input>
 		<input name="admin_password" type="hidden" value="<?php echo $f_admin_password?>"></input>
 		<input name="log_queries" type="hidden" value="<?php echo( $f_log_queries ? 1 : 0 )?>"></input>
-		<input name="retry" type="submit" value="Retry"></input>
 		<input name="db_exists" type="hidden" value="<?php echo( $f_db_exists ? 1 : 0 )?>"></input>
+		<input name="retry" type="submit" class="button" value="Retry"></input>
 	</td>
 </tr>
 </table>

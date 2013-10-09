@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,7 +167,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Có một lỗi trong báo cáo của bạn';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Không có tập tin chỉ định.';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Loại tệp là không được phép';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Thư mục không tồn tại. Hãy kiểm tra các thiết lập của dự án.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Đây là một tập tin trùng lặp. Hãy xoá các tệp trước.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Một dự án với tên đó đã tồn tại.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Một trường cần thiết "%1$s" đã trống. Xin vui lòng kiểm tra lại các đầu vào của bạn.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Tài khoản này được bảo vệ. Bạn không được phép truy cập vào tài khoản cho đến khi bảo vệ được nâng lên.';
@@ -1117,7 +1116,7 @@ $s_status_changed_to = 'Trạng thái chuyển thành';
 $s_email_on_deleted = 'Gửi email khi bị xoá';
 $s_email_on_sponsorship_changed = 'Gửi email khi tài trợ thay đổi';
 $s_email_on_relationship_changed = 'Gửi email khi mối quan hệ thay đổi';
-$s_loading = 'Đang tải...';
+$s_loading = 'Đang tải…';
 $s_between_date = 'Giữa';
 $s_on_or_before_date = 'Ngay hoặc trước khi';
 $s_before_date = 'Trước khi';

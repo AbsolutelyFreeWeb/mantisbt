@@ -18,11 +18,10 @@
  * @package Tests
  * @subpackage UnitTests
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
-require_once 'PHPUnit/Framework.php';
 
 $t_root_path = dirname( dirname( dirname( __FILE__ ) ) ) . DIRECTORY_SEPARATOR;
 
@@ -33,11 +32,13 @@ class SoapBase extends PHPUnit_Framework_TestCase {
 	protected $client;
 	protected $userName = 'administrator';
 	protected $password = 'root';
+	protected $email = 'root@localhost';
 	protected $userId = '1';
 	
 	protected $mantisPath;
 	private   $issueIdsToDelete = array();
 	private   $versionIdsToDelete = array();
+	private   $tagIdsToDelete = array();
 	private   $defaultSoapClientOptions = array(  'trace'      => true,
 								                  'exceptions' => true,
 								        		  'cache_wsdl' => WSDL_CACHE_NONE,
@@ -80,6 +81,10 @@ class SoapBase extends PHPUnit_Framework_TestCase {
     			$this->userName,
     			$this->password,
     			$issueIdToDelete);
+    	}
+    	
+    	foreach ( $this->tagIdsToDelete as $tagIdToDelete ) {
+    		$this->client->mc_tag_delete ( $this->userName, $this->password, $tagIdToDelete );
     	}
     }
 
@@ -127,6 +132,17 @@ class SoapBase extends PHPUnit_Framework_TestCase {
 	protected function deleteVersionAfterRun( $versionId ) {
 		
 		$this->versionIdsToDelete[] = $versionId;
+	}
+	
+	/**
+	 * Registers a tag for deletion after the test method has run
+	 * 
+	 * @param int $tagId
+	 * @return void
+	 */
+	protected function deleteTagAfterRun ( $tagId ) {
+		
+		$this->tagIdsToDelete[] = $tagId;
 	}
 
 	protected function skipIfDueDateIsNotEnabled() {

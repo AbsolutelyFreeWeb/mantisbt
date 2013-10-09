@@ -19,7 +19,7 @@
  * @package CoreAPI
  * @subpackage SponsorshipAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -344,6 +344,23 @@ function sponsorship_set( $p_sponsorship ) {
 	}
 
 	return $t_sponsorship_id;
+}
+
+/**
+ * delete all sponsorships of a bug
+ * @param int $p_bug_id
+ * @return null
+ */
+function sponsorship_delete_all( $p_bug_id ) {
+	$c_bug_id = db_prepare_int( $p_bug_id );
+
+	$t_sponsorship_table = db_get_table( 'mantis_sponsorship_table' );
+
+	$query = "DELETE FROM $t_sponsorship_table
+				  WHERE bug_id=" . db_param();
+	db_query_bound( $query, $c_bug_id );
+
+	sponsorship_clear_cache();
 }
 
 /**

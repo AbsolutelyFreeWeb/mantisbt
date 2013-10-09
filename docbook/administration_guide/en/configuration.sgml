@@ -134,19 +134,79 @@
         </variablelist>
     </section>
 
-    <section id="admin.config.webserver">
-        <title>Webserver</title>
+	<section id="admin.config.webserver">
+		<title>Webserver</title>
 
-        <variablelist>
-            <varlistentry>
-                <term>$g_use_iis</term>
-                <listitem>
-                    <para>Indicates the IIS (Microsoft Internet Information Server) is the web server on which MantisBT is hosted.
-                    </para>
-                </listitem>
-            </varlistentry>
-        </variablelist>
-    </section>
+		<variablelist>
+			<varlistentry>
+				<term>$g_use_iis</term>
+				<listitem>
+					<para>Indicates that IIS (Microsoft Internet Information Server)
+					is the web server on which MantisBT is hosted.
+					</para>
+					<para>Default value is normally determined automatically by the system.</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>$g_session_handler</term>
+				<listitem>
+					<para>Session handler. Possible values are as per the
+					list below; the default is <emphasis>php</emphasis>.
+						<itemizedlist>
+							<listitem><para><emphasis>php</emphasis>: PHP filesystem sessions</para></listitem>
+							<listitem><para><emphasis>adodb</emphasis>: Database storage sessions</para></listitem>
+							<listitem><para><emphasis>memcached</emphasis>: Memcached storage sessions</para></listitem>
+						</itemizedlist>
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>$g_session_key</term>
+				<listitem>
+					<para>A string to uniquely identify the MantisBT sessions.
+					This should be unique between multiple installations to prevent conflicts.
+					Defaults to <emphasis>MantisBT</emphasis>.
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>$g_session_save_path</term>
+				<listitem>
+					<para>Location where session files are stored.
+					The default is <emphasis>false</emphasis>, meaning
+					the session handler's default location will be used.
+					</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>$g_session_validation</term>
+				<listitem>
+					<para>Use Session validation (defaults to <emphasis>ON</emphasis>)
+					</para>
+					<para><emphasis>WARNING: Disabling this could be a potential security risk</emphasis></para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>$g_form_security_validation</term>
+				<listitem>
+					<para>Form security validation, defaults to <emphasis>ON</emphasis>.
+					This protects against <ulink url="http://en.wikipedia.org/wiki/Cross-site_request_forgery">
+						Cross-Site Request Forgery</ulink>.
+					Some proxy servers may not correctly work with this option enabled
+					because they cache pages incorrectly.
+					</para>
+					<para><emphasis>WARNING: Disabling this option is a security risk,
+					it is strongly recommended to leave it ON</emphasis></para>
+				</listitem>
+			</varlistentry>
+
+		</variablelist>
+	</section>
 
     <section id="admin.config.settings">
         <title>Configuration Settings</title>
@@ -168,8 +228,12 @@
             <varlistentry>
                 <term>$g_allow_signup</term>
                 <listitem>
-                    <para>Allow users to signup for their own accounts. Default is ON.
-                    </para>
+					<para>Allow users to signup for their own accounts.
+					</para>
+					<para>If ON (default), then $g_send_reset_password must be ON
+						as well, and mail settings must be correctly configured
+						(see <link linkend="admin.config.email">Email Configuration</link>).
+					</para>
                 </listitem>
             </varlistentry>
 
@@ -194,11 +258,14 @@
             <varlistentry>
                 <term>$g_send_reset_password</term>
                 <listitem>
-                    <para>When set to ON, MantisBT will email the users their new
-                        passwords when their accounts are reset. If set to OFF, the
-                        password will be reset to blank and no e-mail will be sent. Default
-                        is ON.
-                    </para>
+					<para>If ON (default), users will be sent their password when
+						their account is created or password reset (this requires
+						mail settings to be correctly configured).
+					</para>
+					<para>If OFF, then the Administrator will have to provide
+						a password when creating new accounts, and the password
+						will be set to blank when reset.
+					</para>
                 </listitem>
             </varlistentry>
 
@@ -301,7 +368,7 @@
                 <listitem>
                     <para>Associated with each action a list of flags to control who
                         should be notified.The default will be used if the action is not
-                        included in $g_notify_flags orif the flag is not included in the
+                        included in $g_notify_flags or if the flag is not included in the
                         specific action definition. The list of actions include: new,
                         assigned, resolved, bugnote, reopened, closed, deleted,
                         feedback.The default is:
@@ -444,7 +511,7 @@
                 <term>$g_smtp_host</term>
                 <listitem>
                     <para>This option specifies the SMTP server to submit messages to.  The SMTP
-                    server (MTA) then takes on the responsibility of deliverying such messages
+                    server (MTA) then takes on the responsibility of delivering such messages
                     to their final destinations.  To use the local SMTP (if available) set this
                     to 'localhost', otherwise use the fully qualified domain name of the remote
                     SMTP server.  Default value is 'localhost'.
@@ -490,7 +557,14 @@
             <varlistentry>
                 <term>$g_email_send_using_cronjob</term>
                 <listitem>
-                    <para>TODO</para>
+                    <para>Disables sending of emails as soon as an action is performed.
+			Emails are instead queued and must be sent by running
+			scripts/send_emails.php periodically. This script can only be
+			executed from the CLI, not from the web interface, for security
+			reasons.</para>
+			<para>Enabling this option can help with performance problems if large
+			numbers of emails are generated or mail delivery is slow by not
+			delaying page execution when sending emails.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -580,7 +654,7 @@
                     </para>
                 </listitem>
                 <listitem>
-                    <para>the recipient has no email address extered</para>
+                    <para>the recipient has no email address entered</para>
                 </listitem>
             </itemizedlist>
         </para>
@@ -745,15 +819,15 @@
                 <term>$g_view_issues_page_columns</term>
                 <listitem>
                     <para>This configuration option is used to select the columns to be included in the View Issues page and in which order.  If one of the column is not accessible to the logged in user, or corresponds to a disabled feature, then it will be automatically removed from the list at runtime.  Hence, the same column list may show a different set of columns based on the logged in user, the currently selected project and enabled features (e.g. sponsorship_total is only shown if the sponsorship feature is enabled).</para>
-                    <para>The supported columns are: selection, edit, id, project_id, reporter_id, handler_id, priority, reproducibility, projection, eta, resolution, fixed_in_version, view_state, os, os_build, build (for product build), platform, version, date_submitted, attachment, category, sponsorship_total, severity, status, last_updated, summary, bugnotes_count, description, steps_to_reproduce, additional_information.  As for custom fields they can be referenced by adding a 'custom_' to their name (e.g. xyz would be custom_xyz).</para>
-                    <para>By default the following columns are selected: selection, edit, priority, id, sponsorship_total, bugnotes_count, attachment, category_id, severity, status, last_updated, summary.</para>
+                    <para>The supported columns are: selection, edit, id, project_id, reporter_id, handler_id, priority, reproducibility, projection, eta, resolution, fixed_in_version, view_state, os, os_build, build (for product build), platform, version, date_submitted, attachment_count, category, sponsorship_total, severity, status, last_updated, summary, bugnotes_count, description, steps_to_reproduce, additional_info.  As for custom fields they can be referenced by adding a 'custom_' to their name (e.g. xyz would be custom_xyz).</para>
+                    <para>By default the following columns are selected: selection, edit, priority, id, sponsorship_total, bugnotes_count, attachment_count, category_id, severity, status, last_updated, summary.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>$g_print_issues_page_columns</term>
                 <listitem>
                     <para>This configuration option is used to select the columns to be included in the Print Issues page and in which order.  See $g_view_issues_page_columns for more details about the supported fields.</para>
-                    <para>By default the following columns are selected: selection, priority, id, sponsorship_total, bugnotes_count, attachment, category_id, severity, status, last_updated, summary</para>
+                    <para>By default the following columns are selected: selection, priority, id, sponsorship_total, bugnotes_count, attachment_count, category_id, severity, status, last_updated, summary</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -788,16 +862,6 @@
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term>$g_show_attachments_indicator</term>
-                <listitem>
-                    <para>In view all bug page, show a clip icon next to bugs that has
-                        one or more attachments. The default value is OFF.
-                        The reason why this is defaulted to OFF is that it adds an extra
-                        query for every bug dispayed in the list.
-                    </para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
                 <term>$g_show_product_version</term>
                 <listitem>
                     <para>This controls display of the product version in the
@@ -824,7 +888,7 @@
                 <term>$g_show_realname</term>
                 <listitem>
                     <para>This control will replace the user's userid with their
-                        realname. If it is set to ON, and the real name fiels has been
+                        realname. If it is set to ON, and the real name field has been
                         populated, the replacement will occur. It defaults to OFF.
                     </para>
                 </listitem>
@@ -832,22 +896,46 @@
             <varlistentry>
                 <term>$g_show_avatar</term>
                 <listitem>
-                    <para>Show user avatar (default OFF); the current implementation is based on http://www.gravatar.com,
-                    users will need to register there with the same email address used in
-                    this MantisBT installation to have their avatar shown.</para>
-                    <note><para>Upon registration or avatar change, it takes some time for the updated gravatar images to show on sites.</para></note>
+					<para>Show the user's avatar
+					</para>
+					<para>The current implementation is based on
+						<ulink url="http://www.gravatar.com">Gravatar</ulink>;
+						Users will need to register there the same email address
+						used in this MantisBT installation to have their avatar
+						shown.
+						Please note: upon registration or avatar change, it may
+						take some time for the updated gravatar images to show
+						on sites
+					</para>
+					<para>The config can be either set to OFF (avatars disabled),
+						or to a string defining the default avatar to be used
+						when none is associated with the user's email.
+						Valid values are:
+						<itemizedlist>
+							<listitem><para>OFF (default)</para>
+							</listitem>
+							<listitem><para>ON (equivalent to 'identicon')
+							</para></listitem>
+							<listitem><para>One of Gravatar's defaults
+								(mm, identicon, monsterid, wavatar, retro);
+								refer to
+								<ulink url="http://en.gravatar.com/site/implement/images/">
+									Image Requests documentation
+								</ulink>
+								for further details.
+							</para></listitem>
+							<listitem><para>An URL to the default image to be used
+								(for example, "http:/path/to/unknown.jpg"
+								or "%path%images/no_avatar.png").
+							</para></listitem>
+						</itemizedlist>
+					</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>$g_show_avatar_threshold</term>
                 <listitem>
                     <para>The threshold of users for which MantisBT should attempt to show the avatar (default DEVELOPER).  Note that the threshold is related to the user for whom the avatar is being shown, rather than the user who is currently logged in.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>$g_default_avatar</term>
-                <listitem>
-                    <para>The full URL to the image to be used when a user doesn't have an avatar account.</para>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -863,6 +951,15 @@
                     <para>Time for 'permanent' cookie to live in seconds. This is what
                         is used when a user selects "save login". Default is the equivalent
                         of 1 year (30000000).
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>$g_allow_permanent_cookie</term>
+                <listitem>
+                    <para>Allow users to opt for a 'permanent' cookie when logging in.
+                        Controls the display of the 'Remember my login in this browser'
+                        checkbox on the login page. See $g_cookie_time_length.
                     </para>
                 </listitem>
             </varlistentry>
@@ -936,6 +1033,34 @@
 
     </section>
 
+	<section id="admin.config.timezone">
+		<title>Time Zone</title>
+
+		<variablelist>
+			<varlistentry>
+				<term>$g_default_timezone</term>
+				<listitem>
+					<para>Default timezone to use in MantisBT.
+						This must be set to one of the values specified in the
+						<ulink url="http://php.net/timezones ">
+							List of Supported Timezones</ulink>.
+					</para>
+					<para>If this config is left blank (default), it will be
+						initialized by calling function
+						<ulink url="http://php.net/date-default-timezone-get">
+							date_default_timezone_get()</ulink>
+						to determine the default timezone.
+						With PHP >= 5.3, this will result in a system warning if
+						the timezone has not been defined in
+						<ulink url="http://php.net/date.timezone">php.ini</ulink>.
+						Note that this function's behavior was modified in PHP 5.4.0.
+					</para>
+					<para>
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
 
     <section id="admin.config.news">
         <title>News</title>
@@ -1264,10 +1389,10 @@
             <varlistentry>
                 <term>$g_summary_category_include_project</term>
                 <listitem>
-                    <para>Specifies whether category names should be preceeded by
+                    <para>Specifies whether category names should be preceded by
                         project names (eg: [Project] Category) when the summary page is
                         viewed for all projects. This is useful in the case where category
-                        names are common accross projects. The default is OFF.
+                        names are common across projects. The default is OFF.
                     </para>
                 </listitem>
             </varlistentry>
@@ -1363,12 +1488,12 @@
     <section id="admin.config.uploads">
         <title>File Upload</title>
 
-        <para>MantisBT allows users to upload file attachements and
-            associated them with bugs as well as projects. Bug attachments /
-            project documents can be uploaded to the webserver, database, or an
+        <para>MantisBT allows users to upload file attachments and
+            associate them with bugs as well as projects. Bug attachments /
+            project documents can be uploaded to the webserver, database or an
             FTP server. When bugs are uploaded to the webserver they are
             uploaded to the path that is configured in the project
-            properties.In case of problems getting the file upload feature to
+            properties. In case of problems getting the file upload feature to
             work, check the following resources:
             <ulink url="http://www.php.net/manual/en/features.file-upload.php">PHP
                 Manual
@@ -1388,7 +1513,7 @@
             <varlistentry>
                 <term>$g_file_upload_method</term>
                 <listitem>
-                    <para>Specify the location for uploading attachements. This can be
+                    <para>Specify the location for uploading attachments. This can be
                         DISK, DATABASE, or FTP. In case of FTP, the files are saved on the
                         webserver (same as disk) as well as on the specified FTP server.
                         Default value is DATABASE.
@@ -1396,6 +1521,13 @@
                         webserver with write access rights to the configured upload path
                         (configured in the project) and temporary upload path (used by
                         PHP).
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>$g_file_upload_max_num</term>
+                <listitem>
+                    <para>Maximum number of files that can be uploaded simultaneously.
                     </para>
                 </listitem>
             </varlistentry>
@@ -1429,7 +1561,7 @@
             <varlistentry>
                 <term>$g_file_upload_ftp_pass</term>
                 <listitem>
-                    <para>Password to use when loggin in to the FTP server.</para>
+                    <para>Password to use when logging in to the FTP server.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1533,7 +1665,7 @@
             <varlistentry>
                 <term>$g_bottom_include_page</term>
                 <listitem>
-                    <para>If this page eixsts it will be displayed at the bottom of
+                    <para>If this page exists it will be displayed at the bottom of
                         every page. It makes a good company branding include page.
                     </para>
                 </listitem>
@@ -2251,8 +2383,31 @@
                 <term>$g_bug_link_tag</term>
                 <listitem>
                     <para>If a number follows this tag it will create a link to a
-                        bug. eg. for # a link would be #45 eg. for bug: a
-                        link would be bug:98
+                        bug. Default is '#'.
+                        <itemizedlist>
+                            <listitem>
+                                <para>'#': a link would be #45</para>
+                            </listitem>
+                            <listitem>
+                                <para>'bug:' a link would be bug:98</para>
+                            </listitem>
+                        </itemizedlist>
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>$g_bugnote_link_tag</term>
+                <listitem>
+                    <para>If a number follows this tag it will create a link to a
+                        bug note. Default is '~'.
+                        <itemizedlist>
+                            <listitem>
+                                <para>'~': a link would be ~45</para>
+                            </listitem>
+                            <listitem>
+                                <para>'bugnote:' a link would be bugnote:98</para>
+                            </listitem>
+                        </itemizedlist>
                     </para>
                 </listitem>
             </varlistentry>
@@ -2346,57 +2501,101 @@
                     </para>
                 </listitem>
             </varlistentry>
+            <varlistentry>
+                <term>$g_csv_add_bom</term>
+                <listitem>
+                    <para>Add Byte Order Mark (BOM) at the begining of the file as it helps Excel display the file in UTF-8.
+                    The default value is OFF;
+                    </para>
+                </listitem>
+            </varlistentry>
         </variablelist>
     </section>
 
 
     <section id="admin.config.cookies">
         <title>Cookies</title>
-        <para>The configuration variables $g_string_cookie,
-            $g_project_cookie, $g_view_all_cookie, $g_manage_cookie are
-            calculated based on $g_cookie_prefix. When you change the cookie
-            prefix in config_inc.php, you need to follow it with a copy of the
-            four lines that calculate the names for these cookies.
-        </para>
 
         <variablelist>
             <varlistentry>
                 <term>$g_cookie_path</term>
                 <listitem>
-                    <para>This is specifies to the path under which a cookie is
-                        visible. All scripts in this directory and its sub-directories will
-                        be able to access MantisBT cookies. Default value is '/'. It is
-                        recommended to set this to the actual MantisBT path.
-                    </para>
+					<para>Specifies the path under which a cookie is visible.
+					</para>
+					<para>All scripts in this directory and its sub-directories
+						will be able to access MantisBT cookies.
+					</para>
+					<para>Default value is '/'.
+						It is recommended to set this to the actual MantisBT path.
+					</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>$g_cookie_domain</term>
                 <listitem>
-                    <para>Unused</para>
+					<para>The domain that the MantisBT cookies are available to.</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>$g_cookie_version</term>
                 <listitem>
-                    <para>Cookie version is used as a prefix for cookies that should
-                        be expire when the code is changed in a certain way. The developers
-                        would increase this version when necessary, which in effect will
-                        cause the creation of new cookies that are compatible with the new
-                        code. It is not expected for the user to need to change this
-                        setting.
-                    </para>
+					<para>Version of the view_all_page cookie.</para>
+					<para>This is used as a prefix for cookies that should
+						be expired when the code is changed in a certain way.
+						The developers would increase this version when necessary,
+						which in effect will cause the creation of new cookies
+						that are compatible with the new code.
+					</para>
+					<para>It is not expected for the user to need to change this
+						setting.
+					</para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>$g_cookie_prefix</term>
                 <listitem>
-                     <para>This should be set to a unique identifier which does not
-                         include spaces or periods. Again, this should be unique per
-                         MantisBT installation, especially if $g_cookie_path is not
-                         restricting the cookies scope to the actual MantisBT
-                         directory.
-                     </para>
+					<para>Prefix for all MantisBT cookies</para>
+					<para>This should be an identifier which does not include
+						spaces or periods, and should be unique per MantisBT
+						installation, especially if $g_cookie_path is not
+						restricting the cookies' scope to the actual
+						MantisBT directory.
+					</para>
+					<para>It applies to the cookies listed below. Their actual
+						names are calculated by prepending the prefix, and
+						it is not expected for the user to need to change these.
+					</para>
+
+					<itemizedlist>
+						<listitem>
+							<para>$g_string_cookie</para>
+						</listitem>
+						<listitem>
+							<para>$g_project_cookie</para>
+						</listitem>
+						<listitem>
+							<para>$g_view_all_cookie</para>
+						</listitem>
+						<listitem>
+							<para>$g_manage_users_cookie</para>
+							<para>Stores the filter criteria for the
+								Manage Users page
+							</para>
+						</listitem>
+						<listitem>
+							<para>$g_manage_config_cookie</para>
+							<para>Stores the filter criteria for the
+								Manage Config Report page
+							</para>
+						</listitem>
+						<listitem>
+							<para>$g_logout_cookie</para>
+						</listitem>
+						<listitem>
+							<para>$g_bug_list_cookie</para>
+						</listitem>
+					</itemizedlist>
+
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -2647,7 +2846,9 @@
 
     <section id="admin.config.sourcecontrol">
         <title>Source Control Integration</title>
-
+		<para>Note that the script expects to be invoked with UTF-8 input. If you have a 
+			program which outputs text in a different encoding the results may be
+			incorrect.</para>
 
         <variablelist>
             <varlistentry>
@@ -2718,7 +2919,7 @@
             <varlistentry>
                 <term>$$g_custom_field_edit_after_create</term>
                 <listitem>
-                    <para>This flag determines whether to start editng a custom field
+                    <para>This flag determines whether to start editing a custom field
                         immediately after creating it, or return to the definition list.
                         The default is ON (edit the custom field after creating).
                     </para>
@@ -3032,6 +3233,18 @@
 
                         <variablelist>
                             <varlistentry>
+                                <term>LOG_AJAX</term>
+                                <listitem>
+                                    <para></para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
+                                <term>LOG_DATABASE</term>
+                                <listitem>
+                                    <para></para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
                                 <term>LOG_EMAIL</term>
                                 <listitem>
                                     <para>logs issue id, message type and recipients for all emails
@@ -3048,8 +3261,23 @@
                                     </para>
                                 </listitem>
                             </varlistentry>
+                            <varlistentry>
+                                <term>LOG_FILTERING</term>
+                                <listitem>
+                                    <para></para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
+                                <term>LOG_LDAP</term>
+                                <listitem>
+                                    <para>logs the details of LDAP operations</para>
+                                </listitem>
+                            </varlistentry>
                         </variablelist>
                     </para>
+
+                    <para>Multiple logging levels can be combined by using an inclusive or operator, e.g.
+                    	<literal>LOG_EMAIL | LOG_EMAIL_RECIPIENT</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -3102,7 +3330,7 @@
 					<term>$g_time_tracking_stopwatch</term>
 					<listitem>
 						<para>
-							Instead of a text field turning this option on places a stopwatch on the page with <guibutton>Start/Stop</guibutton> and <guibutton>Reset</guibutton> buttons next to it. You must have $g_use_javascript switched on for this to take effect. A bit gimickie, but who cares.
+							Instead of a text field turning this option on places a stopwatch on the page with <guibutton>Start/Stop</guibutton> and <guibutton>Reset</guibutton> buttons next to it. You must have $g_use_javascript switched on for this to take effect. A bit gimmicky, but who cares.
 						</para>
 					</listitem>
 				</varlistentry>
@@ -3137,4 +3365,38 @@
 			</variablelist>
     </section>
 
+    <section id="admin.config.soap">
+	<title>SOAP API</title>
+	<para>These options are used to control the behaviour of the MantisBT SOAP API and are usually configured in <literal>api/soap/mc_config_inc.php</literal>.</para>
+        <variablelist>
+            <varlistentry>
+                <term>$g_mc_use_nusoap</term>
+                <listitem>
+                    <para>
+			Flag controlling the library to use for SOAP communication. When the native PHP extension is available this flag default to OFF, which means that nusoap will not used. The native extension has the advantage of being faster, more memory efficient and maintained to work with recent versions on PHP. When the extension is not available MantisBT falls back to using nusoap.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+
+    <section id="admin.config.mantistouch">
+        <title>MantisTouch</title>
+        <para>
+			These options are used to integrate with MantisTouch (http://www.mantistouch.org) to provide experience targeted to mobile devices.
+        </para>
+
+        <variablelist>
+            <varlistentry>
+                <term>$g_mantistouch_url</term>
+                <listitem>
+                    <para>
+						The MantisTouch URL to direct to.  The %s will be replaced by the contents of $g_path configuration option.
+						A blank value will disable redirection.  The %s is not required when redirecting to
+						MantisTouch instances that point to a single MantisBT instance and hence have a hard-coded URL.
+						Examples include: '' (default), 'http://mantisbt.mobi?url=%s', and 'http://MyOwnMantisTouch.com/'.
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
 </chapter>

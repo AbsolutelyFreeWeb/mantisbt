@@ -17,7 +17,7 @@
 	/**
 	 * @package MantisBT
 	 * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
-	 * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+	 * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
 	 * @link http://www.mantisbt.org
 	 */
 	 /**
@@ -36,8 +36,12 @@
 	} else {
 		$t_user_id = user_get_id_by_name( $f_username );
 		if ( $t_user_id === false ) {
-			error_parameters( $f_username );
-			trigger_error( ERROR_USER_BY_NAME_NOT_FOUND, ERROR );
+			# If we can't find the user by name, attempt to find by email.
+			$t_user_id = user_get_id_by_email( $f_username );
+			if ( $t_user_id === false ) {
+				error_parameters( $f_username );
+				trigger_error( ERROR_USER_BY_NAME_NOT_FOUND, ERROR );
+			}
 		}
 	}
 
@@ -119,7 +123,7 @@
 		?>
 	</td>
 </tr>
- 
+
 <!-- Access Level -->
 <tr <?php echo helper_alternate_class() ?>>
 	<td class="category">
@@ -175,38 +179,50 @@
 <br />
 
 <!-- RESET AND DELETE -->
+<?php
+	$t_reset = $t_user['id'] != auth_get_current_user_id()
+		&& helper_call_custom_function( 'auth_can_change_password', array() );
+	$t_unlock = OFF != config_get( 'max_failed_login_count' ) && $t_user['failed_login_count'] > 0;
+	$t_delete = !( ( user_is_administrator( $t_user_id ) && ( user_count_level( config_get_global( 'admin_site_threshold' ) ) <= 1 ) ) );
+
+	if( $t_reset || $t_unlock || $t_delete ) {
+?>
 <div class="border center">
 
-<!-- Reset Button -->
-<?php if( helper_call_custom_function( 'auth_can_change_password', array() ) ) { ?>
+<!-- Reset/Unlock Button -->
+<?php if( $t_reset || $t_unlock ) { ?>
 	<form method="post" action="manage_user_reset.php">
 <?php echo form_security_field( 'manage_user_reset' ) ?>
 		<input type="hidden" name="user_id" value="<?php echo $t_user['id'] ?>" />
+<?php if( $t_reset ) { ?>
 		<input type="submit" class="button" value="<?php echo lang_get( 'reset_password_button' ) ?>" />
+<?php } else { ?>
+		<input type="submit" class="button" value="<?php echo lang_get( 'account_unlock_button' ) ?>" />
+<?php } ?>
 	</form>
 <?php } ?>
 
 <!-- Delete Button -->
-<?php if ( !( ( user_is_administrator( $t_user_id ) && ( user_count_level( config_get_global( 'admin_site_threshold' ) ) <= 1 ) ) ) ) { ?>
+<?php if ( $t_delete ) { ?>
 	<form method="post" action="manage_user_delete.php">
 <?php echo form_security_field( 'manage_user_delete' ) ?>
-
 		<input type="hidden" name="user_id" value="<?php echo $t_user['id'] ?>" />
 		<input type="submit" class="button" value="<?php echo lang_get( 'delete_user_button' ) ?>" />
 	</form>
 <?php } ?>
 </div>
-<br />
-<?php if( !$t_ldap ) { ?>
-<div align="center">
-<?php
-	if ( ( ON == config_get( 'send_reset_password' ) ) && ( ON == config_get( 'enable_email_notification' ) ) ) {
-		echo lang_get( 'reset_password_msg' );
-	} else {
-		echo lang_get( 'reset_password_msg2' );
-	}
-?>
-</div>
+	<?php if( $t_reset ) { ?>
+	<div align="center">
+	<br />
+	<?php
+		if ( ( ON == config_get( 'send_reset_password' ) ) && ( ON == config_get( 'enable_email_notification' ) ) ) {
+			echo lang_get( 'reset_password_msg' );
+		} else {
+			echo lang_get( 'reset_password_msg2' );
+		}
+	?>
+	</div>
+	<?php } ?>
 <?php } ?>
 
 

@@ -18,7 +18,7 @@
  * @package CoreAPI
  * @subpackage ConfigurationAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -63,7 +63,7 @@ function config_get( $p_option, $p_default = null, $p_user = null, $p_project = 
 	# @@ debug @@ if ($t_bypass_lookup) { echo "bp=$p_option match=$t_match_pattern <br />"; }
 
 	if( !$t_bypass_lookup ) {
-		if( $g_project_override != null && $p_project == null ) {
+		if( $g_project_override !== null && $p_project === null ) {
 			$p_project = $g_project_override;
 		}
 		# @@ debug @@ if ( ! db_is_connected() ) { echo "no db "; }
@@ -178,7 +178,7 @@ function config_get_global( $p_option, $p_default = null ) {
 	global $g_cache_config_eval;
 	if( isset( $GLOBALS['g_' . $p_option] ) ) {
 		if( !isset( $g_cache_config_eval['g_' . $p_option] ) ) {
-			$t_value = config_eval( $GLOBALS['g_' . $p_option] );
+			$t_value = config_eval( $GLOBALS['g_' . $p_option], true );
 			$g_cache_config_eval['g_' . $p_option] = $t_value;
 		} else {
 			$t_value = $g_cache_config_eval['g_' . $p_option];
@@ -346,7 +346,7 @@ function config_set( $p_option, $p_value, $p_user = NO_USER, $p_project = ALL_PR
 						project_id = " . db_param() . " AND
 						user_id = " . db_param();
 			$t_params = Array(
-				$c_value,
+				(string)$c_value,
 				$t_type,
 				$c_access,
 				$c_option,
@@ -359,7 +359,7 @@ function config_set( $p_option, $p_value, $p_user = NO_USER, $p_project = ALL_PR
 					VALUES
 					(" . db_param() . ', ' . db_param() . ', ' . db_param() . ', ' . db_param() . ', ' . db_param() . ',' . db_param() . ' )';
 			$t_params = Array(
-				$c_value,
+				(string)$c_value,
 				$t_type,
 				$c_access,
 				$c_option,
@@ -419,9 +419,9 @@ function config_can_set_in_database( $p_option ) {
 
 	# bypass table lookup for certain options
 	if( $g_cache_can_set_in_database == '' ) {
-		$g_cache_can_set_in_database = '/' . implode( '|', config_get_global( 'global_settings' ) ) . '/';
+		$g_cache_can_set_in_database = config_get_global( 'global_settings' );
 	}
-	$t_bypass_lookup = ( 0 < preg_match( $g_cache_can_set_in_database, $p_option ) );
+	$t_bypass_lookup = in_array( $p_option, $g_cache_can_set_in_database, true );
 
 	$g_cache_bypass_lookup[$p_option] = $t_bypass_lookup;
 
@@ -522,35 +522,63 @@ function config_flush_cache( $p_option = '', $p_user = ALL_USERS, $p_project = A
 # Checks if an obsolete configuration variable is still in use.  If so, an error
 # will be generated and the script will exit.  This is called from admin_check.php.
 function config_obsolete( $p_var, $p_replace = '' ) {
+	global $g_cache_config;
 
 	# @@@ we could trigger a WARNING here, once we have errors that can
 	#     have extra data plugged into them (we need to give the old and
 	#     new config option names in the warning text)
 
 	if( config_is_set( $p_var ) ) {
-		$t_description = '<p><b>Warning:</b> The configuration option <tt>$g_' . $p_var . '</tt> is now obsolete</p>';
+		$t_description = '<p><b>Warning:</b> The configuration option <tt>' . $p_var . '</tt> is now obsolete</p>';
+		$t_info = '';
+
+		// Check if set in the database
+		if( is_array( $g_cache_config ) && array_key_exists( $p_var, $g_cache_config ) ) {
+			$t_info .= 'it is currently defined in ';
+			if( isset( $GLOBALS['g_' . $p_var] ) ) {
+				$t_info .= 'config_inc.php, as well as in ';
+			}
+			$t_info .= 'the database configuration for: <ul>';
+
+			foreach( $g_cache_config[$p_var] as $t_user_id => $t_user ) {
+				$t_info .= '<li>'
+					. (($t_user_id == 0)? lang_get('all_users') : user_get_name( $t_user_id ))
+					. ': ';
+				foreach ( $t_user as $t_project_id => $t_project ) {
+					$t_info .= project_get_name( $t_project_id ) . ', ';
+				}
+				$t_info = rtrim( $t_info, ', ') . '</li>';
+			}
+			$t_info .= '</ul>';
+		}
+
+		// Replacement defined
 		if( is_array( $p_replace ) ) {
-			$t_info = 'please see the following options: <ul>';
+			$t_info .= 'please see the following options: <ul>';
 			foreach( $p_replace as $t_option ) {
-				$t_info .= '<li>$g_' . $t_option . '</li>';
+				$t_info .= '<li>' . $t_option . '</li>';
 			}
 			$t_info .= '</ul>';
 		}
 		else if( !is_blank( $p_replace ) ) {
-			$t_info = 'please use <tt>$g_' . $p_replace . '</tt> instead.';
-		} else {
-			$t_info = '';
+			$t_info .= 'please use <tt>' . $p_replace . '</tt> instead.';
 		}
 
 		print_test_warn_row( $t_description, false, $t_info );
 	}
 }
 
-# ------------------
-# check for recursion in defining config variables
-# If there is a %text% in the returned value, re-evaluate the "text" part and replace
-#  the string
-function config_eval( $p_value ) {
+/**
+ * check for recursion in defining config variables
+ *
+ * If there is a %text% in the returned value, re-evaluate the "text"
+ * part and replace the string
+ *
+ * @param string $p_value config variable to evaluate
+ * @param bool if true, gets  %text% as a global config, defaults to false
+ * @return string
+ */
+function config_eval( $p_value, $p_global = false ) {
 	$t_value = $p_value;
 	if( !empty( $t_value ) && is_string( $t_value ) && !is_numeric( $t_value ) ) {
 		if( 0 < preg_match_all( '/(?:^|[^\\\\])(%([^%]+)%)/U', $t_value, $t_matches ) ) {
@@ -559,7 +587,11 @@ function config_eval( $p_value ) {
 
 				# $t_matches[0][$i] is the matched string including the delimiters
 				# $t_matches[1][$i] is the target parameter string
-				$t_repl = config_get( $t_matches[2][$i] );
+				if( $p_global ) {
+					$t_repl = config_get_global( $t_matches[2][$i] );
+				} else {
+					$t_repl = config_get( $t_matches[2][$i] );
+				}
 				$t_value = str_replace( $t_matches[1][$i], $t_repl, $t_value );
 			}
 		}
@@ -568,8 +600,17 @@ function config_eval( $p_value ) {
 	return $t_value;
 }
 
-# list of configuration variable which may expose webserver details and shouldn't be
-# exposed to users or webservices
+/**
+ * Defines if a config variable is considered "private"
+ *
+ * The purpose of this function is to avoid exposure of potentially
+ * sensitive or confidential information to users or web services.
+ * This includes things such as webserver details, paths, usernames and
+ * passwords, hostnames/IP addresses, etc.
+ *
+ * @param string $p_config_var config variable to evaluate
+ * @return bool
+ */
 function config_is_private( $p_config_var ) {
 	switch( $p_config_var ) {
 		case 'hostname':
@@ -595,7 +636,6 @@ function config_is_private( $p_config_var ) {
 		case 'global_settings':
 		case 'system_font_folder':
 		case 'phpMailer_method':
-		case 'default_avatar':
 		case 'file_upload_ftp_server':
 		case 'file_upload_ftp_user':
 		case 'file_upload_ftp_pass':

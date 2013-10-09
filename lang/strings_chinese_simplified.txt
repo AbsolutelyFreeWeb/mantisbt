@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Simplified Chinese (‪中文(简体)‬)
+/** Simplified Chinese (中文（简体）‎)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -26,21 +26,27 @@
  * @file
  *
  * @author Bbqyee
+ * @author Fengchao
  * @author Fwolf
  * @author Gaoxuewei
  * @author Hacked by justin schnell_18@yahoo.com
  * @author Hydra
+ * @author Hzy980512
  * @author Kai-Zheng Cheng, neek@sina.com
  * @author Liangent
+ * @author Mmyangfl
  * @author NetCobra, netcobra@gmail.com
  * @author PhiLiP
  * @author Riceball LEE riceballl@hotmail.com
  * @author Singoo, singoo@163.com
  * @author XanaduNWH
  * @author Xiaomingyan
+ * @author Yanmiao liu
+ * @author Yfdyh000
  * @author liaobin@jite.net
  * @author rerbin@lonmo.com
  * @author zoomq@itcase.com
+ * @author 乌拉跨氪
  */
 
 $s_actiongroup_menu_move = '移动';
@@ -138,6 +144,8 @@ $s_select_option = '(请选择)';
 $s_bug_actiongroup_access = '你无权执行该项操作';
 $s_bug_actiongroup_status = '无法将问题的状态改成指定的状态';
 $s_bug_actiongroup_category = '无法将该问题修改为指定的类别';
+$s_bug_actiongroup_handler = '请求的用户不能处理此问题';
+$s_bug_actiongroup_version = '请求的版本在此问题的项目中不存在';
 $s_close_bugs_conf_msg = '确定要关闭这些问题吗？';
 $s_delete_bugs_conf_msg = '你确定要删除这些问题吗？';
 $s_move_bugs_conf_msg = '将问题移动到';
@@ -180,7 +188,6 @@ $MANTIS_ERROR[ERROR_REPORT] = '在你的报表中发现错误。';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = '没有指定文件';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = '此类型的文件不允许上传';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = '目录不存在；请检查项目设置。';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = '已经有一个同名文件存在；请先删除该文件。';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = '已经存在一个同名的项目。';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = '字段“%1$s”是必须填写的，不能为空白，请重新填写。';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = '该帐号设置为被保护状态，解除保护前你不能使用该账号。';
@@ -226,6 +233,7 @@ $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE] = '名称重复。';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_IN_USE] = '最少还有一个项目仍然在使用该字段。';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_VALUE] = '该数值对字段"%1$s" 无效。';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_DEFINITION] = '自定义字段定义无效';
+$MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_PROPERTY] = '无效的自定义字段属性 (%1$s)。';
 $MANTIS_ERROR[ERROR_LDAP_AUTH_FAILED] = 'LDAP 验证失败';
 $MANTIS_ERROR[ERROR_LDAP_SERVER_CONNECT_FAILED] = '连接至 LDAP 服务器失败';
 $MANTIS_ERROR[ERROR_LDAP_UPDATE_FAILED] = '更新 LDAP 记录失败。';
@@ -238,6 +246,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = '已存在同名类别。';
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = '没有指定的复制操作。';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = '没有找到类别。';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = '未在项目 "%2$s"中找到"%1$s"类别';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = '这个分类不可以被删除，因为它被定为“为移动默认的分类“';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = '已存在同名版本。';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = '没有找到版本“%1$s” 。';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = '用户名无效。用户名只能包含字母、数字、空格、连字符、点、加号和下划线。';
@@ -276,11 +285,15 @@ $MANTIS_ERROR[ERROR_EVENT_UNDECLARED] = '事件"%1$s"未声明';
 $MANTIS_ERROR[ERROR_PLUGIN_NOT_REGISTERED] = '插件未在MantisBT中注册';
 $MANTIS_ERROR[ERROR_PLUGIN_ALREADY_INSTALLED] = '插件已安装';
 $MANTIS_ERROR[ERROR_PLUGIN_PAGE_NOT_FOUND] = '插件页面未找到';
+$MANTIS_ERROR[ERROR_PLUGIN_INSTALL_FAILED] = '插件安装失败：%1$s。';
+$MANTIS_ERROR[ERROR_PLUGIN_UPGRADE_FAILED] = '升级插件方案失败于块 #%1$s。';
 $MANTIS_ERROR[ERROR_PLUGIN_GENERIC] = '在执行插件"%2$s"过程中出现未知错误"%1$s"';
+$MANTIS_ERROR[ERROR_COLUMNS_DUPLICATE] = '字段 "%1$s" 包含重复字段 "%2$s"。';
+$MANTIS_ERROR[ERROR_COLUMNS_INVALID] = '字段 "%1$s" 包含无效字段 "%2$s"。';
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = '会话句柄无效';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = '未找到会话变量"%1$s"';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = '您的会话已经失效';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = '无效的表单安全权标。您是否重复提交了该表单？';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = '无效的安全权标。这可能是会话超时或者重复提交表单导致的。';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = '无法使用该方法访问此页面';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = '无效的排序字段。';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = '无效日期格式';
@@ -347,6 +360,7 @@ $s_email_notification_title_for_action_dependant_on_relationship_deleted = '下�
 $s_email_notification_title_for_action_blocks_relationship_deleted = '下面的问题已经不再被设置为问题 %1$s 的子项问题。';
 $s_email_notification_title_for_action_relationship_child_resolved = '相关联的问题 %1$s 已经被解决。';
 $s_email_notification_title_for_action_relationship_child_closed = '相关联的问题 %1$s 已经被关闭。';
+$s_email_notification_title_for_action_monitor = '问题 %1$s 现在由用户 %2$s 监视。';
 $s_email_reporter = '报告员';
 $s_email_handler = '处理员';
 $s_email_project = '项目';
@@ -453,8 +467,8 @@ $s_acknowledged_bug_title = '告知问题已收到';
 $s_confirmed_bug_title = '确认问题存在';
 $s_assigned_bug_title = '分派问题';
 $s_new_bug_button = '创建问题';
-$s_feedback_bug_button = '反馈问题';
-$s_acknowledged_bug_button = '告知问题已收到';
+$s_feedback_bug_button = '需要反馈';
+$s_acknowledged_bug_button = '收到问题';
 $s_confirmed_bug_button = '确认问题存在';
 $s_assigned_bug_button = '分派问题';
 $s_bug_close_msg = '问题已被关闭...';
@@ -463,12 +477,15 @@ $s_closed_bug_title = '关闭问题';
 $s_bug_deleted_msg = '问题已经被删除...';
 $s_delete_bug_sure_msg = '确定要删除此问题吗？';
 $s_delete_bug_button = '删除问题';
-$s_monitor_bug_button = '显示器';
+$s_monitor_bug_button = '监视';
 $s_unmonitor_bug_button = '取消监视';
 $s_file_upload_msg = '文件上传成功';
 $s_upload_file = '上传文件';
+$s_upload_files = '上传文件';
 $s_select_file = '选择文件';
+$s_select_files = '选择文件';
 $s_upload_file_button = '上传文件';
+$s_upload_files_button = '上传文件';
 $s_max_file_size = '最大大小';
 $s_bug_reopened_msg = '问题已经被重新打开...';
 $s_reopen_add_bugnote_title = '重启问题的原因...';
@@ -477,12 +494,14 @@ $s_resolved_bug_title = '解决问题';
 $s_resolved_bug_button = '解决问题';
 $s_bug_resolved_msg = '问题已经被解决，请在下面填入问题注释...';
 $s_resolve_add_bugnote_title = '为解决问题添加问题注释';
-$s_bugnote_add_resolve_button = '添加问题注释';
+$s_bugnote_add_resolve_button = '添加注释';
 $s_from = '从';
 $s_to = '到';
 $s_sent_you_this_reminder_about = '向您发送这个提醒，关于';
-$s_bug_reminder = '问题提醒';
-$s_reminder_sent_to = '发送提醒:';
+$s_bug_reminder = '发送提醒';
+$s_reminder_sent_to = '提醒发送至';
+$s_reminder_sent_none = '无法发送任何提醒';
+$s_reminder_list_truncated = '收件人列表被缩短，请查阅问题历史以获取完整列表';
 $s_bug_send_button = '发送';
 $s_reminder = '提醒';
 $s_reminder_explain = '该提醒将发送给被要求接收该问题反馈的所有收件人。';
@@ -517,14 +536,15 @@ $s_fixed_in_version = '修正版本';
 $s_target_version = '目标版本';
 $s_votes = '投票';
 $s_summary = '摘要';
-$s_description = '说明';
+$s_description = '描述';
 $s_steps_to_reproduce = '问题重现步骤';
 $s_update_information_button = '更新信息';
 $s_sticky_issue = '置顶问题';
 $s_profile = '配置';
 $s_updating_bug_simple_title = '正在更新问题信息';
 $s_view_revisions = '查看修订历史';
-$s_revision = '修订版本';
+$s_revision = '版本';
+$s_revision_by = '%1$s - %2$s';
 $s_revision_drop = '删除';
 $s_bug_revision_dropped_history = '删除的 bug 修正';
 $s_bugnote_revision_dropped_history = '删除的注释修订';
@@ -535,11 +555,11 @@ $s_vote_added_msg = '投票已添加...';
 $s_bugnote_added_msg = '已添加问题注释...';
 $s_bugnote_deleted_msg = '已删除问题注释...';
 $s_bug_notes_title = '问题注释';
-$s_edit_bugnote_title = '编辑问题注释';
+$s_edit_bugnote_title = '编辑注释';
 $s_no_bugnotes_msg = '这个问题没有注释信息';
 $s_delete_link = '删除';
-$s_add_bugnote_title = '添加问题注释';
-$s_add_bugnote_button = '添加问题注释';
+$s_add_bugnote_title = '添加注释';
+$s_add_bugnote_button = '添加注释';
 $s_bugnote_edit_link = '编辑';
 $s_closed_bug_button = '关闭问题';
 $s_bugnote_updated_msg = '已经被成功更新问题注释...';
@@ -547,18 +567,22 @@ $s_edited_on = '编辑于：';
 $s_hide_content = '隐藏内容';
 $s_show_content = '显示内容';
 $s_total_queries_executed = '共执行了%1$d条查询语句';
+$s_unique_queries_executed = '执行了 %1$d 条唯一的查询语句';
 $s_memory_usage_in_kb = '内存使用： %1$s KB';
 $s_please_report = '请报告至 %1$s。';
 $s_click_to_login = '登录';
 $s_warning_plain_password_authentication = '<strong>警告：</strong>身份验证使用了明文方式，您的密码对于管理员是可见的。';
-$s_warning_default_administrator_account_present = '<strong>警告:</strong>建议禁止缺省管理员帐号或修改该账号密码';
+$s_warning_default_administrator_account_present = '<strong>警告：</strong>应该禁止默认 \'administrator\' 帐号或修改其密码。';
 $s_warning_admin_directory_present = '<strong>警告：</strong>Admin 目录应该被删除。';
+$s_error_database_version_out_of_date_1 = '<strong>错误：</strong>数据库结构好像已经过时（config(databaseversion) 是 0 并且存在老的升级表）。MantisBT 版本 1.x 引入新的升级流程。您好像是在从 0.XX 版本升级。请升级至 1.0.8 或 1.1.X 后再升级至 1.2。';
+$s_error_database_no_schema_version = '<strong>错误：</strong>数据库结构好像已经过时（config(databaseversion) 是 0 并且存在老的升级表）。请检查数据库是否正在运行 - 我们不能获取数据库方案的版本。Config 表未返回有效数据库方案版本 - 如果需要请向 mantis-help 邮件列表请求支持。';
+$s_error_database_version_out_of_date_2 = '<strong>警告：</strong>数据库结构也许已经过时。请再登录前升级<a href="admin/install.php">这里</a>。';
 $s_error_code_version_out_of_date = '<strong>警告：</strong>更多最新安装的代码比数据库结构。请升级代码。';
-$s_login_page_info = '欢迎访问问题跟踪管理系统';
+$s_login_page_info = '欢迎访问问题跟踪系统';
 $s_login_title = '登录';
-$s_save_login = '在此浏览器上保留我的登录信息';
-$s_secure_session = '安全Session';
-$s_secure_session_long = '仅允许通过本IP使用你的session.';
+$s_save_login = '在该浏览器保存我的登录状态';
+$s_secure_session = '安全会话';
+$s_secure_session_long = '仅允许通过本IP使用你的会话。';
 $s_choose_project = '选择项目';
 $s_login_button = '登录';
 $s_signup_link = '注册一个新帐号';
@@ -590,6 +614,7 @@ $s_protected = '保护';
 $s_create_user_button = '创建用户';
 $s_hide_disabled = '隐藏未启用的账号';
 $s_filter_button = '筛选';
+$s_default_filter = '默认筛选器';
 $s_create_filter_link = '创建固定链接';
 $s_create_short_link = '创建短网址';
 $s_filter_permalink = '以下是当前设置的过滤器的固顶链接:';
@@ -606,12 +631,13 @@ $s_manage_workflow_config = '工作流';
 $s_manage_tags_link = '标签管理';
 $s_create_new_account_link = '创建新账号';
 $s_projects_link = '创建项目';
-$s_documentation_link = '说明';
+$s_documentation_link = '文档';
 $s_new_accounts_title = '新帐号';
 $s_1_week_title = '一周内';
 $s_never_logged_in_title = '从未登录';
 $s_prune_accounts = '清理帐号';
 $s_hide_inactive = '隐藏非活动的';
+$s_show_disabled = '显示已禁用';
 $s_manage_accounts_title = '管理帐号';
 $s_date_created = '创建日期';
 $s_last_visit = '最近一次登录';
@@ -694,7 +720,7 @@ $s_plugin_actions = '操作';
 $s_plugin_install = '安装';
 $s_plugin_upgrade = '升级';
 $s_plugin_uninstall = '卸载';
-$s_plugin_uninstall_message = '您确实想卸载插件"%1$s"么？';
+$s_plugin_uninstall_message = '您确实想卸载插件"%1$s"吗？';
 $s_plugin_key = '关键';
 $s_plugin_key_met = '准备好的插件';
 $s_plugin_key_unmet = '未得到满足的依赖关系';
@@ -762,9 +788,10 @@ $s_notify_user = '通知用户';
 $s_accounts_pruned_msg = '已删除所有在一个星期以前注册，并且从来没有登录过的账号。';
 $s_prune_accounts_button = '删除';
 $s_confirm_account_pruning = '你确定要删除从来没有登录过的旧账号吗？';
-$s_edit_user_title = '编辑使用者';
+$s_edit_user_title = '编辑用户';
+$s_account_unlock_button = '解锁帐户';
 $s_reset_password_button = '重设密码';
-$s_delete_user_button = '删除使用者';
+$s_delete_user_button = '删除用户';
 $s_reset_password_msg = '如果重置密码，修改密码的网页链接将同通过邮件发送用户。';
 $s_reset_password_msg2 = '如果重置密码，新密码将变为空。';
 $s_show_all_users = '全部';
@@ -773,7 +800,8 @@ $s_users_new = '新的';
 $s_account_reset_protected_msg = '帐号受保护，不能重置密码。';
 $s_account_reset_msg = '确认邮件已经发往你的邮箱...';
 $s_account_reset_msg2 = '账号密码已经置为空...';
-$s_manage_user_protected_msg = '帐号受保护，“用户级别”和“是否启用”信息不能修改；帐号无法更新...';
+$s_account_unlock_msg = '该帐户已解锁。';
+$s_manage_user_protected_msg = '帐号受保护；“用户级别”和“是否启用”信息不能修改；其他信息已成功更新。';
 $s_manage_user_updated_msg = '帐号成功更新...';
 $s_email_user_updated_subject = '帐户已更新';
 $s_email_user_updated_msg = '您的帐户已被管理员更新。下面提供了这些更改的列表。可以在任何时候更新您的帐户的详细信息和首选项，请访问下面的 URL：';
@@ -786,7 +814,7 @@ $s_summary_link = '统计报表';
 $s_account_link = '个人资料';
 $s_users_link = '用户';
 $s_manage_link = '管理';
-$s_edit_news_link = '管理新闻';
+$s_edit_news_link = '编辑新闻';
 $s_docs_link = '文档';
 $s_logout_link = '注销';
 $s_my_view_link = '我的视图';
@@ -798,7 +826,7 @@ $s_my_view_title_resolved = '已解决的';
 $s_my_view_title_monitored = '我监视的';
 $s_my_view_title_feedback = '正在等待我的反馈';
 $s_my_view_title_verify = '正在等待我的解决程度确认';
-$s_my_view_title_my_comments = '评述了问题';
+$s_my_view_title_my_comments = '评述过的问题';
 $s_news_added_msg = '新闻已添加...';
 $s_news_deleted_msg = '已删除新闻...';
 $s_delete_news_sure_msg = '你确定要删除此新闻？';
@@ -919,6 +947,9 @@ $s_sort = '排序字段';
 $s_issue_id = '问题 #';
 $s_recently_visited = '最近浏览的';
 $s_note_user_id = '注释人';
+$s_filter_match_type = '匹配类型';
+$s_filter_match_all = '所有情况';
+$s_filter_match_any = '任何情况';
 $s_none = '无';
 $s_current = '当前';
 $s_search = '搜索';
@@ -957,6 +988,7 @@ $s_update_bug_button = '编辑';
 $s_bug_assign_to_button = '分派给：';
 $s_bug_status_to_button = '状态改为:';
 $s_reopen_bug_button = '重启问题';
+$s_close_bug_button = '关闭';
 $s_move_bug_button = '移动';
 $s_attached_files = '附件';
 $s_publish = '发布';
@@ -1053,6 +1085,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>注意</b>：当前�
 $s_create_child_bug_button = '创建子问题';
 $s_bug_cloned_to = '问题已复制';
 $s_bug_created_from = '问题产生于';
+$s_copy_from_parent = '从父问题中复制扩展数据';
+$s_copy_notes_from_parent = '复制缺陷注释';
+$s_copy_attachments_from_parent = '复制附件';
 $s_viewing_bug_relationship_graph_title = '关联图表';
 $s_viewing_bug_dependency_graph_title = '依赖关系图';
 $s_relation_graph = '关联图表';
@@ -1113,6 +1148,7 @@ $s_handle_sponsored_issue = '管理有资助的问题';
 $s_others = '其他';
 $s_see_email_addresses_of_other_users = '查看其它用户的Email地址';
 $s_send_reminders = '发送提醒';
+$s_receive_reminders = '接收提醒';
 $s_add_profiles = '添加配置';
 $s_notify_of_new_user_created = '创建新用户时提醒';
 $s_email_notification = '电子邮件通知';
@@ -1120,7 +1156,7 @@ $s_status_changed_to = '状态已修改为';
 $s_email_on_deleted = '删除时发送 Email';
 $s_email_on_sponsorship_changed = '资助改变时发送 Email';
 $s_email_on_relationship_changed = '关联改变时发送 Email';
-$s_loading = '载入中……';
+$s_loading = '正在载入...';
 $s_between_date = '介于';
 $s_on_or_before_date = '不晚于';
 $s_before_date = '早于';
@@ -1166,6 +1202,7 @@ $s_tag_create = '创建标签';
 $s_show_all_tags = '全部';
 $s_time_tracking_billing_link = '时间记录';
 $s_time_tracking = '时间记录';
+$s_time_tracking_time_spent = '花费时间：';
 $s_time_tracking_get_info_button = '获取时间记录信息';
 $s_time_tracking_cost_per_hour = '每小时成本';
 $s_time_tracking_cost = '成本';
@@ -1174,6 +1211,8 @@ $s_time_tracking_stopwatch_start = '开始';
 $s_time_tracking_stopwatch_stop = '停止';
 $s_time_tracking_stopwatch_reset = '重置';
 $s_access_denied = '无权操作.';
+$s_twitter_resolved = '%1$d：[%2$s] %3$s （解决者 %4$s 于 %5$s）';
+$s_twitter_resolved_no_version = '%1$d：[%2$s] %3$s （解决者 %4$s）';
 $s_development_team = '开发团队';
 $s_manage_columns_config = '管理列';
 $s_all_columns_title = '可用的列';

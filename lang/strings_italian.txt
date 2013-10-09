@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
  */
-/** Italian (Italiano)
+/** Italian (italiano)
  * 
  * See the qqq 'language' for message documentation incl. usage of parameters
  * To improve a translation please visit http://translatewiki.net
@@ -25,15 +25,19 @@
  * @ingroup Language
  * @file
  *
+ * @author Beta16
  * @author Darth Kule
  * @author Giallu
+ * @author Gianfranco
  * @author Lele Gaifax, lele@seldati.it
  * @author Luca Pescatore, l.pescatore@network.it
  * @author Marcello Scatà, marcello@marcelloscata.com
  * @author Marco Vassura, m.vassura@itools.it
  * @author Massimo itaca
  * @author McDutchie
+ * @author Nemo bis
  * @author Stefano-c
+ * @author Ximo17
  */
 
 $s_actiongroup_menu_move = 'Sposta';
@@ -131,6 +135,8 @@ $s_select_option = '(seleziona)';
 $s_bug_actiongroup_access = 'Non disponi dell\'autorizzazione necessaria per eseguire questa azione';
 $s_bug_actiongroup_status = 'Non è possibile impostare lo stato richiesto per la presente anomalia';
 $s_bug_actiongroup_category = 'Non è possibile impostare la categoria richiesta per la presente anomalia';
+$s_bug_actiongroup_handler = 'L\'utente richiesto non è autorizzato a gestire questo problema';
+$s_bug_actiongroup_version = 'La versione richiesta non esiste nel progetto che si occupa di questo problema';
 $s_close_bugs_conf_msg = 'Confermi di voler chiudere queste anomalie?';
 $s_delete_bugs_conf_msg = 'Confermi di voler eliminare queste anomalie?';
 $s_move_bugs_conf_msg = 'Sposta anomalia su';
@@ -173,7 +179,6 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Il tuo report conteneva un errore.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Non è stato specificato nessun file';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Tipo di file non consentito';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'La directory non esiste.  Controlla le impostazioni del progetto.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Il file è un duplicato.  Cancella prima il file presente.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Esiste già un progetto con quel nome.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Il campo obbligatorio "%1$s" era vuoto.  Ricontrolla le informazioni che hai inserito.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Questo account è protetto.  Non ti è consentito accedere finché non verrà tolta la protezione.';
@@ -219,6 +224,7 @@ $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE] = 'Questo nome è duplicato.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_IN_USE] = 'Almeno un progetto fa ancora uso di questo campo.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_VALUE] = 'Valore di "%1$s" non valido.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_DEFINITION] = 'Definizione di campo personalizzato non valida.';
+$MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_PROPERTY] = 'Proprietà campo personalizzato non valido (%1$s).';
 $MANTIS_ERROR[ERROR_LDAP_AUTH_FAILED] = 'Autenticazione LDAP fallita.';
 $MANTIS_ERROR[ERROR_LDAP_SERVER_CONNECT_FAILED] = 'Connessione al server LDAP fallita.';
 $MANTIS_ERROR[ERROR_LDAP_UPDATE_FAILED] = 'Aggiornamento del record LDAP fallito.';
@@ -231,6 +237,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = 'Una categoria con quel nome esiste gi
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = 'Non è stata specificata nessuna azione di copia.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = 'Categoria non trovata.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = 'Categoria "%1$s" non trovata nel progetto "%2$s"';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = 'Questa categoria non può essere eliminata perché è definita come "Categoria predefinita per gli spostamenti".';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'Una versione con quel nome esiste già.';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Versione "%1$s" non trovata.';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = 'Il nome dell\'utente non è valido.  I nomi utente possono contenere solo lettere non accentate, numeri, spazi, trattini, punti e underscore ("_").';
@@ -269,6 +276,7 @@ $MANTIS_ERROR[ERROR_EVENT_UNDECLARED] = 'L\'evento "%1$s" non è stato ancora di
 $MANTIS_ERROR[ERROR_PLUGIN_NOT_REGISTERED] = 'Il Plugin non registrato con MantisBT.';
 $MANTIS_ERROR[ERROR_PLUGIN_ALREADY_INSTALLED] = 'Plugin già installato';
 $MANTIS_ERROR[ERROR_PLUGIN_PAGE_NOT_FOUND] = 'Pagina del plugin non trovata';
+$MANTIS_ERROR[ERROR_PLUGIN_INSTALL_FAILED] = 'Installazione del plugin non riuscita: %1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_UPGRADE_FAILED] = 'Upgrade dello schema del plugin fallito nel blocco #%1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_GENERIC] = 'Si è verificato un errore sconosciuto "%1$s" durante l\'esecuzione del plugin "%2$s"';
 $MANTIS_ERROR[ERROR_COLUMNS_DUPLICATE] = 'Il campo "%1$s" contiene colonne duplicate "%2$s".';
@@ -276,7 +284,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'Il campo "%1$s" contiene un campo invali
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Gestore di sessione invalido.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'Variabile di sessione "%1$s" non trovato.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'La sessione è scaduta.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Chiave di sicurezza del modulo invalido. Hai sottomesso il modulo più volte per errore?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Chiave di sicurezza del modulo (token) invalido. Questo potrebbe essere causato da un timeout di sessione, o da un invio del modulo più volte per errore.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Non si può accedere a questa pagina usando questo metodo.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Campo ordinamento invalido.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Formato data invalido.';
@@ -437,7 +445,7 @@ $s_amount = 'Somma';
 $s_total_owing = 'Totale dovuto';
 $s_total_paid = 'Totale pagato';
 $s_sponsor_hide = 'Nascondi risolte e pagate';
-$s_sponsor_show = 'Mostrale tutte';
+$s_sponsor_show = 'Mostra tutte';
 $s_payment_updated = 'Informazioni sul pagamento aggiornate.';
 $s_account_updated_msg = 'Il tuo Account è stato aggiornato con successo...';
 $s_email_updated = 'L\'indirizzo email è stato aggiornato con successo';
@@ -466,8 +474,11 @@ $s_monitor_bug_button = 'Tieni sotto controllo';
 $s_unmonitor_bug_button = 'Non tenere sotto controllo';
 $s_file_upload_msg = 'File caricato con successo';
 $s_upload_file = 'Carica file';
+$s_upload_files = 'Carica file';
 $s_select_file = 'Seleziona file';
+$s_select_files = 'Seleziona file';
 $s_upload_file_button = 'Carica file';
+$s_upload_files_button = 'Carica file';
 $s_max_file_size = 'Dimensione massima';
 $s_bug_reopened_msg = 'L\'anomalia è stata riaperta...';
 $s_reopen_add_bugnote_title = 'Aggiungi una nota con le ragioni per la riapertura dell\'anomalia';
@@ -481,7 +492,9 @@ $s_from = 'Da';
 $s_to = 'A';
 $s_sent_you_this_reminder_about = 'ti invia questo memorandum a proposito dell\'anomalia';
 $s_bug_reminder = 'Invia un memorandum';
-$s_reminder_sent_to = 'Memorandum spedito a:';
+$s_reminder_sent_to = 'Memorandum spedito a';
+$s_reminder_sent_none = 'Nessun promemoria può essere inviato';
+$s_reminder_list_truncated = 'elenco destinatari troncato, consulta la cronologia per l\'elenco completo';
 $s_bug_send_button = 'Invia';
 $s_reminder = 'Memorandum';
 $s_reminder_explain = 'Questo memorandum verrà inviato agli utenti selezionati a cui si richiede un feedback sull\'anomalia.';
@@ -595,6 +608,7 @@ $s_protected = 'Protetto';
 $s_create_user_button = 'Crea utente';
 $s_hide_disabled = 'Nascondi disabilitati';
 $s_filter_button = 'Applica il filtro';
+$s_default_filter = 'Filtro predefinito';
 $s_create_filter_link = 'Crea link permanente';
 $s_create_short_link = 'Crea link breve';
 $s_filter_permalink = 'Quello che segue è un link permanente alla configurazione attuale dei filtri:';
@@ -617,6 +631,7 @@ $s_1_week_title = '1 Settimana';
 $s_never_logged_in_title = 'Mai entrato nel sistema';
 $s_prune_accounts = 'Pulisci account';
 $s_hide_inactive = 'Nascondi inattivi';
+$s_show_disabled = 'Visualizza non abilitati';
 $s_manage_accounts_title = 'Gestione account';
 $s_date_created = 'Data inserimento';
 $s_last_visit = 'Ultima visita';
@@ -689,7 +704,7 @@ $s_plugins_installed = 'Plugin installati';
 $s_plugins_available = 'Plugin disponibili';
 $s_plugin_description = 'Descrizione';
 $s_plugin_author = 'Autore: %1$s';
-$s_plugin_url = 'Website:';
+$s_plugin_url = 'Sito web:';
 $s_plugin_depends = 'Dipendenze';
 $s_plugin_no_depends = 'Nessuna dipendenza';
 $s_plugin_priority = 'Priorità';
@@ -768,17 +783,19 @@ $s_accounts_pruned_msg = 'Tutti gli account che non hanno mai effettuato il logi
 $s_prune_accounts_button = 'Elimina';
 $s_confirm_account_pruning = 'Sei sicuro di voler eliminare i vecchi account che non sono mai stati utilizzati?';
 $s_edit_user_title = 'Modifica utente';
+$s_account_unlock_button = 'Sblocca l\'account';
 $s_reset_password_button = 'Resetta password';
 $s_delete_user_button = 'Elimina utente';
 $s_reset_password_msg = 'Resettando la password, verrà inviata all\'utente una email di verifica con il codice di convalida.';
 $s_reset_password_msg2 = 'Resettando la password, questa verrà impostata come vuota.';
-$s_show_all_users = 'TUTTI';
+$s_show_all_users = 'Tutti';
 $s_users_unused = 'Non usato';
 $s_users_new = 'Nuovo';
 $s_account_reset_protected_msg = 'Account protetto.  Non è possibile resettare la password.';
 $s_account_reset_msg = 'Il codice di convalida è stata inviato via email all\'utente...  Con quello l\'utente sarà in grado di cambiare la propria password.';
 $s_account_reset_msg2 = 'La password è stata rimossa...';
-$s_manage_user_protected_msg = 'Account protetto.  Il livello di accesso e l\'abilitazione non sono modificabili.  Per il resto, l\'account è stato aggiornato...';
+$s_account_unlock_msg = 'L\'account è stato sbloccato.';
+$s_manage_user_protected_msg = 'Account protetto. Il "livello di accesso" e "l\'abilitazione" non sono modificabili. Per il resto, l\'account è stato aggiornato...';
 $s_manage_user_updated_msg = 'Account aggiornato correttamente...';
 $s_email_user_updated_subject = 'Utenza aggiornata';
 $s_email_user_updated_msg = 'La tua utenza é stata aggiornata dall\'amministratore. La lista delle modifiche effettuate é riportata sotto. Puoi modificare i dettagli della tua utenza e le preferenze ogni volta che lo desideri visitando il seguente indirizzo:';
@@ -924,6 +941,9 @@ $s_sort = 'Ordina per';
 $s_issue_id = 'Anomalia #';
 $s_recently_visited = 'Esaminate di recente';
 $s_note_user_id = 'Note di';
+$s_filter_match_type = 'Tipo di corrispondenza';
+$s_filter_match_all = 'Tutte le condizioni';
+$s_filter_match_any = 'Qualsiasi condizione';
 $s_none = 'in bianco';
 $s_current = 'attuale';
 $s_search = 'Ricerca';
@@ -962,6 +982,7 @@ $s_update_bug_button = 'Modifica';
 $s_bug_assign_to_button = 'Assegna a:';
 $s_bug_status_to_button = 'Cambia stato in:';
 $s_reopen_bug_button = 'Riapri';
+$s_close_bug_button = 'Chiudi';
 $s_move_bug_button = 'Sposta';
 $s_attached_files = 'File allegati';
 $s_publish = 'Pubblica';
@@ -1011,7 +1032,7 @@ $s_confirm_used_custom_field_deletion = 'Questo campo è attualmente utilizzato 
 $s_confirm_custom_field_deletion = 'Sei sicuro di voler eliminare questo campo personalizzato e tutti i valori associati?';
 $s_field_delete_button = 'Elimina campo personalizzato';
 $s_confirm_custom_field_unlinking = 'Sei sicuro di volere scollegare il campo personalizzato dal progetto? I valori non verranno cancellati fino a quando non verrà cancellato il campo stesso.';
-$s_field_remove_button = 'Rimuovi campo personalizzato';
+$s_field_remove_button = 'Rimuovi campo';
 $s_hide_status = 'Non mostrare';
 $s_filter_closed = 'Chiuse';
 $s_filter_resolved = 'Risolte';
@@ -1058,6 +1079,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>ATTENZIONE</b>: non t
 $s_create_child_bug_button = 'Duplica';
 $s_bug_cloned_to = 'Anomalia duplicata';
 $s_bug_created_from = 'Anomalia generata da';
+$s_copy_from_parent = 'Copia i dati estesi dalla questione superiore';
+$s_copy_notes_from_parent = 'Copia le note del bug';
+$s_copy_attachments_from_parent = 'Copia gli allegati';
 $s_viewing_bug_relationship_graph_title = 'Grafico delle relazioni';
 $s_viewing_bug_dependency_graph_title = 'Grafico delle dipendenze';
 $s_relation_graph = 'Grafico relazioni';
@@ -1068,7 +1092,7 @@ $s_view_issue = 'Dettaglio anomalia';
 $s_checkin = 'Checkin';
 $s_perm_rpt_capability = 'Funzionalità';
 $s_view = 'Visualizzare';
-$s_issues = 'ANOMALIE';
+$s_issues = 'Anomalie';
 $s_report_issue = 'Segnala anomalia';
 $s_update_issue = 'Aggiorna anomalia';
 $s_monitor_issue = 'Tieni sotto controllo anomalia';
@@ -1096,7 +1120,7 @@ $s_delete_attachments = 'Elimina allegati';
 $s_delete_attachment_button = 'Elimina allegato';
 $s_delete_attachment_sure_msg = 'Sei sicuro di voler eliminare questo allegato?';
 $s_upload_issue_attachments = 'Aggiungere allegati ad una anomalia';
-$s_filters = 'filtri';
+$s_filters = 'Filtri';
 $s_save_filters = 'Crea nuovi filtri';
 $s_save_filters_as_shared = 'Crea nuovi filtri condivisi';
 $s_use_saved_filters = 'Utilizza i filtri memorizzati';
@@ -1118,6 +1142,7 @@ $s_handle_sponsored_issue = 'Gestisce anomalia sponsorizzata';
 $s_others = 'ALTRI';
 $s_see_email_addresses_of_other_users = 'Visualizza indirizzi email altri utenti';
 $s_send_reminders = 'Invia memorandum';
+$s_receive_reminders = 'Ricevi promemoria';
 $s_add_profiles = 'Aggiunge nuovi profili';
 $s_notify_of_new_user_created = 'Notifica creazione nuovi utenti';
 $s_email_notification = 'Notifica via e-mail';
@@ -1167,10 +1192,11 @@ $s_tag_history_renamed = 'Etichetta rinominata';
 $s_tag_related = 'Etichette correlate';
 $s_tag_related_issues = 'Anomalie correlate (%1$s)';
 $s_tag_stats_attached = 'Anomalie contrassegnate: %1$s';
-$s_tag_create = 'Crea voce';
+$s_tag_create = 'Crea Tag';
 $s_show_all_tags = 'Tutto';
-$s_time_tracking_billing_link = 'Riepilogo costi';
+$s_time_tracking_billing_link = 'Tempistiche';
 $s_time_tracking = 'Tempistiche';
+$s_time_tracking_time_spent = 'Tempo trascorso:';
 $s_time_tracking_get_info_button = 'Informazioni sulle tempistiche';
 $s_time_tracking_cost_per_hour = 'Costo orario';
 $s_time_tracking_cost = 'Costo';
@@ -1189,14 +1215,14 @@ $s_view_issues_columns_title = 'Colonne anomalia in visualizzazione';
 $s_print_issues_columns_title = 'Colonne anomalia in Stampa';
 $s_excel_columns_title = 'Colonne Excel';
 $s_update_columns_as_global_default = 'Aggiorna Colonne come Standard Globale per tutti i Progetti';
-$s_update_columns_for_current_project = 'Aggiorna Colonne per il progetto corrente';
+$s_update_columns_for_current_project = 'Aggiorna colonne per il progetto attuale';
 $s_update_columns_as_my_default = 'Aggiorna colonne come Standard per Tutti i progetti';
 $s_reset_columns_configuration = 'Ripristina configurazione colonne';
 $s_copy_columns_from = 'Copia colonne da';
 $s_copy_columns_to = 'Copia colonne a';
 $s_due_date = 'Data di scadenza';
 $s_overdue = 'In ritardo';
-$s_view_account_title = 'Informazioni Utente';
+$s_view_account_title = 'Informazioni utente';
 $s_manage_user = 'Gestisci Utente';
 $s_install_information = 'MantisBT Informazioni d\'installazione';
 $s_database_information = 'MantisBT Informazioni del Database';

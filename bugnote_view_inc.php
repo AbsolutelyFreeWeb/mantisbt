@@ -20,7 +20,7 @@
  *
  * @package MantisBT
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -111,7 +111,7 @@ $num_notes = count( $t_bugnotes );
 ?>
 <tr class="bugnote" id="c<?php echo $t_bugnote->id ?>">
         <td class="<?php echo $t_bugnote_css ?>">
-		<?php if ( ON  == config_get("show_avatar") ) print_avatar( $t_bugnote->reporter_id ); ?>
+		<?php print_avatar( $t_bugnote->reporter_id ); ?>
 		<span class="small">(<a href="<?php echo string_get_bugnote_view_url($t_bugnote->bug_id, $t_bugnote->id) ?>" title="<?php echo lang_get( 'bugnote_link_title' ) ?>"><?php echo $t_bugnote_id_formatted ?>)</a></span><br />
 		<?php
 			echo print_user( $t_bugnote->reporter_id );
@@ -119,7 +119,10 @@ $num_notes = count( $t_bugnotes );
 		<span class="small"><?php
 			if ( user_exists( $t_bugnote->reporter_id ) ) {
 				$t_access_level = access_get_project_level( null, (int)$t_bugnote->reporter_id );
-				echo '(', get_enum_element( 'access_levels', $t_access_level ), ')';
+				// Only display access level when higher than 0 (ANYBODY)
+				if( $t_access_level > ANYBODY ) {
+					echo '(', get_enum_element( 'access_levels', $t_access_level ), ')';
+				}
 			}
 		?></span>
 		<?php if ( VS_PRIVATE == $t_bugnote->view_state ) { ?>
@@ -176,14 +179,31 @@ $num_notes = count( $t_bugnotes );
 		<?php
 			switch ( $t_bugnote->note_type ) {
 				case REMINDER:
-					echo '<em>' . lang_get( 'reminder_sent_to' ) . lang_get( 'word_separator' );
-					$t_note_attr = utf8_substr( $t_bugnote->note_attr, 1, utf8_strlen( $t_bugnote->note_attr ) - 2 );
-					$t_to = array();
-					foreach ( explode( '|', $t_note_attr ) as $t_recipient ) {
-						$t_to[] = prepare_user_name( $t_recipient );
+					echo '<em>';
+
+					# List of recipients; remove surrounding delimiters
+					$t_recipients = trim( $t_bugnote->note_attr, '|' );
+
+					if( empty( $t_recipients ) ) {
+						echo lang_get( 'reminder_sent_none' );
+					} else {
+						# If recipients list's last char is not a delimiter, it was truncated
+						$t_truncated = ( '|' != utf8_substr( $t_bugnote->note_attr, utf8_strlen( $t_bugnote->note_attr ) - 1 ) );
+
+						# Build recipients list for display
+						$t_to = array();
+						foreach ( explode( '|', $t_recipients ) as $t_recipient ) {
+							$t_to[] = prepare_user_name( $t_recipient );
+						}
+
+						echo lang_get( 'reminder_sent_to' ) . ': '
+							. implode( ', ', $t_to )
+							. ( $t_truncated ? ' (' . lang_get( 'reminder_list_truncated' ) . ')' : '' );
 					}
-					echo implode( ', ', $t_to ) . '</em><br /><br />';
+
+					echo '</em><br /><br />';
 					break;
+
 				case TIME_TRACKING:
 					if ( access_has_bug_level( config_get( 'time_tracking_view_threshold' ), $f_bug_id ) ) {
 						echo '<b>', lang_get( 'time_tracking_time_spent' ) . ' ' . $t_time_tracking_hhmm, '</b><br /><br />';

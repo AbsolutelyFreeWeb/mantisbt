@@ -18,7 +18,7 @@
  * @package CoreAPI
  * @subpackage CustomFunctionAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -63,7 +63,7 @@ function custom_function_default_changelog_print_issue( $p_issue_id, $p_issue_le
 	}
 
 	if( !isset( $t_status[$t_bug->status] ) ) {
-		$t_status[$t_bug->status] = get_enum_element( 'status', $t_bug->status );
+		$t_status[$t_bug->status] = get_enum_element( 'status', $t_bug->status, auth_get_current_user_id(), $t_bug->project_id );
 	}
 	echo ' - ', $t_status[$t_bug->status], '.<br />';
 }
@@ -102,7 +102,7 @@ function custom_function_default_roadmap_print_issue( $p_issue_id, $p_issue_leve
 	}
 
 	if( !isset( $t_status[$t_bug->status] ) ) {
-		$t_status[$t_bug->status] = get_enum_element( 'status', $t_bug->status );
+		$t_status[$t_bug->status] = get_enum_element( 'status', $t_bug->status, auth_get_current_user_id(), $t_bug->project_id );
 	}
 	echo ' - ', $t_status[$t_bug->status], $t_strike_end, '.<br />';
 }
@@ -168,7 +168,7 @@ function custom_function_default_issue_update_notify( $p_issue_id ) {
 function custom_function_default_issue_create_validate( $p_new_issue_data ) {
 }
 
-# Hook to notify after aa issue has been created.
+# Hook to notify after an issue has been created.
 # In case of errors, this function should call trigger_error()
 # p_issue_id is the issue number that can be used to get the existing state
 function custom_function_default_issue_create_notify( $p_issue_id ) {
@@ -332,7 +332,7 @@ function custom_function_default_print_column_value( $p_column, $p_bug, $p_colum
 			if( $p_columns_target != COLUMNS_TARGET_CSV_PAGE ) {
 				$t_function( $p_bug, $p_columns_target );
 			} else {
-				$t_function( $p_bug->$p_column );
+				$t_function( $p_bug );
 			}
 
 		} else if ( isset( $t_plugin_columns[ $p_column ] ) ) {
@@ -385,7 +385,7 @@ function custom_function_default_enum_released_versions() {
 	return $t_possible_values;
 }
 
-# Construct an enumeration for released versions for the current project.
+# Construct an enumeration for future versions for the current project.
 # The enumeration will be empty if current project is ALL PROJECTS.
 # Enumerations format is: "abc|lmn|xyz"
 # To use this in a custom field type "=future_versions" in the possible values field.
@@ -413,7 +413,7 @@ function custom_function_default_enum_categories() {
 
 	$t_enum = array();
 	foreach( $t_categories as $t_category ) {
-		$t_enum[] = $t_category['category'];
+		$t_enum[] = $t_category['name'];
 	}
 
 	$t_possible_values = implode( '|', $t_enum );

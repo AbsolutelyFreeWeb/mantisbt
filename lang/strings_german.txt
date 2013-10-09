@@ -2,7 +2,7 @@
 /** MantisBT - a php based bugtracking system
  *
  * Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  *
  * MantisBT is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,16 +30,21 @@
  * @author Atrol
  * @author Ayonik
  * @author Campmaster
+ * @author Das Schäfchen
  * @author Diebuche
  * @author Dr. Jürgen Kehrel, jkehrel@kehrel.de
+ * @author Erdemaslancan
+ * @author Exit91
  * @author Heiko Gierer, gierer@rittershaus.de
  * @author Hermann-Josef Beckers, hjb-rheine@t-online.de
  * @author Imre
  * @author KarlReichert
  * @author Kghbln
+ * @author Manuae
  * @author Martin Fuchs, martin-fuchs@gmx.net
  * @author Matthias Bauer, mantis-de@moeffju.de
  * @author Melancholie
+ * @author Metalhead64
  * @author MichaelFrey
  * @author Pill
  * @author Purodha
@@ -145,6 +150,8 @@ $s_select_option = '(auswählen)';
 $s_bug_actiongroup_access = 'Sie haben nicht die notwendigen Berechtigungen, um die gewählte Aktion auszuführen.';
 $s_bug_actiongroup_status = 'Der gewünschte Status ist für diesen Eintrag nicht wählbar.';
 $s_bug_actiongroup_category = 'Dieser Eintrag kann nicht in die gewünschte Kategorie verändert werden.';
+$s_bug_actiongroup_handler = 'Dem angegebenen Benutzer ist es nicht erlaubt den Eintrag zu bearbeiten';
+$s_bug_actiongroup_version = 'Die angegebene Version existiert nicht im Projekt dieses Eintrags';
 $s_close_bugs_conf_msg = 'Möchten Sie alle ausgewählten Einträge wirklich schließen?';
 $s_delete_bugs_conf_msg = 'Möchten Sie alle ausgewählten Einträge wirklich löschen?';
 $s_move_bugs_conf_msg = 'Eintrag verschieben zu Projekt:';
@@ -187,11 +194,10 @@ $MANTIS_ERROR[ERROR_REPORT] = 'Während des Reports trat ein Fehler auf.';
 $MANTIS_ERROR[ERROR_NO_FILE_SPECIFIED] = 'Keine Datei angegeben.';
 $MANTIS_ERROR[ERROR_FILE_DISALLOWED] = 'Dieser Dateityp ist nicht erlaubt.';
 $MANTIS_ERROR[ERROR_NO_DIRECTORY] = 'Das Verzeichnis existiert nicht. Überprüfen Sie die Einstellungen.';
-$MANTIS_ERROR[ERROR_DUPLICATE_FILE] = 'Dies ist eine doppelte Datei. Löschen Sie bitte die erste Datei.';
 $MANTIS_ERROR[ERROR_DUPLICATE_PROJECT] = 'Ein Projekt mit diesem Namen ist bereits vorhanden.';
 $MANTIS_ERROR[ERROR_EMPTY_FIELD] = 'Ein notwendiges Feld „%1$s“ war leer. Überprüfen Sie Ihre Eingabe.';
 $MANTIS_ERROR[ERROR_PROTECTED_ACCOUNT] = 'Dieses Konto ist geschützt. Sie können nicht darauf zugreifen, bevor der Schutz aufgehoben ist.';
-$MANTIS_ERROR[ERROR_ACCESS_DENIED] = 'Zugang verweigert.';
+$MANTIS_ERROR[ERROR_ACCESS_DENIED] = 'Zugriff verweigert.';
 $MANTIS_ERROR[ERROR_UPLOAD_FAILURE] = 'Dateiübertragung fehlgeschlagen. Datei konnte nicht von MantisBT gelesen werden. Bitte prüfe die Projekteinstellungen.';
 $MANTIS_ERROR[ERROR_FILE_TOO_BIG] = 'Dateiübertragung fehlgeschlagen. Wahrscheinlich liegt die Dateigröße über der erlaubten für diese PHP-Installation.';
 $MANTIS_ERROR[ERROR_GPC_VAR_NOT_FOUND] = 'Ein erforderlicher Parameter für diese Seite (%1$s) wurde nicht gefunden.';
@@ -199,11 +205,11 @@ $MANTIS_ERROR[ERROR_USER_NAME_NOT_UNIQUE] = 'Dieser Benutzername ist schon verge
 $MANTIS_ERROR[ERROR_CONFIG_OPT_NOT_FOUND] = 'Konfigurationsoption „%1$s“ nicht gefunden.';
 $MANTIS_ERROR[ERROR_CONFIG_OPT_CANT_BE_SET_IN_DB] = 'Die Konfigurationsoption „%1$s“ wurde nicht in der Datenbank gefunden. Sie muss in config_inc.php definiert werden.';
 $MANTIS_ERROR[ERROR_LANG_STRING_NOT_FOUND] = 'Zeichenkette „%1$s“ nicht gefunden.';
-$MANTIS_ERROR[ERROR_BUGNOTE_NOT_FOUND] = 'Problemnotiz nicht gefunden.';
+$MANTIS_ERROR[ERROR_BUGNOTE_NOT_FOUND] = 'Eintragsnotiz nicht gefunden.';
 $MANTIS_ERROR[ERROR_PROJECT_NOT_FOUND] = 'Projekt „%1$d“ nicht gefunden.';
 $MANTIS_ERROR[ERROR_DB_FIELD_NOT_FOUND] = 'Datenbankfeld „%1$s“ nicht gefunden.';
 $MANTIS_ERROR[ERROR_FTP_CONNECT_ERROR] = 'Keine Verbindung zum FTP-Server.';
-$MANTIS_ERROR[ERROR_HANDLER_ACCESS_TOO_LOW] = 'Der Problembearbeiter hat keine ausreichenden Rechte, um ein Problem mit diesem Status zu bearbeiten.';
+$MANTIS_ERROR[ERROR_HANDLER_ACCESS_TOO_LOW] = 'Der Bearbeiter hat keine ausreichenden Rechte, um einen Eintrag mit diesem Status zu bearbeiten.';
 $MANTIS_ERROR[ERROR_PROJECT_NAME_NOT_UNIQUE] = 'Ein Projekt mit diesem Namen ist bereits vorhanden. Gehen Sie zurück und wählen Sie einen anderen Namen.';
 $MANTIS_ERROR[ERROR_PROJECT_NAME_INVALID] = 'Ungültiger Projektname. Projektnamen können nicht leer sein.';
 $MANTIS_ERROR[ERROR_USER_BY_NAME_NOT_FOUND] = 'Benutzer mit Namen „%1$s“ nicht gefunden.';
@@ -215,7 +221,7 @@ $MANTIS_ERROR[ERROR_USER_CREATE_PASSWORD_MISMATCH] = 'Eingegebene Passwörter st
 $MANTIS_ERROR[ERROR_GPC_ARRAY_EXPECTED] = 'Ein Feld wurde für %1$s erwartet, aber eine Zeichenkette übergeben.';
 $MANTIS_ERROR[ERROR_GPC_ARRAY_UNEXPECTED] = 'Eine Zeichenkette wurde erwartet, aber ein Feld wurde für %1$s übergeben.';
 $MANTIS_ERROR[ERROR_GPC_NOT_NUMBER] = 'Eine Zahl wurde für %1$s erwartet.';
-$MANTIS_ERROR[ERROR_BUG_NOT_FOUND] = 'Problem %1$d nicht gefunden.';
+$MANTIS_ERROR[ERROR_BUG_NOT_FOUND] = 'Eintrag %1$d nicht gefunden.';
 $MANTIS_ERROR[ERROR_FILTER_NOT_FOUND] = 'Filter %1$s nicht gefunden.';
 $MANTIS_ERROR[ERROR_FILTER_TOO_OLD] = 'Der Filter, den Sie verwenden wollen, ist zu alt für eine Überarbeitung. Bitte neu erstellen.';
 $MANTIS_ERROR[ERROR_EMAIL_INVALID] = 'Ungültige E-Mail-Adresse.';
@@ -226,13 +232,14 @@ $MANTIS_ERROR[ERROR_FILE_DUPLICATE] = 'Dies ist eine doppelte Datei. Löschen Si
 $MANTIS_ERROR[ERROR_FILE_INVALID_UPLOAD_PATH] = 'Ungültiger Pfad, die Dateiübertragung war nicht erfolgreich. Das Verzeichnis existiert nicht oder konnte nicht beschrieben werden.';
 $MANTIS_ERROR[ERROR_FILE_NO_UPLOAD_FAILURE] = 'Keine Datei übertragen. Gehen Sie zurück und wählen Sie eine Datei aus, bevor Sie auf Datei übertragen drücken';
 $MANTIS_ERROR[ERROR_FILE_MOVE_FAILED] = 'Übertragene Datei konnte nicht in das Speicherverzeichnis verschoben werden. Verzeichnis nicht vorhanden oder vom Webserver nicht beschreibbar.';
-$MANTIS_ERROR[ERROR_BUG_DUPLICATE_SELF] = 'Sie können kein Problem als Duplikat von sich selbst anlegen.';
-$MANTIS_ERROR[ERROR_BUG_REVISION_NOT_FOUND] = 'Überarbeitung des Problems nicht gefunden';
+$MANTIS_ERROR[ERROR_BUG_DUPLICATE_SELF] = 'Sie können keinen Eintrag als Duplikat von sich selbst anlegen.';
+$MANTIS_ERROR[ERROR_BUG_REVISION_NOT_FOUND] = 'Überarbeitung des Eintrags nicht gefunden';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NOT_FOUND] = 'Benutzerdefiniertes Feld nicht gefunden.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE] = 'Name doppelt vorhanden.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_IN_USE] = 'Mindestens ein Projekt benutzt noch dieses Feld.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_VALUE] = 'Ungültiger Wert für Feld „%1$s“.';
 $MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_DEFINITION] = 'Ungültige Definition für benutzerdefiniertes Feld';
+$MANTIS_ERROR[ERROR_CUSTOM_FIELD_INVALID_PROPERTY] = 'Ungültiges benutzerdefiniertes Feldattribut (%1$s).';
 $MANTIS_ERROR[ERROR_LDAP_AUTH_FAILED] = 'LDAP-Authentifizierung fehlgeschlagen.';
 $MANTIS_ERROR[ERROR_LDAP_SERVER_CONNECT_FAILED] = 'Verbindung zum LDAP-Server fehlgeschlagen.';
 $MANTIS_ERROR[ERROR_LDAP_UPDATE_FAILED] = 'Aktualisierung des LDAP-Eintrags fehlgeschlagen.';
@@ -245,6 +252,7 @@ $MANTIS_ERROR[ERROR_CATEGORY_DUPLICATE] = 'Eine Kategorie mit diesem Namen exist
 $MANTIS_ERROR[ERROR_CATEGORY_NO_ACTION] = 'Kein Kopiervorgang angegeben.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND] = 'Kategorie nicht gefunden.';
 $MANTIS_ERROR[ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT] = 'Die Kategorie „%1$s“ wurde für das Projekt „%2$s“ nicht gefunden.';
+$MANTIS_ERROR[ERROR_CATEGORY_CANNOT_DELETE_DEFAULT] = 'Diese Kategorie kann nicht gelöscht werden, da sie als „Standardkategorie für Verschiebungen“ definiert ist.';
 $MANTIS_ERROR[ERROR_VERSION_DUPLICATE] = 'Eine Version mit diesem Namen existiert bereits.';
 $MANTIS_ERROR[ERROR_VERSION_NOT_FOUND] = 'Version „%1$s“ nicht gefunden.';
 $MANTIS_ERROR[ERROR_USER_NAME_INVALID] = 'Der Benutzername ist ungültig. Erlaubt sind nur lateinische Buchstaben, Ziffern, Leerzeichen, Bindestriche, Punkte, Pluszeichen und Unterstriche.';
@@ -254,15 +262,15 @@ $MANTIS_ERROR[ERROR_USER_REAL_MATCH_USER] = 'Der eingegebene „Vollständige Na
 $MANTIS_ERROR[ERROR_SPONSORSHIP_NOT_ENABLED] = 'Sponsor-Unterstützung nicht aktiviert.';
 $MANTIS_ERROR[ERROR_SPONSORSHIP_NOT_FOUND] = 'Sponsor %1$d nicht gefunden.';
 $MANTIS_ERROR[ERROR_SPONSORSHIP_AMOUNT_TOO_LOW] = 'Sponsorschaft (%1$s) liegt unter dem Mindestbetrag (%2$s).';
-$MANTIS_ERROR[ERROR_SPONSORSHIP_HANDLER_ACCESS_LEVEL_TOO_LOW] = 'Bearbeiter hat nicht die benötigten Zugangsrechte für gesponserte Probleme.';
-$MANTIS_ERROR[ERROR_SPONSORSHIP_ASSIGNER_ACCESS_LEVEL_TOO_LOW] = 'Zugang verweigert: Zuweisung gesponserter Probleme erfordert höhere Benutzerrechte.';
+$MANTIS_ERROR[ERROR_SPONSORSHIP_HANDLER_ACCESS_LEVEL_TOO_LOW] = 'Bearbeiter hat nicht die benötigten Zugangsrechte für gesponserte Einträge.';
+$MANTIS_ERROR[ERROR_SPONSORSHIP_ASSIGNER_ACCESS_LEVEL_TOO_LOW] = 'Zugang verweigert: Zuweisung gesponserter Einträge erfordert höhere Benutzerrechte.';
 $MANTIS_ERROR[ERROR_SPONSORSHIP_SPONSOR_NO_EMAIL] = 'Sponsor hat keine E-Mail-Adresse angegeben. Bitte aktualisieren Sie Ihr Konto.';
 $MANTIS_ERROR[ERROR_CONFIG_OPT_INVALID] = 'Einstellung „%1$s“ enthält ungültigen Wert „%2$s“.';
-$MANTIS_ERROR[ERROR_BUG_READ_ONLY_ACTION_DENIED] = 'Aktion nicht ausführbar, weil Problem „%1$d“ schreibgeschützt ist.';
-$MANTIS_ERROR[ERROR_RELATIONSHIP_ALREADY_EXISTS] = 'Es besteht bereits eine Beziehung zwischen diesen zwei Problemen.';
+$MANTIS_ERROR[ERROR_BUG_READ_ONLY_ACTION_DENIED] = 'Aktion nicht ausführbar da Eintrag „%1$d“ schreibgeschützt ist.';
+$MANTIS_ERROR[ERROR_RELATIONSHIP_ALREADY_EXISTS] = 'Es besteht bereits eine Beziehung zwischen diesen beiden Einträgen.';
 $MANTIS_ERROR[ERROR_RELATIONSHIP_NOT_FOUND] = 'Beziehung nicht gefunden.';
-$MANTIS_ERROR[ERROR_RELATIONSHIP_ACCESS_LEVEL_TO_DEST_BUG_TOO_LOW] = 'Zugang verweigert: Das Problem %1$d benötigt höhere Zugriffsrechte.';
-$MANTIS_ERROR[ERROR_RELATIONSHIP_SAME_BUG] = 'Ein Problem kann nicht mit sich selbst in Beziehung gesetzt werden.';
+$MANTIS_ERROR[ERROR_RELATIONSHIP_ACCESS_LEVEL_TO_DEST_BUG_TOO_LOW] = 'Zugang verweigert: Der Eintrag %1$d benötigt höhere Zugriffsrechte.';
+$MANTIS_ERROR[ERROR_RELATIONSHIP_SAME_BUG] = 'Ein Eintrag kann nicht mit sich selbst in Beziehung gesetzt werden.';
 $MANTIS_ERROR[ERROR_SIGNUP_NOT_MATCHING_CAPTCHA] = 'Bestätigungsschlüssel nicht korrekt. Bitte versuchen Sie es noch einmal.';
 $MANTIS_ERROR[ERROR_LOST_PASSWORD_NOT_ENABLED] = 'Die „Passwort vergessen“-Funktion ist nicht verfügbar.';
 $MANTIS_ERROR[ERROR_LOST_PASSWORD_NO_EMAIL_SPECIFIED] = 'Sie müssen eine E-Mail-Adresse angeben, um Ihr Passwort zurücksetzen zu können.';
@@ -283,6 +291,7 @@ $MANTIS_ERROR[ERROR_EVENT_UNDECLARED] = 'Der Event „%1$s“ ist bisher noch ni
 $MANTIS_ERROR[ERROR_PLUGIN_NOT_REGISTERED] = 'Das Plugin ist nicht in MantisBT registriert.';
 $MANTIS_ERROR[ERROR_PLUGIN_ALREADY_INSTALLED] = 'Das Plugin ist bereits installiert.';
 $MANTIS_ERROR[ERROR_PLUGIN_PAGE_NOT_FOUND] = 'Die Plugin-Seite wurde nicht gefunden.';
+$MANTIS_ERROR[ERROR_PLUGIN_INSTALL_FAILED] = 'Installation des Plugins fehlgeschlagen: %1$s.';
 $MANTIS_ERROR[ERROR_PLUGIN_UPGRADE_FAILED] = 'Aktualisierung des Plugin-Schemas ist in Block #%1$s fehlgeschlagen.';
 $MANTIS_ERROR[ERROR_PLUGIN_GENERIC] = 'Es ist ein unbekannter Fehler „%1$s“ während der Ausführung des „%2$s“-Plugins aufgetreten.';
 $MANTIS_ERROR[ERROR_COLUMNS_DUPLICATE] = 'Das Feld „%1$s“ enthält doppelte Spalte „%2$s“.';
@@ -290,7 +299,7 @@ $MANTIS_ERROR[ERROR_COLUMNS_INVALID] = 'Das Feld „%1$s“ enthält ungültiges
 $MANTIS_ERROR[ERROR_SESSION_HANDLER_INVALID] = 'Ungültiger Session-Handler.';
 $MANTIS_ERROR[ERROR_SESSION_VAR_NOT_FOUND] = 'Session-Variable „%1$s“ wurde nicht gefunden.';
 $MANTIS_ERROR[ERROR_SESSION_NOT_VALID] = 'Ihre Sitzung ist ungültig geworden.';
-$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Ungültiges Formular Sicherheits-Token. Haben Sie das Formular versehentlich zweimal abgeschickt?';
+$MANTIS_ERROR[ERROR_FORM_TOKEN_INVALID] = 'Ungültiges Sicherheitstoken zum Formular. Dies kann durch einen Sitzungsablauf oder durch versehentliches doppeltes Speichern des Formulars verursacht worden sein.';
 $MANTIS_ERROR[ERROR_INVALID_REQUEST_METHOD] = 'Auf diese Seite kann nicht mit dieser Methode zugegriffen werden.';
 $MANTIS_ERROR[ERROR_INVALID_SORT_FIELD] = 'Ungültiges Sortierfeld.';
 $MANTIS_ERROR[ERROR_INVALID_DATE_FORMAT] = 'Ungültiges Datumsformat';
@@ -314,7 +323,7 @@ $s_priority_enum_string = '10:keine,20:niedrig,30:normal,40:hoch,50:dringend,60:
 $s_severity_enum_string = '10:Feature-Wunsch,20:Trivial,30:Fehler im Text,40:Unschönheit,50:kleinerer Fehler,60:schwerer Fehler,70:Absturz,80:Blocker';
 $s_reproducibility_enum_string = '10:immer,30:manchmal,50:zufällig,70:nicht getestet,90:nicht reproduzierbar,100:N/A';
 $s_status_enum_string = '10:neu,20:Rückmeldung,30:anerkannt,40:bestätigt,50:zugewiesen,80:erledigt,90:geschlossen';
-$s_resolution_enum_string = '10:offen,20:erledigt,30:wiedereröffnet,40:nicht reproduzierbar,50:unlösbar,60:doppelt,70:kein Fehler,80:aufgeschoben,90:wird nicht behoben';
+$s_resolution_enum_string = '10:offen,20:erledigt,30:wiedereröffnet,40:nicht reproduzierbar,50:unlösbar,60:doppelt,70:keine Änderung notwendig,80:aufgeschoben,90:wird nicht behoben';
 $s_projection_enum_string = '10:keine,30:Kleinigkeit,50:kleinere Änderung,70:größere Änderung,90:Neuentwicklung';
 $s_eta_enum_string = '10:keine,20:< 1 Tag,30:2-3 Tage,40:< 1 Woche,50:< 1 Monat,60:> 1 Monat';
 $s_sponsorship_enum_string = '0:unbezahlt,1:gefordert,2:bezahlt';
@@ -329,7 +338,7 @@ $s_new_account_IP = 'Von IP-Adresse:';
 $s_new_account_signup_msg = 'Das folgende Konto wurde angelegt:';
 $s_reset_request_msg = 'Jemand (vermutlich Sie) hat einen Passwortwechsel durch E-Mail-Bestätigung angefordert. Wenn Sie es nicht waren, ignorieren Sie diese Nachricht, es wird nichts passieren.
 
-Wenn Sie die Bestätigung angefordert haben, besuchen Sie die folgende URL, um ihr Passwort zu ändern:';
+Wenn Sie die Bestätigung angefordert haben, besuchen Sie die folgende URL, um Ihr Passwort zu ändern:';
 $s_reset_request_in_progress_msg = 'Wenn Sie Benutzernamen und E-Mail-Adresse für Ihr Konto richtig angegeben haben, senden wir Ihnen jetzt eine Bestätigungsmail an diese Adresse. Nach dem Erhalt der Meldung befolgen Sie bitte die Anweisungen, um das Passwort Ihres Kontos zu ändern.';
 $s_email_notification_title_for_status_bug_new = 'Der folgende Eintrag hat (erneut) den Status NEU';
 $s_email_notification_title_for_status_bug_feedback = 'Der folgende Eintrag benötigt Ihre Rückmeldung.';
@@ -374,7 +383,7 @@ $s_email_duplicate = 'Duplikat';
 $s_email_fixed_in_version = 'Behoben in Version';
 $s_email_target_version = 'Zielversion';
 $s_email_date_submitted = 'Erstellt am';
-$s_email_last_modified = 'Letzte Aktualisierung';
+$s_email_last_modified = 'Zuletzt geändert';
 $s_email_summary = 'Zusammenfassung';
 $s_email_description = 'Beschreibung';
 $s_email_additional_information = 'Zusätzliche Informationen';
@@ -480,8 +489,11 @@ $s_monitor_bug_button = 'Beobachten';
 $s_unmonitor_bug_button = 'Beobachtung beenden';
 $s_file_upload_msg = 'Dateitransfer erfolgreich';
 $s_upload_file = 'Datei übertragen';
+$s_upload_files = 'Dateien übertragen';
 $s_select_file = 'Datei wählen';
+$s_select_files = 'Dateien wählen';
 $s_upload_file_button = 'Datei übertragen';
+$s_upload_files_button = 'Dateien übertragen';
 $s_max_file_size = 'Max. Größe';
 $s_bug_reopened_msg = 'Eintrag wurde wiedereröffnet …';
 $s_reopen_add_bugnote_title = 'Notiz für Eintragswiedereröffnung hinzufügen';
@@ -495,7 +507,9 @@ $s_from = 'Von';
 $s_to = 'An';
 $s_sent_you_this_reminder_about = 'hat Ihnen diese Erinnerung bezüglich des folgenden Eintrags gesandt';
 $s_bug_reminder = 'Erinnerung senden';
-$s_reminder_sent_to = 'Erinnerung gesendet an:';
+$s_reminder_sent_to = 'Erinnerung gesendet an';
+$s_reminder_sent_none = 'Es konnten keine Erinnerungen gesendet werden';
+$s_reminder_list_truncated = 'Die Liste der Empfänger wurde gekürzt, die Eintrags-Historie enthält die komplette Liste';
 $s_bug_send_button = 'Absenden';
 $s_reminder = 'Erinnerung';
 $s_reminder_explain = 'Diese Notiz wird an die aufgeführten Empfänger gesandt, um eine Rückmeldung zu diesem Eintrag anzufordern.';
@@ -513,7 +527,7 @@ $s_category = 'Kategorie';
 $s_severity = 'Auswirkung';
 $s_reproducibility = 'Reproduzierbar';
 $s_date_submitted = 'Meldungsdatum';
-$s_last_update = 'Letzte Aktualisierung';
+$s_last_update = 'Zuletzt aktualisiert';
 $s_reporter = 'Reporter';
 $s_assigned_to = 'Bearbeitung durch';
 $s_priority = 'Priorität';
@@ -608,6 +622,7 @@ $s_protected = 'Änderungsgeschützt';
 $s_create_user_button = 'Benutzer anlegen';
 $s_hide_disabled = 'inaktive ausblenden';
 $s_filter_button = 'Filter';
+$s_default_filter = 'Standardfilter';
 $s_create_filter_link = 'Permalink erzeugen';
 $s_create_short_link = 'Kurzen Link erzeugen';
 $s_filter_permalink = 'Dies ist ein permanenter Link zum derzeit aktiven Filter:';
@@ -629,7 +644,8 @@ $s_new_accounts_title = 'Neue Konten';
 $s_1_week_title = '1 Woche';
 $s_never_logged_in_title = 'Noch nie angemeldet';
 $s_prune_accounts = 'Konten löschen';
-$s_hide_inactive = 'Inaktive verstecken';
+$s_hide_inactive = 'Inaktive ausblenden';
+$s_show_disabled = 'Deaktivierte anzeigen';
 $s_manage_accounts_title = 'Konten verwalten';
 $s_p = 'Änderungsgeschützt';
 $s_date_created = 'Erstellungsdatum';
@@ -782,6 +798,7 @@ $s_accounts_pruned_msg = 'Alle Konten, die niemals benutzt wurden und älter als
 $s_prune_accounts_button = 'Endgültig löschen';
 $s_confirm_account_pruning = 'Möchten Sie alte Benutzer löschen, die sich nie angemeldet haben?';
 $s_edit_user_title = 'Benutzer bearbeiten';
+$s_account_unlock_button = 'Benutzerkonto entsperren';
 $s_reset_password_button = 'Passwort zurücksetzen';
 $s_delete_user_button = 'Benutzer löschen';
 $s_reset_password_msg = 'Passwort zurücksetzen sendet eine Bestätigungs-URL über E-Mail.';
@@ -792,7 +809,8 @@ $s_users_new = 'NEU';
 $s_account_reset_protected_msg = 'Konto geschützt. Passwort kann nicht gelöscht werden.';
 $s_account_reset_msg = 'Bestätigungsnachricht wurde an Ihre E-Mail-Adresse geschickt …';
 $s_account_reset_msg2 = 'Leeres Passwort wurde gesetzt …';
-$s_manage_user_protected_msg = 'Konto geschützt. Zugriffsrechte und Aktivitätsflag sind geschützt. Andere Optionen wurden geändert …';
+$s_account_unlock_msg = 'Das Benutzerkonto wurde entsperrt';
+$s_manage_user_protected_msg = 'Konto geschützt. Die Felder \'Zugangsberechtigung\' und \'Aktiv\' können nicht geändert werden. Andere Felder wurden erfolgreich aktualisiert.';
 $s_manage_user_updated_msg = 'Konto aktualisiert …';
 $s_email_user_updated_subject = 'Benutzerkonto aktualisiert';
 $s_email_user_updated_msg = 'Ihr Benutzerkonto wurde von einem Administrator aktualisiert. Eine Liste der Änderungen wird unten aufgelistet. Sie können Ihre Kontodetails und Einstellungen jederzeit unter der folgenden URL ändern:';
@@ -919,7 +937,7 @@ $s_balance = 'Bilanz';
 $s_most_active = 'Maximale Aktivität';
 $s_score = 'Punktzahl';
 $s_days = 'Tage';
-$s_time_stats = 'Zeit-Statistik f&uuml;r erledigte Eintr&auml;ge (Tage)';
+$s_time_stats = 'Zeit-Statistik für erledigte Einträge (Tage)';
 $s_longest_open_bug = 'Eintrag mit maximaler Bearbeitungsdauer';
 $s_longest_open = 'Maximale Bearbeitungsdauer';
 $s_average_time = 'durchschnittlich';
@@ -938,6 +956,9 @@ $s_sort = 'Sortieren nach';
 $s_issue_id = 'Eintrag #';
 $s_recently_visited = 'Kürzlich geöffnet';
 $s_note_user_id = 'Notiz von';
+$s_filter_match_type = 'Treffertyp';
+$s_filter_match_all = 'Alle Bedingungen';
+$s_filter_match_any = 'Beliebige Bedingung';
 $s_none = 'keine';
 $s_current = 'aktuelle';
 $s_search = 'Suche';
@@ -976,6 +997,7 @@ $s_update_bug_button = 'Aktualisieren';
 $s_bug_assign_to_button = 'Zuordnen zu';
 $s_bug_status_to_button = 'Status wechseln zu:';
 $s_reopen_bug_button = 'Wiedereröffnen';
+$s_close_bug_button = 'Schließen';
 $s_move_bug_button = 'Verschieben';
 $s_attached_files = 'Angehängte Dateien';
 $s_publish = 'Veröffentlichen';
@@ -1039,7 +1061,7 @@ $s_attachments = 'Angehängte Datei(en)';
 $s_bytes = 'Bytes';
 $s_attachment_missing = 'Dateianhang fehlt';
 $s_attachment_count = 'Anzahl Dateianhänge';
-$s_view_attachments_for_issue = 'Anzeige %1$d Dateianhänge für Eintrag #%2$d';
+$s_view_attachments_for_issue = 'Zeige %1$d Dateianhänge für Eintrag #%2$d';
 $s_phpmailer_language = 'de';
 $s_sponsors = '%1$d Sponsor(en)';
 $s_sponsorship_added = 'Sponsorenschaft hinzugefügt';
@@ -1072,6 +1094,9 @@ $s_relationship_warning_blocking_bugs_not_resolved_2 = '<b>ACHTUNG</b> Nicht all
 $s_create_child_bug_button = 'Klonen';
 $s_bug_cloned_to = 'Eintrag dupliziert';
 $s_bug_created_from = 'Eintrag angelegt von';
+$s_copy_from_parent = 'Kopiere weitere Daten vom Original-Eintrag';
+$s_copy_notes_from_parent = 'Kopiere Notizen';
+$s_copy_attachments_from_parent = 'Kopiere Dateianhänge';
 $s_viewing_bug_relationship_graph_title = 'Beziehungs-Grafik';
 $s_viewing_bug_dependency_graph_title = 'Abhängigkeits-Grafik';
 $s_relation_graph = 'Grafik der Beziehungen';
@@ -1131,7 +1156,8 @@ $s_assign_sponsored_issue = 'Gesponsorten Eintrag zuweisen';
 $s_handle_sponsored_issue = 'Gesponsorten Eintrag bearbeiten';
 $s_others = 'SONSTIGES';
 $s_see_email_addresses_of_other_users = 'E-Mail-Adressen von Benutzern ansehen';
-$s_send_reminders = 'Erinnerungen versenden';
+$s_send_reminders = 'Erinnerungen senden';
+$s_receive_reminders = 'Erinnerungen erhalten';
 $s_add_profiles = 'Profile hinzufügen';
 $s_notify_of_new_user_created = 'Benachrichtigung über neu angelegte Benutzer';
 $s_email_notification = 'E-Mail-Benachrichtigung';
@@ -1159,7 +1185,7 @@ $s_tag_creator = 'angelegt von';
 $s_tag_created = 'angelegt am';
 $s_tag_updated = 'zuletzt geändert';
 $s_tag_description = 'Tag-Beschreibung';
-$s_tag_statistics = 'Verwendungs-Statistik';
+$s_tag_statistics = 'Nutzungsstatistiken';
 $s_tag_update = 'Tag aktualisieren: %1$s';
 $s_tag_update_return = 'Zurück zu Tag';
 $s_tag_update_button = 'Tag aktualisieren';
@@ -1210,7 +1236,7 @@ $s_reset_columns_configuration = 'Spalten-Konfiguration zurücksetzen';
 $s_copy_columns_from = 'Kopiere Spalten von';
 $s_copy_columns_to = 'Kopiere Spalten nach';
 $s_due_date = 'Fälligkeitsdatum';
-$s_overdue = 'überfällig';
+$s_overdue = 'Überfällig';
 $s_view_account_title = 'Benutzerinformation';
 $s_manage_user = 'Benutzer verwalten';
 $s_install_information = 'MantisBT-Installationsinformationen';

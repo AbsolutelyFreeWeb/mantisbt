@@ -26,7 +26,7 @@
  * @package CoreAPI
  * @subpackage UtilityAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -81,7 +81,7 @@ function ini_get_bool( $p_name ) {
 	$result = ini_get( $p_name );
 
 	if( is_string( $result ) ) {
-		switch( $result ) {
+		switch( strtolower( $result ) ) {
 			case 'off':
 			case 'false':
 			case 'no':
@@ -198,6 +198,15 @@ function is_page_name( $p_string ) {
 	return isset( $_SERVER['SCRIPT_NAME'] ) && ( 0 < strpos( $_SERVER['SCRIPT_NAME'], $p_string ) );
 }
 
+/**
+ * A function that determines whether the logo should be centered or left aligned based on the page.
+ * @return bool true: centered, false: otherwise.
+ * @access public
+ */
+function should_center_logo() {
+	return ( is_page_name( 'login_page' ) || is_page_name( 'signup_page' ) || is_page_name( 'signup' ) || is_page_name( 'lost_pwd_page' ) );
+}
+
 function is_windows_server() {
 	if( defined( 'PHP_WINDOWS_VERSION_MAJOR' ) ) {
 		return (PHP_WINDOWS_VERSION_MAJOR > 0);
@@ -253,4 +262,23 @@ function get_font_path() {
 			}
 		}
 		return $t_font_path;
+}
+
+function finfo_get_if_available() {
+	
+	if ( class_exists( 'finfo' ) ) {
+		$t_info_file = config_get( 'fileinfo_magic_db_file' );
+	
+		if ( is_blank( $t_info_file ) ) {
+			$finfo = new finfo( FILEINFO_MIME );
+		} else {
+			$finfo = new finfo( FILEINFO_MIME, $t_info_file );
+		}
+	
+		if ( $finfo ) {
+			return $finfo;
+		}
+	}
+
+	return null;
 }

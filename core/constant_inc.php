@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MantisBT.  If not, see <http://www.gnu.org/licenses/>.
 
-define( 'MANTIS_VERSION', '1.2.8' );
+define( 'MANTIS_VERSION', '1.2.15' );
 
 # --- constants -------------------
 # magic numbers
@@ -200,6 +200,8 @@ define( 'REV_ADDITIONAL_INFO', 3 );
 define( 'REV_BUGNOTE', 4 );
 
 # bug relationship constants
+define( 'BUG_REL_NONE', -2 );
+define( 'BUG_REL_ANY', -1 );
 define( 'BUG_DUPLICATE', 0 );
 define( 'BUG_RELATED', 1 );
 define( 'BUG_DEPENDANT', 2 );
@@ -213,7 +215,6 @@ define( 'ERROR_REPORT', 3 );
 define( 'ERROR_NO_FILE_SPECIFIED', 4 );
 define( 'ERROR_FILE_DISALLOWED', 5 );
 define( 'ERROR_NO_DIRECTORY', 6 );
-define( 'ERROR_DUPLICATE_FILE', 9 );
 define( 'ERROR_DUPLICATE_PROJECT', 10 );
 define( 'ERROR_EMPTY_FIELD', 11 );
 define( 'ERROR_PROTECTED_ACCOUNT', 12 );
@@ -303,6 +304,7 @@ define( 'ERROR_CUSTOM_FIELD_NAME_NOT_UNIQUE', 1301 );
 define( 'ERROR_CUSTOM_FIELD_IN_USE', 1302 );
 define( 'ERROR_CUSTOM_FIELD_INVALID_VALUE', 1303 );
 define( 'ERROR_CUSTOM_FIELD_INVALID_DEFINITION', 1304 );
+define( 'ERROR_CUSTOM_FIELD_INVALID_PROPERTY', 1306 );
 
 # ERROR_LDAP_*
 define( 'ERROR_LDAP_AUTH_FAILED', 1400 );
@@ -316,6 +318,7 @@ define( 'ERROR_CATEGORY_DUPLICATE', 1500 );
 define( 'ERROR_CATEGORY_NO_ACTION', 1501 );
 define( 'ERROR_CATEGORY_NOT_FOUND', 1502 );
 define( 'ERROR_CATEGORY_NOT_FOUND_FOR_PROJECT', 1503 );
+define( 'ERROR_CATEGORY_CANNOT_DELETE_DEFAULT', 1504 );
 
 # ERROR_VERSION_*
 define( 'ERROR_VERSION_DUPLICATE', 1600 );
@@ -368,6 +371,7 @@ define( 'ERROR_PLUGIN_NOT_REGISTERED', 2500 );
 define( 'ERROR_PLUGIN_ALREADY_INSTALLED', 2501 );
 define( 'ERROR_PLUGIN_PAGE_NOT_FOUND', 2502 );
 define( 'ERROR_PLUGIN_UPGRADE_FAILED', 2503 );
+define( 'ERROR_PLUGIN_INSTALL_FAILED', 2504 );
 define( 'ERROR_PLUGIN_GENERIC', 2599 );
 
 # ERROR_COLUMNS_*
@@ -428,6 +432,10 @@ define( 'FILTER_TYPE_BOOLEAN', 2 );
 define( 'FILTER_TYPE_MULTI_STRING', 3 );
 define( 'FILTER_TYPE_MULTI_INT', 4 );
 
+# Filter match types
+define( 'FILTER_MATCH_ALL', 0);
+define( 'FILTER_MATCH_ANY', 1);
+
 # Versions
 define( 'VERSION_ALL', null );
 define( 'VERSION_FUTURE', 0 );
@@ -461,6 +469,7 @@ define( 'TOKEN_EXPIRY_AUTHENTICATED', 5 * 60 );
 define( 'TOKEN_EXPIRY_COLLAPSE', 365 * 24 * 60 * 60 );
 
 # config types
+define( 'CONFIG_TYPE_DEFAULT', 0 );
 define( 'CONFIG_TYPE_INT', 1 );
 define( 'CONFIG_TYPE_STRING', 2 );
 define( 'CONFIG_TYPE_COMPLEX', 3 );
@@ -492,6 +501,7 @@ define( 'LOG_FILTERING',                4 );  # logging for filtering.
 define( 'LOG_AJAX',                     8 );  # logging for AJAX / XmlHttpRequests
 define( 'LOG_LDAP',                     16 );  # logging for ldap
 define( 'LOG_DATABASE',                 32 );  # logging for ldap
+define( 'LOG_SOAP',                     64 );  # logging for SOAP
 
 # COLUMNS_TARGET_*
 define( 'COLUMNS_TARGET_VIEW_PAGE', 1 );

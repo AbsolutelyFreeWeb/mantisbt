@@ -51,7 +51,7 @@
  * @package CoreAPI
  * @subpackage HTMLAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  * @uses lang_api.php
  */
@@ -463,17 +463,14 @@ function html_top_banner() {
 	if( !is_blank( $t_page ) && file_exists( $t_page ) && !is_dir( $t_page ) ) {
 		include( $t_page );
 	} else if( $t_show_logo ) {
-		if( is_page_name( 'login_page' ) ) {
-			$t_align = 'center';
-		} else {
-			$t_align = 'left';
-		}
+		$t_align = should_center_logo() ? 'center' : 'left';
 
 		echo '<div align="', $t_align, '">';
 		if( $t_show_url ) {
 			echo '<a href="', config_get( 'logo_url' ), '">';
 		}
-		echo '<img border="0" alt="Mantis Bug Tracker" src="' . helper_mantis_url( config_get( 'logo_image' ) ) . '" />';
+		$t_alternate_text = string_html_specialchars( config_get( 'window_title' ) );
+		echo '<img border="0" alt="', $t_alternate_text, '" src="' . helper_mantis_url( $t_logo_image ) . '" />';
 		if( $t_show_url ) {
 			echo '</a>';
 		}
@@ -518,11 +515,11 @@ function html_login_info() {
 	echo "<span class=\"italic\">$t_now</span>";
 	echo '</td>';
 	echo '<td class="login-info-right">';
-	$t_show_project_selector = true;
-	if( count( current_user_get_accessible_projects() ) == 1 ) {
 
-		// >1
-		$t_project_ids = current_user_get_accessible_projects();
+	# Project Selector hidden if only one project visisble to user
+	$t_show_project_selector = true;
+	$t_project_ids = current_user_get_accessible_projects();
+	if( count( $t_project_ids ) == 1 ) {
 		$t_project_id = (int) $t_project_ids[0];
 		if( count( current_user_get_accessible_subprojects( $t_project_id ) ) == 0 ) {
 			$t_show_project_selector = false;
@@ -547,7 +544,21 @@ function html_login_info() {
 		}
 		echo '<input type="submit" class="button-small" value="' . lang_get( 'switch' ) . '" />';
 		echo '</form>';
+	} else {
+		# User has only one project, set it as both current and default
+		if( ALL_PROJECTS == helper_get_current_project() ) {
+			helper_set_current_project( $t_project_id );
+
+			if ( !current_user_is_protected() ) {
+				current_user_set_default_project( $t_project_id );
+			}
+
+			# Force reload of current page
+			$t_redirect_url = str_replace( config_get( 'short_path' ), '', $_SERVER['REQUEST_URI'] );
+			html_meta_redirect( $t_redirect_url, 0, false );
+		}
 	}
+
 	if( OFF != config_get( 'rss_enabled' ) ) {
 
 		# Link to RSS issues feed for the selected project, including authentication details.
@@ -598,9 +609,15 @@ function html_footer( $p_file = null ) {
 	echo '<table border="0" width="100%" cellspacing="0" cellpadding="0"><tr valign="top"><td>';
 	if( ON == config_get( 'show_version' ) ) {
 		$t_version_suffix = config_get_global( 'version_suffix' );
-		echo "\t", '<span class="timer"><a href="http://www.mantisbt.org/" title="Free Web Based Bug Tracker">MantisBT ', MANTIS_VERSION, ( $t_version_suffix ? " $t_version_suffix" : '' ), '</a>', '[<a href="http://www.mantisbt.org/"  title="Free Web Based Bug Tracker" target="_blank">^</a>]</span>', "\n";
+		$t_mantis_version = MANTIS_VERSION . ( $t_version_suffix ? " $t_version_suffix" : '' );
+		$t_mantis_href = '<a href="http://www.mantisbt.org/" title="Free Web-Based Bug Tracker"';
+		echo
+			"\t", '<span class="timer">',
+			"<a $t_mantis_href>MantisBT $t_mantis_version</a> ",
+			"[<a $t_mantis_href ", 'target="_blank">^</a>]',
+			"</span>\n";
 	}
-	echo "\t", '<address>Copyright &copy; 2000 - 2011 MantisBT Group</address>', "\n";
+	echo "\t<address>Copyright &copy; 2000 - ", date( 'Y' ), " MantisBT Team</address>\n";
 
 	# only display webmaster email is current user is not the anonymous user
 	if( !is_page_name( 'login_page.php' ) && auth_is_user_authenticated() && !current_user_is_anonymous() ) {
@@ -659,9 +676,16 @@ function html_footer( $p_file = null ) {
 		}
 	}
 
-	echo '</td><td>', "\n\t", '<div align="right">';
-	echo '<a href="http://www.mantisbt.org" title="Free Web Based Bug Tracker"><img src="' . helper_mantis_url( 'images/mantis_logo_button.gif' ) . '" width="88" height="35" alt="Powered by Mantis Bugtracker" border="0" /></a>';
-	echo '</div>', "\n", '</td></tr></table>', "\n";
+	echo '</td><td>', "\n\t";
+
+	# We don't have a button anymore, so for now we will only show the resized version of the logo when not on login page.
+	if ( !is_page_name( 'login_page' ) ) {
+		echo '<div align="right">';
+		echo '<a href="http://www.mantisbt.org" title="Free Web Based Bug Tracker"><img src="' . helper_mantis_url( 'images/mantis_logo.png' ) . '" width="145" height="50" alt="Powered by Mantis Bugtracker" border="0" /></a>';
+		echo '</div>', "\n";
+	}
+
+	echo '</td></tr></table>', "\n";
 }
 
 /**
@@ -1235,7 +1259,7 @@ function html_status_legend() {
 	# draw the status bar
 	$width = (int)( 100 / count( $t_status_array ) );
 	foreach( $t_status_array as $t_status => $t_name ) {
-		$t_val = $t_status_names[$t_status];
+		$t_val = isset( $t_status_names[$t_status] ) ? $t_status_names[$t_status] : $t_status_array[$t_status];
 		$t_color = get_status_color( $t_status );
 
 		echo "<td class=\"small-caption\" width=\"$width%\" bgcolor=\"$t_color\">$t_val</td>";
@@ -1310,7 +1334,7 @@ function html_status_percentage_legend() {
 /**
  * Print an html button inside a form
  * @param string $p_action
- * @param string $p_buttion_text
+ * @param string $p_button_text
  * @param array $p_fields
  * @param string $p_method
  * @return null
@@ -1362,15 +1386,29 @@ function html_button_bug_update( $p_bug_id ) {
  * This code is similar to print_status_option_list except
  * there is no masking, except for the current state
  *
- * @param int $p_bug_id
+ * @param BugData $p_bug Bug object
  * @return null
  */
-function html_button_bug_change_status( $p_bug_id ) {
-	$t_bug_project_id = bug_get_field( $p_bug_id, 'project_id' );
-	$t_bug_current_state = bug_get_field( $p_bug_id, 'status' );
-	$t_current_access = access_get_project_level( $t_bug_project_id );
+function html_button_bug_change_status( $p_bug ) {
+	$t_current_access = access_get_project_level( $p_bug->project_id );
 
-	$t_enum_list = get_status_option_list( $t_current_access, $t_bug_current_state, false, ( bug_get_field( $p_bug_id, 'reporter_id' ) == auth_get_current_user_id() && ( ON == config_get( 'allow_reporter_close' ) ) ), $t_bug_project_id );
+	# User must have updater access to use the change status button
+	if( !access_has_bug_level( config_get( 'update_bug_threshold' ), $p_bug->id ) ) {
+		return;
+	}
+
+	$t_enum_list = get_status_option_list(
+		$t_current_access,
+		$p_bug->status,
+		false,
+		# Add close if user is bug's reporter, still has rights to report issues
+		# (to prevent users downgraded to viewers from updating issues) and
+		# reporters are allowed to close their own issues
+		(  bug_is_user_reporter( $p_bug->id, auth_get_current_user_id() )
+		&& access_has_bug_level( config_get( 'report_bug_threshold' ), $p_bug->id )
+		&& ON == config_get( 'allow_reporter_close' )
+		),
+		$p_bug->project_id );
 
 	if( count( $t_enum_list ) > 0 ) {
 
@@ -1396,7 +1434,7 @@ function html_button_bug_change_status( $p_bug_id ) {
 		}
 		echo '</select>';
 
-		$t_bug_id = string_attribute( $p_bug_id );
+		$t_bug_id = string_attribute( $p_bug->id );
 		echo "<input type=\"hidden\" name=\"id\" value=\"$t_bug_id\" />\n";
 
 		echo "</form>\n";
@@ -1405,36 +1443,32 @@ function html_button_bug_change_status( $p_bug_id ) {
 
 /**
  * Print Assign To: combo box of possible handlers
- * @param int $p_bug_id
+ * @param BugData $p_bug Bug object
  * @return null
  */
-function html_button_bug_assign_to( $p_bug_id ) {
+function html_button_bug_assign_to( $p_bug ) {
 
 	# make sure status is allowed of assign would cause auto-set-status
-	$t_status = bug_get_field( $p_bug_id, 'status' );
-
 	# workflow implementation
-
-	if( ON == config_get( 'auto_set_status_to_assigned' ) && !bug_check_workflow( $t_status, config_get( 'bug_assigned_status' ) ) ) {
-
-		# workflow
+	if(    ON == config_get( 'auto_set_status_to_assigned' )
+		&& !bug_check_workflow( $p_bug->status, config_get( 'bug_assigned_status' ) )
+	) {
 		return;
 	}
 
 	# make sure current user has access to modify bugs.
-	if( !access_has_bug_level( config_get( 'update_bug_assign_threshold', config_get( 'update_bug_threshold' ) ), $p_bug_id ) ) {
+	if( !access_has_bug_level( config_get( 'update_bug_assign_threshold', config_get( 'update_bug_threshold' ) ), $p_bug->id ) ) {
 		return;
 	}
 
-	$t_reporter_id = bug_get_field( $p_bug_id, 'reporter_id' );
-	$t_handler_id = bug_get_field( $p_bug_id, 'handler_id' );
 	$t_current_user_id = auth_get_current_user_id();
-	$t_new_status = ( ON == config_get( 'auto_set_status_to_assigned' ) ) ? config_get( 'bug_assigned_status' ) : $t_status;
-
+	$t_new_status = ( ON == config_get( 'auto_set_status_to_assigned' ) ) ? config_get( 'bug_assigned_status' ) : $p_bug->status;
 	$t_options = array();
 	$t_default_assign_to = null;
 
-	if(( $t_handler_id != $t_current_user_id ) && ( access_has_bug_level( config_get( 'handle_bug_threshold' ), $p_bug_id, $t_current_user_id ) ) ) {
+	if(    ( $p_bug->handler_id != $t_current_user_id )
+		&& access_has_bug_level( config_get( 'handle_bug_threshold' ), $p_bug->id, $t_current_user_id )
+	) {
 		$t_options[] = array(
 			$t_current_user_id,
 			'[' . lang_get( 'myself' ) . ']',
@@ -1442,14 +1476,17 @@ function html_button_bug_assign_to( $p_bug_id ) {
 		$t_default_assign_to = $t_current_user_id;
 	}
 
-	if(( $t_handler_id != $t_reporter_id ) && user_exists( $t_reporter_id ) && ( access_has_bug_level( config_get( 'handle_bug_threshold' ), $p_bug_id, $t_reporter_id ) ) ) {
+	if(    ( $p_bug->handler_id != $p_bug->reporter_id )
+		&& user_exists( $p_bug->reporter_id )
+		&& access_has_bug_level( config_get( 'handle_bug_threshold' ), $p_bug->id, $p_bug->reporter_id )
+	) {
 		$t_options[] = array(
-			$t_reporter_id,
+			$p_bug->reporter_id,
 			'[' . lang_get( 'reporter' ) . ']',
 		);
 
 		if( $t_default_assign_to === null ) {
-			$t_default_assign_to = $t_reporter_id;
+			$t_default_assign_to = $p_bug->reporter_id;
 		}
 	}
 
@@ -1486,17 +1523,15 @@ function html_button_bug_assign_to( $p_bug_id ) {
 	}
 
 	# allow un-assigning if already assigned.
-	if( $t_handler_id != 0 ) {
+	if( $p_bug->handler_id != 0 ) {
 		echo "<option value=\"0\"></option>";
 	}
 
-	$t_project_id = bug_get_field( $p_bug_id, 'project_id' );
-
 	# 0 means currently selected
-	print_assign_to_option_list( 0, $t_project_id );
+	print_assign_to_option_list( 0, $p_bug->project_id );
 	echo "</select>";
 
-	$t_bug_id = string_attribute( $p_bug_id );
+	$t_bug_id = string_attribute( $p_bug->id );
 	echo "<input type=\"hidden\" name=\"bug_id\" value=\"$t_bug_id\" />\n";
 
 	echo "</form>\n";
@@ -1526,17 +1561,36 @@ function html_button_bug_create_child( $p_bug_id ) {
 
 /**
  * Print a button to reopen the given bug
- * @param int $p_bug_id
+ * @param BugData $p_bug Bug object
  * @return null
  */
-function html_button_bug_reopen( $p_bug_id ) {
-	$t_status = bug_get_field( $p_bug_id, 'status' );
-	$t_project = bug_get_field( $p_bug_id, 'project_id' );
-	$t_reopen_status = config_get( 'bug_reopen_status', null, null, $t_project );
+function html_button_bug_reopen( $p_bug ) {
+	if( access_can_reopen_bug( $p_bug ) ) {
+		$t_reopen_status = config_get( 'bug_reopen_status', null, null, $p_bug->project_id );
+		html_button(
+			'bug_change_status_page.php',
+			lang_get( 'reopen_bug_button' ),
+			array( 'id' => $p_bug->id, 'new_status' => $t_reopen_status, 'reopen_flag' => ON )
+		);
+	}
+}
 
-	if( access_has_bug_level( config_get( 'reopen_bug_threshold', null, null, $t_project ), $p_bug_id ) ||
-			(( bug_get_field( $p_bug_id, 'reporter_id' ) == auth_get_current_user_id() ) && ( ON == config_get( 'allow_reporter_reopen', null, null, $t_project ) ) ) ) {
-		html_button( 'bug_change_status_page.php', lang_get( 'reopen_bug_button' ), array( 'id' => $p_bug_id, 'new_status' => $t_reopen_status, 'reopen_flag' => ON ) );
+/**
+ * Print a button to close the given bug
+ * Only if user can close bugs and workflow allows moving them to that status
+ * @param BugData $p_bug Bug object
+ * @return null
+ */
+function html_button_bug_close( $p_bug ) {
+	$t_closed_status = config_get( 'bug_closed_status_threshold', null, null, $p_bug->project_id );
+	if(    access_can_close_bug( $p_bug )
+		&& bug_check_workflow( $p_bug->status, $t_closed_status )
+	) {
+		html_button(
+			'bug_change_status_page.php',
+			lang_get( 'close_bug_button' ),
+			array( 'id' => $p_bug->id, 'new_status' => $t_closed_status )
+		);
 	}
 }
 
@@ -1614,9 +1668,12 @@ function html_button_wiki( $p_bug_id ) {
  */
 function html_buttons_view_bug_page( $p_bug_id ) {
 	$t_resolved = config_get( 'bug_resolved_status_threshold' );
+	$t_closed = config_get( 'bug_closed_status_threshold' );
 	$t_status = bug_get_field( $p_bug_id, 'status' );
 	$t_readonly = bug_is_readonly( $p_bug_id );
 	$t_sticky = config_get( 'set_bug_sticky_threshold' );
+
+	$t_bug = bug_get( $p_bug_id );
 
 	echo '<table><tr class="vcenter">';
 	if( !$t_readonly ) {
@@ -1627,20 +1684,20 @@ function html_buttons_view_bug_page( $p_bug_id ) {
 
 		# ASSIGN button
 		echo '<td class="center">';
-		html_button_bug_assign_to( $p_bug_id );
+		html_button_bug_assign_to( $t_bug );
 		echo '</td>';
 	}
 
 	# Change status button/dropdown
-	if ( !$t_readonly || config_get( 'allow_reporter_close' ) ) {
+	if ( !$t_readonly ) {
 		echo '<td class="center">';
-		html_button_bug_change_status( $p_bug_id );
+		html_button_bug_change_status( $t_bug );
 		echo '</td>';
 	}
 
 	# MONITOR/UNMONITOR button
 	if( !current_user_is_anonymous() ) {
-		echo '<td class=center">';
+		echo '<td class="center">';
 		if( user_is_monitoring_bug( auth_get_current_user_id(), $p_bug_id ) ) {
 			html_button_bug_unmonitor( $p_bug_id );
 		} else {
@@ -1660,21 +1717,23 @@ function html_buttons_view_bug_page( $p_bug_id ) {
 		echo '</td>';
 	}
 
+	# CLONE button
 	if( !$t_readonly ) {
-		# CREATE CHILD button
 		echo '<td class="center">';
 		html_button_bug_create_child( $p_bug_id );
 		echo '</td>';
 	}
 
-	if( $t_resolved <= $t_status ) {
-		# resolved is not the same as readonly
-		echo '<td class="center">';
+	# REOPEN button
+	echo '<td class="center">';
+	html_button_bug_reopen( $t_bug );
+	echo '</td>';
 
-		# REOPEN button
-		html_button_bug_reopen( $p_bug_id );
-		echo '</td>';
-	}
+	# CLOSE button
+	echo '<td class="center">';
+	html_button_bug_close( $t_bug );
+	echo '</td>';
+
 
 	# MOVE button
 	echo '<td class="center">';

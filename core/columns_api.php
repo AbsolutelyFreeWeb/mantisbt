@@ -18,7 +18,7 @@
  * @package CoreAPI
  * @subpackage ColumnsAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -32,7 +32,7 @@
 function columns_filter_disabled( $p_columns ) {
 	$t_columns = array();
 	$t_enable_profiles = ( config_get( 'enable_profiles' ) == ON );
-	
+
 	foreach ( $p_columns as $t_column ) {
 		switch( $t_column ) {
 			case 'os':
@@ -74,8 +74,10 @@ function columns_filter_disabled( $p_columns ) {
 
 /**
  * Get a list of standard columns.
+ * @param bool $p_enabled_columns_only default true, if false returns all columns regardless of config settings
+ * @return array of column names
  */
-function columns_get_standard() {
+function columns_get_standard( $p_enabled_columns_only = true ) {
 	$t_reflection = new ReflectionClass('BugData');
 	$t_columns = $t_reflection->getDefaultProperties();
 
@@ -85,21 +87,21 @@ function columns_get_standard() {
 	# Overdue icon column (icons appears if an issue is beyond due_date)
 	$t_columns['overdue'] = null;
 
-	if( OFF == config_get( 'enable_profiles' ) ) {
+	if( $p_enabled_columns_only && OFF == config_get( 'enable_profiles' ) ) {
 		unset( $t_columns['os'] );
 		unset( $t_columns['os_build'] );
 		unset( $t_columns['platform'] );
 	}
 
-	if( config_get( 'enable_eta' ) == OFF ) {
+	if( $p_enabled_columns_only && config_get( 'enable_eta' ) == OFF ) {
 		unset( $t_columns['eta'] );
 	}
-	
-	if( config_get( 'enable_projection' ) == OFF ) { 
+
+	if( $p_enabled_columns_only && config_get( 'enable_projection' ) == OFF ) {
 		unset( $t_columns['projection'] );
 	}
-	
-	if( config_get( 'enable_product_build' ) == OFF ) {
+
+	if( $p_enabled_columns_only && config_get( 'enable_product_build' ) == OFF ) {
 		unset( $t_columns['build'] );
 	}
 
@@ -109,7 +111,7 @@ function columns_get_standard() {
 	unset( $t_columns['sticky'] );
 	unset( $t_columns['loading'] );
 
-	return array_keys($t_columns);
+	return array_keys( $t_columns );
 }
 
 /**
@@ -140,6 +142,15 @@ function columns_get_plugin_columns() {
 	}
 
 	return $s_column_array;
+}
+
+/**
+ * Returns true if the specified $p_column is a plugin column.
+ * @param string $p_column A column name.
+ */
+function column_is_plugin_column( $p_column ) {
+	$t_plugin_columns = columns_get_plugin_columns();
+	return isset( $t_plugin_columns[ $p_column ] );
 }
 
 /**
@@ -931,7 +942,7 @@ function print_column_edit( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE
 function print_column_priority( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
 	echo '<td>';
 	if( ON == config_get( 'show_priority_text' ) ) {
-		print_formatted_priority_string( $p_bug->status, $p_bug->priority );
+		print_formatted_priority_string( $p_bug );
 	} else {
 		print_status_icon( $p_bug->priority );
 	}
@@ -1016,8 +1027,6 @@ function print_column_attachment_count( $p_bug, $p_columns_target = COLUMNS_TARG
 	global $t_icon_path;
 
 	# Check for attachments
-	# TODO: factor in the allow_view_own_attachments configuration option
-	# instead of just using a global check.
 	$t_attachment_count = 0;
 	if( file_can_view_bug_attachments( $p_bug->id, null ) ) {
 		$t_attachment_count = file_bug_attachment_count( $p_bug->id );
@@ -1028,12 +1037,7 @@ function print_column_attachment_count( $p_bug, $p_columns_target = COLUMNS_TARG
 	if ( $t_attachment_count > 0 ) {
 		$t_href = string_get_bug_view_url( $p_bug->id ) . '#attachments';
 		$t_href_title = sprintf( lang_get( 'view_attachments_for_issue' ), $t_attachment_count, $p_bug->id );
-		if ( config_get( 'show_attachment_indicator' ) ) {
-			$t_alt_text = $t_attachment_count . lang_get( 'word_separator' ) . lang_get( 'attachments' );
-			echo "<a href=\"$t_href\" title=\"$t_href_title\"><img src=\"${t_icon_path}attachment.png\" alt=\"$t_alt_text\" title=\"$t_alt_text\" /></a>";
-		} else {
-			echo "<a href=\"$t_href\" title=\"$t_href_title\">$t_attachment_count</a>";
-		}
+		echo "<a href=\"$t_href\" title=\"$t_href_title\">$t_attachment_count</a>";
 	} else {
 		echo ' &#160; ';
 	}
@@ -1077,7 +1081,7 @@ function print_column_category_id( $p_bug, $p_columns_target = COLUMNS_TARGET_VI
  */
 function print_column_severity( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
 	echo '<td class="center">';
-	print_formatted_severity_string( $p_bug->status, $p_bug->severity );
+	print_formatted_severity_string( $p_bug );
 	echo '</td>';
 }
 
@@ -1089,7 +1093,7 @@ function print_column_severity( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_
  * @access public
  */
 function print_column_eta( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
-	echo '<td class="center">', get_enum_element( 'eta', $p_bug->eta ), '</td>';
+	echo '<td class="center">', get_enum_element( 'eta', $p_bug->eta, auth_get_current_user_id(), $p_bug->project_id ), '</td>';
 }
 
 /**
@@ -1100,7 +1104,7 @@ function print_column_eta( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE 
  * @access public
  */
 function print_column_projection( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
-	echo '<td class="center">', get_enum_element( 'projection', $p_bug->projection ), '</td>';
+	echo '<td class="center">', get_enum_element( 'projection', $p_bug->projection, auth_get_current_user_id(), $p_bug->project_id ), '</td>';
 }
 
 /**
@@ -1111,7 +1115,7 @@ function print_column_projection( $p_bug, $p_columns_target = COLUMNS_TARGET_VIE
  * @access public
  */
 function print_column_reproducibility( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
-	echo '<td class="center">', get_enum_element( 'reproducibility', $p_bug->reproducibility ), '</td>';
+	echo '<td class="center">', get_enum_element( 'reproducibility', $p_bug->reproducibility, auth_get_current_user_id(), $p_bug->project_id ), '</td>';
 }
 
 /**
@@ -1122,7 +1126,9 @@ function print_column_reproducibility( $p_bug, $p_columns_target = COLUMNS_TARGE
  * @access public
  */
 function print_column_resolution( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
-	echo '<td class="center">', get_enum_element( 'resolution', $p_bug->resolution ), '</td>';
+	echo '<td class="center">',
+		get_enum_element( 'resolution', $p_bug->resolution, auth_get_current_user_id(), $p_bug->project_id ),
+		'</td>';
 }
 
 /**
@@ -1134,7 +1140,10 @@ function print_column_resolution( $p_bug, $p_columns_target = COLUMNS_TARGET_VIE
  */
 function print_column_status( $p_bug, $p_columns_target = COLUMNS_TARGET_VIEW_PAGE ) {
 	echo '<td class="center">';
-	printf( '<span class="issue-status" title="%s">%s</span>', get_enum_element( 'resolution', $p_bug->resolution ), get_enum_element( 'status', $p_bug->status ) );
+	printf( '<span class="issue-status" title="%s">%s</span>',
+		get_enum_element( 'resolution', $p_bug->resolution, auth_get_current_user_id(), $p_bug->project_id ),
+		get_enum_element( 'status', $p_bug->status, auth_get_current_user_id(), $p_bug->project_id )
+	);
 
 	# print username instead of status
 	if(( ON == config_get( 'show_assigned_names' ) ) && ( $p_bug->handler_id > 0 ) && ( access_has_project_level( config_get( 'view_handler_threshold' ), $p_bug->project_id ) ) ) {

@@ -18,7 +18,7 @@
  * @package CoreAPI
  * @subpackage HistoryAPI
  * @copyright Copyright (C) 2000 - 2002  Kenzaburo Ito - kenito@300baud.org
- * @copyright Copyright (C) 2002 - 2011  MantisBT Team - mantisbt-dev@lists.sourceforge.net
+ * @copyright Copyright (C) 2002 - 2013  MantisBT Team - mantisbt-dev@lists.sourceforge.net
  * @link http://www.mantisbt.org
  */
 
@@ -172,9 +172,12 @@ function history_get_raw_events_array( $p_bug_id, $p_user_id = null ) {
 
 		if ( $v_type == NORMAL_TYPE ) {
 			if ( !in_array( $v_field_name, $t_standard_fields ) ) {
+				# check that the item should be visible to the user
 
-				// check that the item should be visible to the user
-				// custom fields - we are passing 32 here to notify the API that the custom field name is truncated by the history column from 64 to 32 characters.
+				# We are passing 32 here to notify the custom field API
+				# that legacy history entries for field names longer than
+				# 32 chars created when the db column was of that size were
+				# truncated (no longer the case since 1.1.0a4, see #8002)
 				$t_field_id = custom_field_get_id_from_name( $v_field_name, 32 );
 				if( false !== $t_field_id && !custom_field_has_read_access( $t_field_id, $p_bug_id, $t_user_id ) ) {
 					continue;
@@ -516,12 +519,10 @@ function history_localize_item( $p_field_name, $p_type, $p_old_value, $p_new_val
 					}
 					break;
 				case BUG_CLONED_TO:
-					$t_note = lang_get( 'bug_cloned_to' );
-					$t_change = bug_format_id( $p_new_value );
+					$t_note = lang_get( 'bug_cloned_to' ) . ': ' . bug_format_id( $p_new_value );
 					break;
 				case BUG_CREATED_FROM:
-					$t_note = lang_get( 'bug_created_from' );
-					$t_change = bug_format_id( $p_new_value );
+					$t_note = lang_get( 'bug_created_from' ) . ': ' . bug_format_id( $p_new_value );
 					break;
 				case CHECKIN:
 					$t_note = lang_get( 'checkin' );
