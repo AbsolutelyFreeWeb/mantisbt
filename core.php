@@ -87,7 +87,9 @@ $g_core_path = $t_core_path;
 /*
  * Set include paths
  */
-define ( 'BASE_PATH' , realpath( dirname(__FILE__) ) );
+$thisfolder = realpath( dirname(__FILE__) );
+if ($thisfolder == '') {$thisfolder = dirname(__FILE__);}; 
+define ( 'BASE_PATH' , $thisfolder );
 $mantisLibrary = BASE_PATH . DIRECTORY_SEPARATOR . 'library';
 $mantisCore = $g_core_path;
 
@@ -107,9 +109,9 @@ set_include_path( implode( PATH_SEPARATOR, $path ) );
  */
 unset($mantisRoot, $mantisLibrary, $mantisCore, $path);
 
-# load UTF8-capable string functions
-require_once( 'utf8/utf8.php' );
-require_once( UTF8 . '/str_pad.php' );
+# load UTF8-capable string functions - anton comments these out
+ require_once( 'library/' . 'utf8/utf8.php' );
+ require_once( UTF8 . DIRECTORY_SEPARATOR . 'str_pad.php' );
 
 # Include compatibility file before anything else
 require_once( 'php_api.php' );

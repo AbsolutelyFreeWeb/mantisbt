@@ -28,6 +28,9 @@
 	require_once( 'core.php' );
 
 	require_once( 'file_api.php' );
+	
+	//anton
+	set_time_limit(0);
 
 	$f_bug_id	= gpc_get_int( 'bug_id', -1 );
 	$f_file		= gpc_get_file( 'file', -1 );

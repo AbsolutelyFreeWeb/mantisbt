@@ -32,7 +32,7 @@
 /**
  * requires adodb library
  */
- require_once( 'adodb' . DIRECTORY_SEPARATOR . 'adodb.inc.php' );
+ require_once( 'library' . DIRECTORY_SEPARATOR . 'adodb' . DIRECTORY_SEPARATOR . 'adodb.inc.php' );
 
 /**
  * An array in which all executed queries are stored.  This is used for profiling
